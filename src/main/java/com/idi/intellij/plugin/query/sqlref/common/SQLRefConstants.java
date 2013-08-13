@@ -12,7 +12,8 @@ import javax.swing.*;
  * To change this template use File | Settings | File Templates.
  */
 public interface SQLRefConstants {
-	public Icon SQL_REF_COMPONENT_ICON = IconLoader.findIcon("/icons/sql-xml-round-12.png");
+	public Icon ANNO_REF_COMPONENT_ICON_CLASS = IconLoader.findIcon("/icons/class_icon_16.png");
+	public Icon ANNO_REF_COMPONENT_ICON_XML = IconLoader.findIcon("/icons/xml_icon_red_16.png");
 	public static final String SQL_REF_ANNOTATION_FQN = "com.idi.framework";
 	public static final String SQL_REF_ANNOTATION_VALUE = "refId";
 	public static final String SQL_REF_NAME = "SQLRef";

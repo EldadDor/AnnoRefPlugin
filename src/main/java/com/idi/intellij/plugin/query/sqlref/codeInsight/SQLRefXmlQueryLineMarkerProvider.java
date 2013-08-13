@@ -40,7 +40,7 @@ public class SQLRefXmlQueryLineMarkerProvider implements LineMarkerProvider {
 						}
 						PsiElement[] elements = new PsiElement[sqlRefReferenceForID.getClassAnnoElements().size()];
 						sqlRefReferenceForID.getClassAnnoElements().toArray(elements);
-						return SQLRefIdLineMarkerInfo.create(element, elements, SQLRefConstants.SQL_REF_COMPONENT_ICON, null);
+						return SQLRefIdLineMarkerInfo.create(element, elements, SQLRefConstants.ANNO_REF_COMPONENT_ICON_XML, null);
 					} else {
 						return null;
 					}

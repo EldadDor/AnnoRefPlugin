@@ -52,7 +52,7 @@ public class SQLRefClassLineMarkerProvider implements LineMarkerProvider {
 					}
 					PsiElement[] elements = new PsiElement[sqlRefReferenceForID.getXmlQueryElements().size()];
 					sqlRefReferenceForID.getXmlQueryElements().toArray(elements);
-					return SQLRefIdLineMarkerInfo.create(element, elements, SQLRefConstants.SQL_REF_COMPONENT_ICON, null);
+					return SQLRefIdLineMarkerInfo.create(element, elements, SQLRefConstants.ANNO_REF_COMPONENT_ICON_CLASS, null);
 				}
 			}
 		}
@@ -82,7 +82,7 @@ public class SQLRefClassLineMarkerProvider implements LineMarkerProvider {
 						if (annoElement != null) {
 							ClassReferenceCache.getInstance(project).addClassReferenceToCache(annoElement.getContainingFile().getVirtualFile(), cleanedAnno, annoElement);
 							for (final String xmlFileName : ReferenceCollectionManager.getInstance(project).getQueriesIdValue().keySet()) {
-//								return SQLRefIdLineMarkerInfo.create(element, sqlRef.getPsiElementsArray(), SQLRefConstants.SQL_REF_COMPONENT_ICON, null);
+//								return SQLRefIdLineMarkerInfo.create(element, sqlRef.getPsiElementsArray(), SQLRefConstants.ANNO_REF_COMPONENT_ICON_CLASS, null);
 
 							}
 						}
