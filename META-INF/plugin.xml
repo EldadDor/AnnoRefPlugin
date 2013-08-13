@@ -1,0 +1,135 @@
+<idea-plugin version="2">
+	<name>SQLRef Usage</name>
+	<description>
+		<![CDATA[
+      Find the SQLRef id and usage in
+      The XML File and Corresponding class file
+      ]]></description>
+	<version>3.0.1</version>
+	<vendor>EldadDor-IDI</vendor>
+	<idea-version since-build="8000"/>
+
+
+	<extensions defaultExtensionNs="com.intellij">
+		<errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
+		<projectService serviceInterface="com.idi.intellij.plugin.query.sqlref.component.SQLRefFileEditorListener"
+		                serviceImplementation="com.idi.intellij.plugin.query.sqlref.component.SQLRefFileEditorListener"/>
+		<projectService serviceInterface="com.idi.intellij.plugin.query.sqlref.component.SQLRefFileSystemListener"
+		                serviceImplementation="com.idi.intellij.plugin.query.sqlref.component.SQLRefFileSystemListener"/>
+		<!--<projectService serviceInterface="com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor"
+		                serviceImplementation="com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor"/>-->
+		<codeInsight.lineMarkerProvider language="XML"
+		                                implementationClass="com.idi.intellij.plugin.query.sqlref.codeInsight.SQLRefXmlQueryLineMarkerProvider"
+		                                order="last"/>
+		<codeInsight.lineMarkerProvider language="JAVA"
+		                                implementationClass="com.idi.intellij.plugin.query.sqlref.codeInsight.SQLRefClassLineMarkerProvider"
+		                                order="last"/>
+		<!--<applicationService serviceInterface="com.idi.intellij.plugin.query.sqlref.component.SQLRefMessageBusAccessor"
+							  serviceImplementation="com.idi.intellij.plugin.query.sqlref.component.SQLRefMessageBusAccessor"/>-->
+		<!--<codeInsight.lineMarkerProvider language="XML" implementationClass="com.idi.intellij.plugin.query.sqlref.codeInsight.SQLRefXmlQueryLineMarkerProviderder"/>-->
+		<projectConfigurable instance="com.idi.intellij.plugin.query.sqlref.config.SQLRefConfigurationConfig"
+		                     id="SQLRefConfiguration" displayName="SQLRef" order="last">
+		</projectConfigurable>
+
+		<!--	<localInspection language="JAVA"
+							 implementationClass="com.idi.intellij.plugin.query.sqlref.inspection.SQLRefClassInspection"
+							 shortName="SQLRefCreator" displayName="convert @SQL to @SQLRef" level="INFO"
+							 enabledByDefault="true" groupName="SQLRef conversion" order="last"/>-->
+	</extensions>
+	<application-components>
+		<!--<component>
+			  <implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefFileEditorListener
+			  </implementation-class>
+		  </component>-->
+		<!--<component>
+			  <implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefFileSystemListener
+			  </implementation-class>
+		  </component>
+		  <component>
+			  <implementation-class>com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor</implementation-class>
+		  </component>
+		  <component>
+			  <implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefMessageBusAccessor
+			  </implementation-class>
+		  </component>-->
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefProjectManager
+			</implementation-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefMessageBusAccessor
+			</implementation-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings
+			</implementation-class>
+			<interface-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings</interface-class>
+		</component>
+	</application-components>
+
+	<project-components>
+		<component>
+			<implementation-class>
+				com.idi.intellij.plugin.query.sqlref.component.XmlRepositorySyncComponent
+			</implementation-class>
+		</component>
+		<!--	<component>
+				<implementation-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigurationStorage
+				</implementation-class>
+				<interface-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigurationStorage</interface-class>
+			</component>-->
+		<!--<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings
+			</implementation-class>
+			<interface-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings</interface-class>
+		</component>-->
+		<!--<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.util.SQLRefNamingUtil</implementation-class>
+			<interface-class>com.idi.intellij.plugin.query.sqlref.util.SQLRefNamingUtil</interface-class>
+		</component>-->
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor</implementation-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefBootStrapComponent
+			</implementation-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.index.SQLRefRepository</implementation-class>
+			<interface-class>com.idi.intellij.plugin.query.sqlref.index.SQLRefRepository</interface-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.repo.model.SQLReferencesCollection
+			</implementation-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefProjectModulesCollection
+			</implementation-class>
+		</component>
+	</project-components>
+
+
+	<!--
+		<application-components>
+			<component>
+				<implementation-class>
+				</implementation-class>
+			</component>
+		</application-components>
+	-->
+
+	<actions>
+		<action id="JumpSQLRef" class="com.idi.intellij.plugin.query.sqlref.action.findSqlRefUsageAction"
+		        text="&amp;SQLRef Usage"
+		        description="Go to SQLRef query in xml file or back to Class">
+			<keyboard-shortcut keymap="$default" first-keystroke="ctrl shift b"/>
+			<mouse-shortcut keystroke="control button1 doubleClick" keymap="$default"/>
+			<add-to-group group-id="GoToMenu" anchor="last"/>
+		</action>
+		<!--  <action id="SQLRefNavigationReset" class="com.idi.intellij.plugin.query.sqlref.action.SQLRefNavigationResetAction" text="Reset Project SQLRefs"
+					  description="Reset the Project's SQLRef references in both XML  Class files, it's much like reopening the project">
+				  <add-to-group group-id="ToolsMenu" anchor="last"/>
+			  </action>-->
+	</actions>
+
+</idea-plugin>

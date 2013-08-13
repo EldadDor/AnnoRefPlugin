@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<queries>
+	<query id="mockTestQuery1">
+		<![CDATA[
+				SELECT * FROM M_SRV_PRN
+		 ]]>
+	</query>
+
+	<query id="mockTestQuery2">
+		<![CDATA[
+				SELECT * FROM T_TABLE
+		 ]]>
+	</query>
+</queries>
