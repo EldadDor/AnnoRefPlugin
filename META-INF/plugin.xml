@@ -31,10 +31,15 @@
 		                     id="SQLRefConfiguration" displayName="SQLRef" order="last">
 		</projectConfigurable>
 
-		<!--	<localInspection language="JAVA"
-							 implementationClass="com.idi.intellij.plugin.query.sqlref.inspection.SQLRefClassInspection"
-							 shortName="SQLRefCreator" displayName="convert @SQL to @SQLRef" level="INFO"
-							 enabledByDefault="true" groupName="SQLRef conversion" order="last"/>-->
+		<localInspection language="JAVA"
+		                 implementationClass="com.idi.intellij.plugin.query.sqlref.inspection.SQLRefClassInspection"
+		                 shortName="SQLRefCreator" displayName="convert @SQL to @SQLRef" level="INFO"
+		                 enabledByDefault="true" groupName="SQLRef conversion" order="last"/>
+		<intentionAction>
+			<className>com.idi.intellij.plugin.query.sqlref.Intention.SQLRefConversionIntention</className>
+			<category>Other</category>
+		</intentionAction>
+
 	</extensions>
 	<application-components>
 		<!--<component>

@@ -5,8 +5,12 @@ import com.intellij.codeInspection.*;
 import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.*;
+import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,23 +31,24 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 	@Nullable
 	@Override
 	public String getAlternativeID() {
-		return super.getAlternativeID();    //To change body of overridden methods use File | Settings | File Templates.
+		return super.getAlternativeID();
 	}
 
-	@Override
+/*	@Override
 	public boolean runForWholeFile() {
-		return super.runForWholeFile();    //To change body of overridden methods use File | Settings | File Templates.
-	}
+		return super.runForWholeFile();
+	}*/
 
 	@Nullable
 	@Override
 	public ProblemDescriptor[] checkFile(@NotNull PsiFile file, @NotNull InspectionManager manager, boolean isOnTheFly) {
 		PsiAnnotation psiAnnotation = SQLRefNamingUtil.getPropitiousAnnotationForFile(file);
-		ProblemDescriptor problemDescriptor = manager.createProblemDescriptor(psiAnnotation.getContext(),
-				"SQLRef conversion", new SQLRefQuickFix(), ProblemHighlightType.INFORMATION, true);
-
-		return new ProblemDescriptor[]{problemDescriptor};
-//		return super.checkFile(file, manager, isOnTheFly);    //To change body of overridden methods use File | Settings | File Templates.
+		if (psiAnnotation != null && psiAnnotation.getContext() != null) {
+			ProblemDescriptor problemDescriptor = manager.createProblemDescriptor(psiAnnotation.getContext(),
+					"SQLRef conversion", new SQLRefQuickFix(), ProblemHighlightType.INFORMATION, true);
+			return new ProblemDescriptor[]{problemDescriptor};
+		}
+		return super.checkFile(file, manager, isOnTheFly);    //To change body of overridden methods use File | Settings | File Templates.
 	}
 
 	@NotNull
@@ -76,5 +81,13 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 	@Override
 	public void inspectionStarted(LocalInspectionToolSession session, boolean isOnTheFly) {
 		super.inspectionStarted(session, isOnTheFly);    //To change body of overridden methods use File | Settings | File Templates.
+	}
+
+	@Nullable
+	@Override
+	public JComponent createOptionsPanel() {
+		final JPanel panel = new JPanel(new BorderLayout(2, 2));
+		panel.add(new JBLabel("Just Testing"), BorderLayout.CENTER);
+		return panel;
 	}
 }

@@ -59,15 +59,6 @@ public class SQLRefApplication {
 		return ServiceManager.getService(project, type);
 	}
 
-	/*public <T> T getInstance(Project project, Class<T> type) {
-		return ServiceManager.getService(project, type);
-	}*/
-
-/*
-	public static <T> T getInstance(String project, Class<T> type) {
-		return SQLRefApplication.projectBasePathMap.get(project)
-	}
-*/
 
 	public static PsiFile getPsiFileFromVirtualFile(VirtualFile virtualFile, Project project) {
 		return PsiDocumentManager.getInstance(project).getPsiFile(FileDocumentManager.getInstance().getDocument(virtualFile));

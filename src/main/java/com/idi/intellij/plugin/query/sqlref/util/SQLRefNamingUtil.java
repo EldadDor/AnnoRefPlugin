@@ -163,6 +163,24 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
+
+	public static boolean isPropitiousClassElement(PsiClass psiClass) {
+		if (psiClass.hasModifierProperty(PsiModifier.PUBLIC)) {
+			for (PsiElement psiElement : psiClass.getChildren()) {
+				if (psiElement instanceof PsiModifierList) {
+					for (PsiAnnotation annotation : ((PsiModifierList) psiElement).getAnnotations()) {
+						if (SQLRefConfigSettings.getInstance(psiClass.getProject()).getSqlRefState().
+								SQLREF_ANNOTATION_FQN.equals(annotation.getQualifiedName())) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+
 	private static boolean isSQLRef(@NotNull final String[] psiAnnotation) {
 		return psiAnnotation[psiAnnotation.length - 1].equalsIgnoreCase("SQLRef");
 	}

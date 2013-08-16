@@ -22,17 +22,20 @@ import javax.swing.*;
  * Time: 7:25 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SQLRefConfigurationConfig implements SearchableConfigurable.Parent {
+public class SQLRefConfigurationConfig extends SearchableConfigurable.Parent.Abstract {
 	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefConfigurationConfig.class.getName());
 	public static final String SQL_REF_NAME = "SQLRef";
 	private final CollectionListModel<String> myModel = new CollectionListModel<String>();
 	private final Project project;
 
-	private JCheckBox enableOverrideSQLRefAnnotationCheckBox;
-	private JTextField sqlRefFQN;
+	private JCheckBox enableAnnotationFQNOverrideCheckBox;
+	private JTextField annolRefFQN;
 	private JPanel SQLRefPanel;
 	private JCheckBox autosyncProjectRootCheckBox;
 	private JTextField annoRefAttributeId;
+	private JTextField annoFQN;
+	private JCheckBox enableConversion;
+	private JTextArea textArea1;
 	private SQLRefSettings settings;
 	private SQLRefSettings settingsClone;
 
@@ -60,14 +63,15 @@ public class SQLRefConfigurationConfig implements SearchableConfigurable.Parent 
 	@Nullable
 	@Override
 	public String getHelpTopic() {
-		return null;
+		return getId();
 	}
 
 	@Nullable
 	@Override
 	public JComponent createComponent() {
-		enableOverrideSQLRefAnnotationCheckBox.setSelected(settings.ENABLE_SQLREF_FQN_OVERRIDE);
-		sqlRefFQN.setText(settings.SQLREF_ANNOTATION_FQN);
+		enableAnnotationFQNOverrideCheckBox.setSelected(settings.ENABLE_SQLREF_FQN_OVERRIDE);
+		annolRefFQN.setText(settings.SQLREF_ANNOTATION_FQN);
+		annoFQN.setText(settings.ANNO_ANNOTATION_FQN);
 		annoRefAttributeId.setText(settings.SQLREF_ANNOTATION_ATTRIBUTE_ID);
 		return SQLRefPanel;
 	}
@@ -76,22 +80,25 @@ public class SQLRefConfigurationConfig implements SearchableConfigurable.Parent 
 	public boolean isModified() {
 		boolean isModified = false;
 		logger.info("isModified():");
-		if (!enableOverrideSQLRefAnnotationCheckBox.isSelected()) {
+		if (!enableAnnotationFQNOverrideCheckBox.isSelected()) {
 			logger.info("isModified(): not-selected");
-			sqlRefFQN.setEnabled(false);
+			annolRefFQN.setEnabled(false);
+			annoFQN.setEnabled(false);
 			annoRefAttributeId.setEnabled(false);
 			return isModified;
 		} else {
 			logger.info("isModified(): selected");
-			sqlRefFQN.setEnabled(true);
-			sqlRefFQN.setEditable(true);
+			annolRefFQN.setEnabled(true);
+			annolRefFQN.setEditable(true);
+			annoFQN.setEnabled(true);
+			annoFQN.setEditable(true);
 			annoRefAttributeId.setEnabled(true);
 			annoRefAttributeId.setEditable(true);
-			if (!sqlRefFQN.getText().equalsIgnoreCase(settings.SQLREF_ANNOTATION_FQN)) {
+			if (!annolRefFQN.getText().equalsIgnoreCase(settings.SQLREF_ANNOTATION_FQN)) {
 				logger.info("isModified(): selected & TextChanged");
-				settings.SQLREF_ANNOTATION_FQN = sqlRefFQN.getText().trim();
+				settings.SQLREF_ANNOTATION_FQN = annolRefFQN.getText().trim();
 				settings.SQLREF_ANNOTATION_ATTRIBUTE_ID = annoRefAttributeId.getText().trim();
-				settings.ENABLE_SQLREF_FQN_OVERRIDE = enableOverrideSQLRefAnnotationCheckBox.isSelected();
+				settings.ENABLE_SQLREF_FQN_OVERRIDE = enableAnnotationFQNOverrideCheckBox.isSelected();
 				isModified = true;
 			}
 			if (settings.ENABLE_AUTO_SYNC != autosyncProjectRootCheckBox.isSelected()) {
@@ -110,8 +117,8 @@ public class SQLRefConfigurationConfig implements SearchableConfigurable.Parent 
 
 	@Override
 	public void reset() {
-		enableOverrideSQLRefAnnotationCheckBox.setSelected(settingsClone.ENABLE_SQLREF_FQN_OVERRIDE);
-		sqlRefFQN.setText(settingsClone.SQLREF_ANNOTATION_FQN);
+		enableAnnotationFQNOverrideCheckBox.setSelected(settingsClone.ENABLE_SQLREF_FQN_OVERRIDE);
+		annolRefFQN.setText(settingsClone.SQLREF_ANNOTATION_FQN);
 		annoRefAttributeId.setText(settingsClone.SQLREF_ANNOTATION_ATTRIBUTE_ID);
 		autosyncProjectRootCheckBox.setSelected(settingsClone.ENABLE_AUTO_SYNC);
 	}
@@ -141,9 +148,15 @@ public class SQLRefConfigurationConfig implements SearchableConfigurable.Parent 
 	public boolean isVisible() {
 		return true;
 	}
-
+/*
 	@Override
 	public Configurable[] getConfigurables() {
 		return new SQLRefConfigurationConfig[]{this};
+	}*/
+
+	@Override
+	protected Configurable[] buildConfigurables() {
+		return new SQLRefConfigurationConfig[]{this};
 	}
+
 }
