@@ -1,5 +1,6 @@
 package com.idi.intellij.plugin.query.sqlref.index;
 
+import com.idi.intellij.plugin.query.sqlref.util.SQLRefApplication;
 import com.intellij.openapi.project.Project;
 
 /**
@@ -21,7 +22,9 @@ public class SQLRefIndexProjectRunnable implements Runnable {
 	@Override
 	public void run() {
 		SQLRefXmlFileIndex refXmlFileIndex = new SQLRefXmlFileIndex(project);
+		SQLRefApplication.addScanner();
 		refXmlFileIndex.indexSQLRef();
+		SQLRefApplication.removeScanner();
 	/*	project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter() {
 			public void rootsChanged(ModuleRootEvent event) {
 				event.isCausedByFileTypesChange();

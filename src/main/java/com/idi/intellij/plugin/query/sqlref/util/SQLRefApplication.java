@@ -6,6 +6,7 @@ import com.idi.intellij.plugin.query.sqlref.index.progress.SQLRefProgressIndicat
 import com.idi.intellij.plugin.query.sqlref.index.progress.SQLRefProgressRunnable;
 import com.idi.intellij.plugin.query.sqlref.model.ClassReferenceCache;
 import com.idi.intellij.plugin.query.sqlref.model.ReferenceCollectionManager;
+import com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings;
 import com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefProjectModulesCollection;
 import com.intellij.ProjectTopics;
 import com.intellij.idea.LoggerFactory;
@@ -28,11 +29,13 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.Processor;
+import org.jetbrains.annotations.TestOnly;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,10 +47,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SQLRefApplication {
 	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefApplication.class.getName());
 
-
 	private static final Map<String, ReferenceCollectionManager> sqlRefProjectReferencesManager = new ConcurrentHashMap<String, ReferenceCollectionManager>();
 	private static final Map<String, ClassReferenceCache> classesRefCacheProjectManager = new ConcurrentHashMap<String, ClassReferenceCache>();
-
+	private final static AtomicInteger scannerCounter = new AtomicInteger(0);
 
 	@Deprecated
 	public static <T> T getInstance(Class<T> type) {
@@ -73,39 +75,54 @@ public class SQLRefApplication {
 		return ApplicationManager.getApplication().getComponent(type);
 	}
 
-	public static void initializeManagersForProject(Project project) {
-		createNewClassesRefCacheForProject(project);
-		registerForProjectRootChanges(project);
-		createNewProjectReferenceManager(project);
+	public static boolean isScanning() {
+		return scannerCounter.get() == 0;
 	}
 
-	private static void registerForProjectRootChanges(Project project) {
+	public static void addScanner() {
+		logger.info("addScannerCounter(): scannerCounter=" + scannerCounter.incrementAndGet());
+	}
+
+	public static void removeScanner() {
+		logger.info("removeScanner(): scannerCounter=" + scannerCounter.decrementAndGet());
+	}
+
+	public static void initializeManagersForProject(Project project) {
+		createNewClassesRefCacheForProject(project);
+		if (!isScanning()) {
+			registerForProjectRootChanges(project);
+		}
+		logger.info("initializeManagersForProject(): Finished initialize");
+	}
+
+	private static void registerForProjectRootChanges(final Project project) {
 		project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter() {
 			public void rootsChanged(ModuleRootEvent event) {
-				logger.info("registerForProjectRootChanges()_rootsChanged(): event=" + event.isCausedByFileTypesChange());
-				Project project = (Project) event.getSource();
-				Set<Module> moduleList = getModules(project);
-				SQLRefProjectModulesCollection modulesRepo = ServiceManager.getService(project, SQLRefProjectModulesCollection.class);
-				Pair<Set<Module>, Set<Module>> differentiate = modulesRepo.differentiate(moduleList);
-
-				final SQLRefProgressIndicator sqlRefProgressIndicator = new SQLRefProgressIndicator(project, "RexIndexing SQLRef usages...",
-						PerformInBackgroundOption.DEAF, "Cancel SQLRef Indexing", "", true);
-
-
-				if (ApplicationManager.getApplication().isDispatchThread()) {
-					SQLRefProgressRunnable process = new SQLRefProgressRunnable(project, differentiate, new ProgressChangedListener() {
-						@Override
-						public void changeMade(boolean isChanged) {
-							if (isChanged) {
-								sqlRefProgressIndicator.setFraction(sqlRefProgressIndicator.getFraction() + 0.05d);
-								logger.info("changeMade(): currentFraction()= " + sqlRefProgressIndicator.getFraction());
+				if (SQLRefConfigSettings.getInstance(project).getSqlRefState().ENABLE_AUTO_SYNC) {
+					logger.info("registerForProjectRootChanges()_rootsChanged(): event=" + event.isCausedByFileTypesChange());
+					Project project = (Project) event.getSource();
+					Set<Module> moduleList = getModules(project);
+					SQLRefProjectModulesCollection modulesRepo = ServiceManager.getService(project, SQLRefProjectModulesCollection.class);
+					Pair<Set<Module>, Set<Module>> differentiate = modulesRepo.differentiate(moduleList);
+					final SQLRefProgressIndicator sqlRefProgressIndicator = new SQLRefProgressIndicator(project, AnnoRefBundle.message("annoRef.progress.reindex"),
+							PerformInBackgroundOption.DEAF, AnnoRefBundle.message("annoRef.progress.reindex.cancel"), "", true);
+					if (ApplicationManager.getApplication().isDispatchThread()) {
+						SQLRefProgressRunnable process = new SQLRefProgressRunnable(project, differentiate, new ProgressChangedListener() {
+							@Override
+							public void changeMade(boolean isChanged) {
+								if (isChanged) {
+									sqlRefProgressIndicator.setFraction(sqlRefProgressIndicator.getFraction() + 0.05d);
+									if (logger.isDebugEnabled()) {
+										logger.debug("changeMade(): currentFraction()= " + sqlRefProgressIndicator.getFraction());
+									}
+								}
 							}
-						}
-					});
-					ProgressManager.getInstance().runProcess(process, sqlRefProgressIndicator);
-					sqlRefProgressIndicator.setFraction(1);
+						});
+						ProgressManager.getInstance().runProcess(process, sqlRefProgressIndicator);
+						sqlRefProgressIndicator.setFraction(1);
+					}
 				}
-//				moduleEnumeratorInfo(project, moduleList);
+				logger.info("registerForProjectRootChanges(): Auto_Sync not enabled");
 			}
 
 			private Set<Module> getModules(Project project) {
@@ -117,6 +134,8 @@ public class SQLRefApplication {
 		});
 	}
 
+
+	@TestOnly
 	private static void moduleEnumeratorInfo(Project project, Set<Module> moduleList) {
 		ModulesOrderEnumerator orderEnumerator = (ModulesOrderEnumerator) ProjectRootManager.getInstance(project).orderEntries(moduleList);
 		orderEnumerator.processRootModules(new Processor<Module>() {
@@ -159,12 +178,6 @@ public class SQLRefApplication {
 		return classesRefCacheProjectManager.get(basePath);
 	}
 
-	private static void createNewProjectReferenceManager(Project project) {
-		String basePath = project.getBasePath();
-		logger.info("createNewProjectReferenceManager(): BasePath=" + basePath);
-		sqlRefProjectReferencesManager.put(basePath, new ReferenceCollectionManager());
-	}
-
 	public static ReferenceCollectionManager getCurrentProjectReferenceCollectionManager(Project project) {
 		String basePath = project.getBasePath();
 		logger.info("getCurrentProjectReferenceCollectionManager(): BasePath=" + basePath);
@@ -175,14 +188,4 @@ public class SQLRefApplication {
 		sqlRefProjectReferencesManager.remove(project.getBasePath());
 		classesRefCacheProjectManager.remove(project.getBasePath());
 	}
-
-	/*public static Project getFilesCorrespondingProject(String filePath) {
-		Map<String, Project> projectCacheHolder = ApplicationManager.getApplication().getComponent(SQLRefProjectManager.class).getProjectCacheHolder();
-		for (final String projectKey : projectCacheHolder.keySet()) {
-			if (FileUtil.startsWith(filePath, projectKey)) {
-				return projectCacheHolder.get(projectKey);
-			}
-		}
-		return null;
-	}*/
 }

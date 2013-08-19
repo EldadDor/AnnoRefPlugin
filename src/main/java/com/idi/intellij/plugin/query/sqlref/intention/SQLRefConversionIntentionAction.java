@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
  * Time: 11:35 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SQLRefConversionIntention extends BaseIntentionAction {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefConversionIntention.class.getName());
+public class SQLRefConversionIntentionAction extends BaseIntentionAction {
+	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefConversionIntentionAction.class.getName());
 
 	@NotNull
 	@Override
@@ -49,4 +49,6 @@ public class SQLRefConversionIntention extends BaseIntentionAction {
 	public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
 		logger.info("Invoke():");
 	}
+
+
 }

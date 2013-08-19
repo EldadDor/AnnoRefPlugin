@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 		storages = {
 				@Storage(
 						id = "other",
-						file = StoragePathMacros.APP_CONFIG + "/other.xml", scheme = StorageScheme.DIRECTORY_BASED
+						file = StoragePathMacros.APP_CONFIG + "/SQLRefConfig.xml", scheme = StorageScheme.DIRECTORY_BASED
 				)}
 )
 public class SQLRefConfigSettings implements PersistentStateComponent<SQLRefSettings>, ApplicationComponent {

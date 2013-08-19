@@ -35,7 +35,7 @@ public class SQLRefConfigurationConfig extends SearchableConfigurable.Parent.Abs
 	private JTextField annoRefAttributeId;
 	private JTextField annoFQN;
 	private JCheckBox enableConversion;
-	private JTextArea textArea1;
+	private JTextArea xmlSchemaTextArea;
 	private SQLRefSettings settings;
 	private SQLRefSettings settingsClone;
 
@@ -70,6 +70,7 @@ public class SQLRefConfigurationConfig extends SearchableConfigurable.Parent.Abs
 	@Override
 	public JComponent createComponent() {
 		enableAnnotationFQNOverrideCheckBox.setSelected(settings.ENABLE_SQLREF_FQN_OVERRIDE);
+		autosyncProjectRootCheckBox.setSelected(settings.ENABLE_AUTO_SYNC);
 		annolRefFQN.setText(settings.SQLREF_ANNOTATION_FQN);
 		annoFQN.setText(settings.ANNO_ANNOTATION_FQN);
 		annoRefAttributeId.setText(settings.SQLREF_ANNOTATION_ATTRIBUTE_ID);

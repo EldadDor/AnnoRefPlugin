@@ -1,5 +1,6 @@
 package com.idi.intellij.plugin.query.sqlref.inspection;
 
+import com.idi.intellij.plugin.query.sqlref.util.AnnoRefBundle;
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefNamingUtil;
 import com.intellij.codeInspection.*;
 import com.intellij.idea.LoggerFactory;
@@ -42,11 +43,14 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 	@Nullable
 	@Override
 	public ProblemDescriptor[] checkFile(@NotNull PsiFile file, @NotNull InspectionManager manager, boolean isOnTheFly) {
-		PsiAnnotation psiAnnotation = SQLRefNamingUtil.getPropitiousAnnotationForFile(file);
-		if (psiAnnotation != null && psiAnnotation.getContext() != null) {
-			ProblemDescriptor problemDescriptor = manager.createProblemDescriptor(psiAnnotation.getContext(),
-					"SQLRef conversion", new SQLRefQuickFix(), ProblemHighlightType.INFORMATION, true);
-			return new ProblemDescriptor[]{problemDescriptor};
+		if (file instanceof PsiClass) {
+			PsiAnnotation psiAnnotation = SQLRefNamingUtil.getPropitiousClassElementAnnotation((PsiClass) file);
+			if (psiAnnotation != null && psiAnnotation.getContext() != null) {
+				ProblemDescriptor problemDescriptor = manager.createProblemDescriptor(psiAnnotation.getContext(),
+						AnnoRefBundle.message("annoRef.conversion"),
+						new SQLRefQuickFix(), ProblemHighlightType.INFORMATION, true);
+				return new ProblemDescriptor[]{problemDescriptor};
+			}
 		}
 		return super.checkFile(file, manager, isOnTheFly);    //To change body of overridden methods use File | Settings | File Templates.
 	}
@@ -59,7 +63,6 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 		}
 		PsiFile file = session.getFile();
 		logger.info("buildVisitor(): file=" + file.getName());
-		PsiAnnotation psiAnnotation = SQLRefNamingUtil.getPropitiousAnnotationForFile(file);
 		return super.buildVisitor(holder, isOnTheFly, session);    //To change body of overridden methods use File | Settings | File Templates.
 	}
 

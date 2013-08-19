@@ -1,13 +1,12 @@
 package com.idi.intellij.plugin.query.sqlref.component;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.idi.intellij.plugin.query.sqlref.index.SQLRefClassProjectRunnable;
 import com.idi.intellij.plugin.query.sqlref.index.SQLRefIndexProjectRunnable;
-import com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefProjectModulesCollection;
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefApplication;
 import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -32,30 +31,42 @@ public class SQLRefBootStrapComponent implements ProjectComponent {
 	public void projectOpened() {
 		final Project project = ProjectManager.getInstance().getOpenProjects()[ProjectManager.getInstance().getOpenProjects().length - 1];
 		SQLRefIndexProjectRunnable xmlIndexRunnable = new SQLRefIndexProjectRunnable(project);
-		StartupManager.getInstance(project).runWhenProjectIsInitialized(xmlIndexRunnable);
+		StartupManager.getInstance(project).registerPostStartupActivity(xmlIndexRunnable);
 		SQLRefClassProjectRunnable classRunnable = new SQLRefClassProjectRunnable(project);
-		StartupManager.getInstance(project).runWhenProjectIsInitialized(classRunnable);
-		Thread xmlThread = new Thread(xmlIndexRunnable);
-		Thread classThread = new Thread(classRunnable);
-		try {
+		StartupManager.getInstance(project).registerPostStartupActivity(classRunnable);
+	/*	Thread xmlThread = new Thread(xmlIndexRunnable);
+		Thread classThread = new Thread(classRunnable);*/
+		final Stopwatch stopwatch = new Stopwatch();
+		stopwatch.start();
+	/*	try {
 			xmlThread.join();
 			if (logger.isDebugEnabled()) {
 				logger.debug("projectOpened(): xmlRunnable-Finish");
 			}
+			logger.info("STOPWATCH elapsed=" + stopwatch.elapsedMillis());
 			classThread.join();
 			if (logger.isDebugEnabled()) {
 				logger.debug("projectOpened(): classRunnable-Finish");
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
-		SQLRefProjectModulesCollection service = ServiceManager.getService(project, SQLRefProjectModulesCollection.class);
-		SQLRefApplication.initializeManagersForProject(project);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}*/
+		logger.info("STOPWATCH first elapsed=" + stopwatch.elapsedMillis());
+
+		StartupManager.getInstance(project).registerPostStartupActivity(new Runnable() {
+			@Override
+			public void run() {
+				SQLRefApplication.initializeManagersForProject(project);
+				stopwatch.stop();
+				logger.info("STOPWATCH run elapsed=" + stopwatch.elapsedMillis());
+			}
+		});
+
+		logger.info("STOPWATCH last elapsed=" + stopwatch.elapsedMillis());
 	}
 
 	@Override
 	public void projectClosed() {
-		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@Override
@@ -65,7 +76,6 @@ public class SQLRefBootStrapComponent implements ProjectComponent {
 
 	@Override
 	public void disposeComponent() {
-		//To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	@NotNull

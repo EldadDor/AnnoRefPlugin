@@ -38,7 +38,9 @@ public class SQLRefClassLineMarkerProvider implements LineMarkerProvider {
 	@Override
 	public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
 		PsiFile psiFile = element.getContainingFile();
-		log.info("getLineMarkerInfo(): element=" + element);
+		if (log.isDebugEnabled()) {
+			log.info("getLineMarkerInfo(): element=" + element);
+		}
 		Project project = ProjectUtil.guessProjectForFile(psiFile.getVirtualFile());
 		if (element instanceof PsiModifierList) {
 			PsiAnnotation[] annotations = ((PsiModifierList) element).getAnnotations();

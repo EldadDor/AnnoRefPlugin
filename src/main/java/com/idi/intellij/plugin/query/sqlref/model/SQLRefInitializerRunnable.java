@@ -18,6 +18,7 @@ import com.intellij.openapi.vfs.VirtualFile;
  * Time: 12:24:02
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class SQLRefInitializerRunnable implements Runnable {
 
 	private static final Logger LOGGER = Logger.getInstance(SQLRefInitializerRunnable.class.getName());

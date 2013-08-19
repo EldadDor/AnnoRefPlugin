@@ -36,6 +36,7 @@ public class SQLRefClassFileIndex {
 	}
 
 	public void indexSQLRef() {
+		logger.info("indexSQLRef():");
 		Collection<VirtualFile> classFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project));
 		for (final VirtualFile classFile : classFiles) {
 			scanClassFile(classFile, false);
@@ -53,6 +54,7 @@ public class SQLRefClassFileIndex {
 	}
 
 	private void scanClassFile(VirtualFile classFile, boolean remove) {
+		logger.info("scanClassFile():");
 		String classFileName = classFile.getName();
 		final PsiElement[] annoElement = new PsiElement[1];
 		String sqlRefIdInClass = SQLRefNamingUtil.isPropitiousClassFile(SQLRefApplication.getPsiFileFromVirtualFile(classFile, project), project, new ClassVisitorListener() {

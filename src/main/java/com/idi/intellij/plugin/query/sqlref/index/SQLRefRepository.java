@@ -36,6 +36,7 @@ public class SQLRefRepository implements ProjectComponent {
 
 
 	public boolean removeClassFromRepository(ID classID) {
+		logger.info("removeClassFromRepository(): classID=" + classID.toString());
 		if (classRepository.containsKey(classID)) {
 			SQLRefReference sqlRefReference = classRepository.get(classID);
 			if (sqlRefReferenceMap.containsValue(sqlRefReference)) {
@@ -45,9 +46,10 @@ public class SQLRefRepository implements ProjectComponent {
 		return false;
 	}
 
-	public boolean removeXmlFromRepository(ID classID) {
-		if (xmlRepository.containsKey(classID)) {
-			SQLRefReference sqlRefReference = xmlRepository.get(classID);
+	public boolean removeXmlFromRepository(ID xmlID) {
+		logger.info("removeXmlFromRepository(): xmlID=" + xmlID);
+		if (xmlRepository.containsKey(xmlID)) {
+			SQLRefReference sqlRefReference = xmlRepository.get(xmlID);
 			if (sqlRefReferenceMap.containsValue(sqlRefReference)) {
 				return sqlRefReferenceMap.values().remove(sqlRefReference);
 			}

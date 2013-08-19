@@ -5,7 +5,7 @@
       Find the SQLRef id and usage in
       The XML File and Corresponding class file
       ]]></description>
-	<version>3.0.1</version>
+	<version>4.0.0</version>
 	<vendor>EldadDor-IDI</vendor>
 	<idea-version since-build="8000"/>
 
@@ -34,9 +34,9 @@
 		<localInspection language="JAVA"
 		                 implementationClass="com.idi.intellij.plugin.query.sqlref.inspection.SQLRefClassInspection"
 		                 shortName="SQLRefCreator" displayName="convert @SQL to @SQLRef" level="INFO"
-		                 enabledByDefault="true" groupName="SQLRef conversion" order="last"/>
+		                 enabledByDefault="true" groupName="AnnoRef conversion" order="last"/>
 		<intentionAction>
-			<className>com.idi.intellij.plugin.query.sqlref.Intention.SQLRefConversionIntention</className>
+			<className>com.idi.intellij.plugin.query.sqlref.intention.SQLRefConversionIntentionAction</className>
 			<category>Other</category>
 		</intentionAction>
 
