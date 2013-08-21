@@ -28,7 +28,7 @@ import java.util.Collection;
  */
 public class SQLRefXmlFileIndex {
 
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefXmlFileIndex.class.getName());
+	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefXmlFileIndex.class.getName());
 
 
 	private Project project;
@@ -45,6 +45,9 @@ public class SQLRefXmlFileIndex {
 	}
 
 	public void scanModuleXmlFiles(Module module, ProgressChangedListener progressIndicator, boolean remove) {
+		/*if (remove) {
+			ServiceManager.getService(project, SQLRefRepository.class).
+		}*/
 		Collection<VirtualFile> xmlFiles = FileTypeIndex.getFiles(XmlFileType.INSTANCE, GlobalSearchScope.moduleScope(module));
 		for (VirtualFile xmlFile : xmlFiles) {
 			scanXmlFile(xmlFile, remove);
@@ -62,12 +65,12 @@ public class SQLRefXmlFileIndex {
 					ServiceManager.getService(project, SQLRefRepository.class).addXmlFileInformationToRepository(refID, indexKey, xmlFile, xmlAttributeElement);
 				}
 			};
-			if (remove) {
+			SQLRefXmlVisitor.getInstance(project).setXmlVisitorListener(xmlVisitorListener);
+			SQLRefXmlVisitor.getInstance(project).visitFile(SQLRefApplication.getPsiFileFromVirtualFile(xmlFile, project));
+			/*if (remove) {
 				ServiceManager.getService(project, SQLRefRepository.class).removeXmlFromRepository(indexKey);
 			} else {
-				SQLRefXmlVisitor.getInstance(project).setXmlVisitorListener(xmlVisitorListener);
-				SQLRefXmlVisitor.getInstance(project).visitFile(SQLRefApplication.getPsiFileFromVirtualFile(xmlFile, project));
-			}
+			}*/
 		}
 	}
 

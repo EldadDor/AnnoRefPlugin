@@ -21,7 +21,7 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefClassInspection extends LocalInspectionTool {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefClassInspection.class.getName());
+	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefClassInspection.class.getName());
 
 	@NotNull
 	@Override
@@ -43,9 +43,10 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 	@Nullable
 	@Override
 	public ProblemDescriptor[] checkFile(@NotNull PsiFile file, @NotNull InspectionManager manager, boolean isOnTheFly) {
-		if (file instanceof PsiClass) {
-			PsiAnnotation psiAnnotation = SQLRefNamingUtil.getPropitiousClassElementAnnotation((PsiClass) file);
-			if (psiAnnotation != null && psiAnnotation.getContext() != null) {
+		if (file instanceof PsiJavaFile) {
+			logger.info("checkFile(): file=" + file);
+			final PsiAnnotation psiAnnotation = SQLRefNamingUtil.getAnnotationForPropitiousClassFile(file, null);
+			if (psiAnnotation != null) {
 				ProblemDescriptor problemDescriptor = manager.createProblemDescriptor(psiAnnotation.getContext(),
 						AnnoRefBundle.message("annoRef.conversion"),
 						new SQLRefQuickFix(), ProblemHighlightType.INFORMATION, true);

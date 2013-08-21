@@ -28,7 +28,7 @@ public class SQLRefXmlQueryLineMarkerProvider implements LineMarkerProvider {
 	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefXmlQueryLineMarkerProvider.class.getName());
 
 	@Override
-	public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
+	public LineMarkerInfo<PsiElement> getLineMarkerInfo(@NotNull PsiElement element) {
 		try {
 			if (SQLRefNamingUtil.isPropitiousXmlFile(element.getContainingFile())) {
 				if (element instanceof XmlAttributeValue) {

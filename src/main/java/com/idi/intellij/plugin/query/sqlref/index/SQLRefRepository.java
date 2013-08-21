@@ -20,20 +20,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefRepository implements ProjectComponent {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefRepository.class.getName());
-
-//	private List<Map<ID<String, PsiElement>, VirtualFile>> xmlFilesRepository = Lists.newArrayList();
-
-//	private List<Map<ID<String, PsiElement>, VirtualFile>> classFilesRepository = Lists.newArrayList();
+	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefRepository.class.getName());
 
 	private Map<ID, SQLRefReference> xmlRepository = new ConcurrentHashMap<ID, SQLRefReference>();
-
 	private Map<ID, SQLRefReference> classRepository = new ConcurrentHashMap<ID, SQLRefReference>();
-
-//	private Map<String, Pair<ID, ID>> sqlRefIdRepository = new ConcurrentHashMap<String, Pair<ID, ID>>();
-
 	private Map<String, SQLRefReference> sqlRefReferenceMap = new ConcurrentHashMap<String, SQLRefReference>();
 
+
+	public void resetAllProjectOnModulesChange() {
+		logger.info("resetAllProjectOnModulesChange():");
+		xmlRepository.clear();
+		classRepository.clear();
+		sqlRefReferenceMap.clear();
+	}
 
 	public boolean removeClassFromRepository(ID classID) {
 		logger.info("removeClassFromRepository(): classID=" + classID.toString());
@@ -56,7 +55,6 @@ public class SQLRefRepository implements ProjectComponent {
 		}
 		return false;
 	}
-
 
 	public void addXmlFileInformationToRepository(String refID, ID xmlFileID, VirtualFile xmlVF, PsiElement xmlAttribElement) {
 		logger.info("addXmlFileInformationToRepository(): refID=" + refID);
@@ -89,7 +87,6 @@ public class SQLRefRepository implements ProjectComponent {
 			classRepository.put(classFileID, sqlRefReference);
 		}
 	}
-
 
 	public void removeClassAndXmlFilesInformationFromRepository(String refID) {
 		logger.info("removeClassFileInformationFromRepository():");

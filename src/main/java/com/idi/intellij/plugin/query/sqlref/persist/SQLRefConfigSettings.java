@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 				)}
 )
 public class SQLRefConfigSettings implements PersistentStateComponent<SQLRefSettings>, ApplicationComponent {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefConfigSettings.class.getName());
+	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefConfigSettings.class.getName());
 
 	private SQLRefSettings sqlRefState;
 

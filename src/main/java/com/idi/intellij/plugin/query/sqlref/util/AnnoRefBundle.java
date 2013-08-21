@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NonNls;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -17,7 +18,7 @@ public class AnnoRefBundle {
 	private static Reference<ResourceBundle> annoRefBundle;
 
 	@NonNls
-	private static final String BUNDLE = "annoRefBundle";
+	private static final String BUNDLE = "annoRefMessages";
 
 	public static String message(String key, Object... params) {
 		return getBundle().getString(key);
@@ -28,7 +29,7 @@ public class AnnoRefBundle {
 		ResourceBundle bundle = null;
 		if (annoRefBundle != null) bundle = annoRefBundle.get();
 		if (bundle == null) {
-			bundle = ResourceBundle.getBundle(BUNDLE);
+			bundle = ResourceBundle.getBundle(BUNDLE, Locale.ENGLISH);
 			annoRefBundle = new SoftReference<ResourceBundle>(bundle);
 		}
 		return bundle;

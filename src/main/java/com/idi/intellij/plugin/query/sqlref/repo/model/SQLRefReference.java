@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -24,12 +25,18 @@ public class SQLRefReference implements Comparator<String> {
 
 	private final String sqlRefId;
 
+	private Module containerModule;
+
 	private Map<ID, List<VirtualFile>> xmlFiles = Maps.newConcurrentMap();
 	private Map<String, List<VirtualFile>> classFiles = Maps.newConcurrentMap();
 
 	private List<PsiElement> xmlQueryElements = new LinkedList<PsiElement>();
 	private List<PsiElement> classAnnoElements = new LinkedList<PsiElement>();
 
+
+	public Module getContainerModule() {
+		return containerModule;
+	}
 
 	public SQLRefReference(String sqlRefId) {
 		this.sqlRefId = sqlRefId;

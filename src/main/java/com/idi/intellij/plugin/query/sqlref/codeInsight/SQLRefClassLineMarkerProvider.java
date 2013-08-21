@@ -13,10 +13,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiModifierList;
+import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,22 +29,22 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefClassLineMarkerProvider implements LineMarkerProvider {
-	private final static Logger log = LoggerFactory.getInstance().getLoggerInstance(SQLRefClassLineMarkerProvider.class.getName());
+	private static final Logger log = LoggerFactory.getInstance().getLoggerInstance(SQLRefClassLineMarkerProvider.class.getName());
 
 	@Nullable
 	@Override
-	public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
+	public LineMarkerInfo<PsiElement> getLineMarkerInfo(@NotNull PsiElement element) {
 		PsiFile psiFile = element.getContainingFile();
-		if (log.isDebugEnabled()) {
-			log.info("getLineMarkerInfo(): element=" + element);
-		}
+		/*if (log.isDebugEnabled()) {
+			log.debug("getLineMarkerInfo(): element=" + element);
+		}*/
 		Project project = ProjectUtil.guessProjectForFile(psiFile.getVirtualFile());
 		if (element instanceof PsiModifierList) {
-			PsiAnnotation[] annotations = ((PsiModifierList) element).getAnnotations();
+			PsiAnnotation[] annotations = ((PsiAnnotationOwner) element).getAnnotations();
 			for (PsiAnnotation annotation : annotations) {
 				if (SQLRefConfigSettings.getInstance(project).getSqlRefState().SQLREF_ANNOTATION_FQN.equals(annotation.getQualifiedName())) {
 					String cleanedAnnoRef = SQLRefNamingUtil.cleanAnnoRefForName(annotation.getContainingFile(), annotation);
-					log.info("Found annoRef, cleaned=" + cleanedAnnoRef);
+//					log.info("Found annoRef, cleaned=" + cleanedAnnoRef);
 					com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference sqlRefReferenceForID = ServiceManager.getService(psiFile.getProject(), SQLRefRepository.class).getSQLRefReferenceForID(cleanedAnnoRef);
 					if (sqlRefReferenceForID.getXmlQueryElements().isEmpty()) {
 						return null;

@@ -1,12 +1,15 @@
 package com.idi.intellij.plugin.query.sqlref.index.progress;
 
 import com.idi.intellij.plugin.query.sqlref.index.SQLRefClassFileIndex;
+import com.idi.intellij.plugin.query.sqlref.index.SQLRefRepository;
 import com.idi.intellij.plugin.query.sqlref.index.SQLRefXmlFileIndex;
 import com.idi.intellij.plugin.query.sqlref.index.listeners.ProgressChangedListener;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -30,22 +33,32 @@ public class SQLRefProgressRunnable implements Runnable {
 		this.progressListener = progressListener;
 	}
 
+	public SQLRefProgressRunnable(Project project, Set<Module> newModules,ProgressChangedListener progressListener) {
+		this.progressListener = progressListener;
+		this.project = project;
+		this.newModules = newModules;
+	}
 
-	public void startScan(Set<Module> modules, boolean remove) {
+	public SQLRefProgressRunnable(Project project, ProgressChangedListener progressListener) {
+		this.project = project;
+		this.progressListener = progressListener;
+	}
+
+	public void startScan(Collection<Module> modules, boolean remove) {
 		modules.size();
 		progressListener.changeMade(true);
 		scanXmlFiles(modules, remove);
 		scanClassFiles(modules, remove);
 	}
 
-	private void scanClassFiles(Set<Module> modules, boolean remove) {
+	private void scanClassFiles(Iterable<Module> modules, boolean remove) {
 		SQLRefClassFileIndex sqlRefClassFileIndex = new SQLRefClassFileIndex(project);
 		for (Module module : modules) {
-			sqlRefClassFileIndex.scanModuleClasses(module, progressListener, remove);
+			sqlRefClassFileIndex.scanModuleClassFiles(module, progressListener, remove);
 		}
 	}
 
-	private void scanXmlFiles(Set<Module> modules, boolean remove) {
+	private void scanXmlFiles(Iterable<Module> modules, boolean remove) {
 		SQLRefXmlFileIndex refXmlFileIndex = new SQLRefXmlFileIndex(project);
 		for (Module module : modules) {
 			refXmlFileIndex.scanModuleXmlFiles(module, progressListener, remove);
@@ -55,7 +68,11 @@ public class SQLRefProgressRunnable implements Runnable {
 
 	@Override
 	public void run() {
-		startScan(oldModules, true);
-		startScan(newModules, false);
+		ServiceManager.getService(project, SQLRefRepository.class).resetAllProjectOnModulesChange();
+		SQLRefXmlFileIndex refXmlFileIndex = new SQLRefXmlFileIndex(project);
+		SQLRefClassFileIndex sqlRefClassFileIndex = new SQLRefClassFileIndex(project);
+		refXmlFileIndex.indexSQLRef();
+		sqlRefClassFileIndex.indexSQLRef();
+//		startScan(newModules, false);
 	}
 }

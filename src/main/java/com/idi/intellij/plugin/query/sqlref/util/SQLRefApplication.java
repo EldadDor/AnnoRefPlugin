@@ -7,7 +7,6 @@ import com.idi.intellij.plugin.query.sqlref.index.progress.SQLRefProgressRunnabl
 import com.idi.intellij.plugin.query.sqlref.model.ClassReferenceCache;
 import com.idi.intellij.plugin.query.sqlref.model.ReferenceCollectionManager;
 import com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings;
-import com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefProjectModulesCollection;
 import com.intellij.ProjectTopics;
 import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.application.ApplicationManager;
@@ -24,7 +23,6 @@ import com.intellij.openapi.roots.ModuleRootEvent;
 import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.impl.ModulesOrderEnumerator;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
@@ -49,7 +47,7 @@ public class SQLRefApplication {
 
 	private static final Map<String, ReferenceCollectionManager> sqlRefProjectReferencesManager = new ConcurrentHashMap<String, ReferenceCollectionManager>();
 	private static final Map<String, ClassReferenceCache> classesRefCacheProjectManager = new ConcurrentHashMap<String, ClassReferenceCache>();
-	private final static AtomicInteger scannerCounter = new AtomicInteger(0);
+	private static final AtomicInteger scannerCounter = new AtomicInteger(0);
 
 	@Deprecated
 	public static <T> T getInstance(Class<T> type) {
@@ -66,7 +64,6 @@ public class SQLRefApplication {
 		return PsiDocumentManager.getInstance(project).getPsiFile(FileDocumentManager.getInstance().getDocument(virtualFile));
 	}
 
-
 	public static VirtualFile getVirtualFileFromPsiFile(PsiFile psiFile, Project project) {
 		return FileDocumentManager.getInstance().getFile(PsiDocumentManager.getInstance(project).getDocument(psiFile));
 	}
@@ -75,7 +72,7 @@ public class SQLRefApplication {
 		return ApplicationManager.getApplication().getComponent(type);
 	}
 
-	public static boolean isScanning() {
+	public static boolean isNotScanning() {
 		return scannerCounter.get() == 0;
 	}
 
@@ -89,7 +86,7 @@ public class SQLRefApplication {
 
 	public static void initializeManagersForProject(Project project) {
 		createNewClassesRefCacheForProject(project);
-		if (!isScanning()) {
+		if (isNotScanning()) {
 			registerForProjectRootChanges(project);
 		}
 		logger.info("initializeManagersForProject(): Finished initialize");
@@ -97,27 +94,29 @@ public class SQLRefApplication {
 
 	private static void registerForProjectRootChanges(final Project project) {
 		project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter() {
+			@Override
 			public void rootsChanged(ModuleRootEvent event) {
 				if (SQLRefConfigSettings.getInstance(project).getSqlRefState().ENABLE_AUTO_SYNC) {
 					logger.info("registerForProjectRootChanges()_rootsChanged(): event=" + event.isCausedByFileTypesChange());
-					Project project = (Project) event.getSource();
-					Set<Module> moduleList = getModules(project);
-					SQLRefProjectModulesCollection modulesRepo = ServiceManager.getService(project, SQLRefProjectModulesCollection.class);
-					Pair<Set<Module>, Set<Module>> differentiate = modulesRepo.differentiate(moduleList);
+					final Project project = (Project) event.getSource();
+//					Set<Module> moduleList = getModules(project);
+//					SQLRefProjectModulesCollection modulesRepo = ServiceManager.getService(project, SQLRefProjectModulesCollection.class);
+//					Pair<Set<Module>, Set<Module>> differentiate = modulesRepo.differentiate(moduleList);
 					final SQLRefProgressIndicator sqlRefProgressIndicator = new SQLRefProgressIndicator(project, AnnoRefBundle.message("annoRef.progress.reindex"),
 							PerformInBackgroundOption.DEAF, AnnoRefBundle.message("annoRef.progress.reindex.cancel"), "", true);
-					if (ApplicationManager.getApplication().isDispatchThread()) {
-						SQLRefProgressRunnable process = new SQLRefProgressRunnable(project, differentiate, new ProgressChangedListener() {
-							@Override
-							public void changeMade(boolean isChanged) {
-								if (isChanged) {
-									sqlRefProgressIndicator.setFraction(sqlRefProgressIndicator.getFraction() + 0.05d);
-									if (logger.isDebugEnabled()) {
-										logger.debug("changeMade(): currentFraction()= " + sqlRefProgressIndicator.getFraction());
-									}
+//					Runnable process = new SQLRefProgressRunnable(project, differentiate, new ProgressChangedListener() {
+					Runnable process = new SQLRefProgressRunnable(project,  new ProgressChangedListener() {
+						@Override
+						public void changeMade(boolean isChanged) {
+							if (isChanged) {
+								sqlRefProgressIndicator.setFraction(sqlRefProgressIndicator.getFraction() + 0.01d);
+								if (logger.isDebugEnabled()) {
+									logger.debug("changeMade(): currentFraction()= " + sqlRefProgressIndicator.getFraction());
 								}
 							}
-						});
+						}
+					});
+					if (ApplicationManager.getApplication().isDispatchThread()) {
 						ProgressManager.getInstance().runProcess(process, sqlRefProgressIndicator);
 						sqlRefProgressIndicator.setFraction(1);
 					}

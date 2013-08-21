@@ -23,7 +23,7 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefProjectModulesCollection implements ProjectComponent {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefProjectModulesCollection.class.getName());
+	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefProjectModulesCollection.class.getName());
 
 	private Set<Module> projectModules = Sets.newHashSet();
 

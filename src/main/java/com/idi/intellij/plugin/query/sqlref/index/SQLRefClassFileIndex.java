@@ -27,8 +27,7 @@ import java.util.Collection;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefClassFileIndex {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefClassFileIndex.class.getName());
-
+	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefClassFileIndex.class.getName());
 	private Project project;
 
 	public SQLRefClassFileIndex(Project project) {
@@ -39,39 +38,39 @@ public class SQLRefClassFileIndex {
 		logger.info("indexSQLRef():");
 		Collection<VirtualFile> classFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project));
 		for (final VirtualFile classFile : classFiles) {
-			scanClassFile(classFile, false);
+			scanClassFile(classFile);
 		}
 	}
 
-
-	public void scanModuleClasses(Module module, ProgressChangedListener progressIndicator, boolean remove) {
-		Collection<VirtualFile> classFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.moduleScope(module));
+	public void scanModuleClassFiles(Module module, ProgressChangedListener progressIndicator, boolean remove) {
+		Collection<VirtualFile> classFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.projectScope(project));
 		for (VirtualFile classFile : classFiles) {
-			scanClassFile(classFile, remove);
+			scanClassFile(classFile);
 			progressIndicator.changeMade(true);
 
 		}
 	}
 
-	private void scanClassFile(VirtualFile classFile, boolean remove) {
-		logger.info("scanClassFile():");
+	private void scanClassFile(VirtualFile classFile) {
 		String classFileName = classFile.getName();
 		final PsiElement[] annoElement = new PsiElement[1];
-		String sqlRefIdInClass = SQLRefNamingUtil.isPropitiousClassFile(SQLRefApplication.getPsiFileFromVirtualFile(classFile, project), project, new ClassVisitorListener() {
+		String sqlRefIdInClass = SQLRefNamingUtil.isPropitiousClassFile(SQLRefApplication.getPsiFileFromVirtualFile(classFile, project), new ClassVisitorListener() {
 			@Override
 			public void foundValidAnnotation(PsiElement classRef) {
 				annoElement[0] = classRef;
 			}
 		});
-		final ID classFileNameKey = StubIndexKey.createIndexKey(classFileName);
 		if (sqlRefIdInClass != null) {
+			final ID classFileNameKey = StubIndexKey.createIndexKey(classFileName);
+			ServiceManager.getService(project, SQLRefRepository.class).addClassFileInformationToRepository(sqlRefIdInClass, classFileNameKey, classFile, annoElement[0]);
+		}
+
+		/*if (sqlRefIdInClass != null) {
 			if (remove) {
 				ServiceManager.getService(project, SQLRefRepository.class).removeClassFromRepository(classFileNameKey);
 			} else {
-
-				ServiceManager.getService(project, SQLRefRepository.class).addClassFileInformationToRepository(sqlRefIdInClass, classFileNameKey, classFile, annoElement[0]);
 			}
-		}
+		}*/
 	}
 
 
