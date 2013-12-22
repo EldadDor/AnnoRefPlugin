@@ -6,7 +6,6 @@ import com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference;
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefNamingUtil;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
@@ -25,7 +24,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefXmlQueryLineMarkerProvider implements LineMarkerProvider {
-	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefXmlQueryLineMarkerProvider.class.getName());
+	private static final Logger logger = Logger.getInstance(SQLRefXmlQueryLineMarkerProvider.class.getName());
 
 	@Override
 	public LineMarkerInfo<PsiElement> getLineMarkerInfo(@NotNull PsiElement element) {

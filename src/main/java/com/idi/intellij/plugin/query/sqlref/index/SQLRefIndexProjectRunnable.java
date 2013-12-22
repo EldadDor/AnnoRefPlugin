@@ -21,16 +21,12 @@ public class SQLRefIndexProjectRunnable implements Runnable {
 
 	@Override
 	public void run() {
-		SQLRefXmlFileIndex refXmlFileIndex = new SQLRefXmlFileIndex(project);
-		SQLRefApplication.addScanner();
-		refXmlFileIndex.indexSQLRef();
-		SQLRefApplication.removeScanner();
-	/*	project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter() {
-			public void rootsChanged(ModuleRootEvent event) {
-				event.isCausedByFileTypesChange();
-				event.getSource();
-			}
-		});
-		//To change body of implemented methods use File | Settings | File Templates.*/
+		try {
+			SQLRefXmlFileIndex refXmlFileIndex = new SQLRefXmlFileIndex(project);
+			SQLRefApplication.addScanner();
+			refXmlFileIndex.indexSQLRef();
+		} finally {
+			SQLRefApplication.removeScanner();
+		}
 	}
 }

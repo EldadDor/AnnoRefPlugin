@@ -26,7 +26,7 @@ public class SQLRefProjectManager implements ApplicationComponent {
 	private Map<String, Project> projectCacheHolder = new ConcurrentHashMap<String, Project>();
 
 	public void placeProjectToManagedCache(Project project) {
-		projectCacheHolder.put(StringUtils.cleanPath(project.getLocation()), project);
+		projectCacheHolder.put(StringUtils.cleanPath(project.getBasePath()), project);
 	}
 
 	public Project getProjectByLocation(String location) {

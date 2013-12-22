@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Time: 15:19:37
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class SQLRefReference implements Comparator<String> {
 	private static final Logger LOGGER = Logger.getInstance(SQLRefReference.class.getName());
 	@NotNull

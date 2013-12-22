@@ -1,6 +1,5 @@
 package com.idi.intellij.plugin.query.sqlref.persist;
 
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -15,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  * To change this template use File | Settings | File Templates.
  */
 @State(
-		name = "SQLRefSettings",
+		name = "AnnoRefSettings",
 		storages = {
 				@Storage(
 						id = "other",
@@ -23,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 				)}
 )
 public class SQLRefConfigSettings implements PersistentStateComponent<SQLRefSettings>, ApplicationComponent {
-	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefConfigSettings.class.getName());
+	private static final Logger logger = Logger.getInstance(SQLRefConfigSettings.class.getName());
 
 	private SQLRefSettings sqlRefState;
 

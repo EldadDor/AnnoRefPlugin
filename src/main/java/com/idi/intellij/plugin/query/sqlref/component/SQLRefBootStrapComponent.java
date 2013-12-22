@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import com.idi.intellij.plugin.query.sqlref.index.SQLRefClassProjectRunnable;
 import com.idi.intellij.plugin.query.sqlref.index.SQLRefIndexProjectRunnable;
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefApplication;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -24,16 +23,16 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefBootStrapComponent implements ProjectComponent {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefBootStrapComponent.class.getName());
+	private static final Logger logger = Logger.getInstance(SQLRefBootStrapComponent.class.getName());
 	private Set<Module> projectModules = Sets.newHashSet();
 
 	@Override
 	public void projectOpened() {
 		final Project project = ProjectManager.getInstance().getOpenProjects()[ProjectManager.getInstance().getOpenProjects().length - 1];
 		SQLRefIndexProjectRunnable xmlIndexRunnable = new SQLRefIndexProjectRunnable(project);
-		StartupManager.getInstance(project).registerPostStartupActivity(xmlIndexRunnable);
+		StartupManager.getInstance(project).registerStartupActivity(xmlIndexRunnable);
 		SQLRefClassProjectRunnable classRunnable = new SQLRefClassProjectRunnable(project);
-		StartupManager.getInstance(project).registerPostStartupActivity(classRunnable);
+		StartupManager.getInstance(project).registerStartupActivity(classRunnable);
 	/*	Thread xmlThread = new Thread(xmlIndexRunnable);
 		Thread classThread = new Thread(classRunnable);*/
 		final Stopwatch stopwatch = new Stopwatch();

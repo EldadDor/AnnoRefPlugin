@@ -21,6 +21,7 @@ import java.util.*;
  * Time: 15:26:12
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class ReferenceCollectionManager extends AbstractCollection<FileReferenceCollection> {
 	private static final Logger LOGGER = Logger.getInstance(ReferenceCollectionManager.class.getName());
 	@NotNull
@@ -118,7 +119,7 @@ public class ReferenceCollectionManager extends AbstractCollection<FileReference
 
 	private NavigableSet<String> createNewNavigationSetFromGiven(NavigableSet<String> givenSet) {
 		return new TreeSet<String>(givenSet);
-	    /*for (String key : givenSet) {
+		/*for (String key : givenSet) {
 
           }*/
 	}

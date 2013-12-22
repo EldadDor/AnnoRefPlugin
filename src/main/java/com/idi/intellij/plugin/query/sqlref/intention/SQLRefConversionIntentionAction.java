@@ -2,7 +2,6 @@ package com.idi.intellij.plugin.query.sqlref.intention;
 
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefNamingUtil;
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
@@ -22,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefConversionIntentionAction extends BaseIntentionAction {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefConversionIntentionAction.class.getName());
+	private final static Logger logger = Logger.getInstance(SQLRefConversionIntentionAction.class.getName());
 
 	@NotNull
 	@Override

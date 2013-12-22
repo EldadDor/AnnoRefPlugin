@@ -2,7 +2,6 @@ package com.idi.intellij.plugin.query.sqlref.action;
 
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefApplication;
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -19,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class findSqlRefUsageAction extends AnAction {
 
-	private static Logger loggerInstance = LoggerFactory.getInstance().getLoggerInstance(findSqlRefUsageAction.class.getName());
+	private static Logger loggerInstance = Logger.getInstance(findSqlRefUsageAction.class.getName());
 
 	@Override
 	public void update(@NotNull AnActionEvent e) {

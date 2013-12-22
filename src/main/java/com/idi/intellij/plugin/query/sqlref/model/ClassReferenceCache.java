@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * Time: 22:25:00
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class ClassReferenceCache {
 	private ConcurrentSkipListMap<String, List<Pair<VirtualFile, PsiElement>>> classesRefCache = new ConcurrentSkipListMap<String, List<Pair<VirtualFile, PsiElement>>>();
 

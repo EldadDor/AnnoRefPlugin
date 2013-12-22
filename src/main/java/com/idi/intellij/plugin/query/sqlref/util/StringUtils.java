@@ -52,6 +52,8 @@ public abstract class StringUtils {
 
 	private static final char EXTENSION_SEPARATOR = '.';
 
+	private static final String SPECIAL_CHARS = "[^\\p{L}\\p{Nd}]";
+
 
 	//---------------------------------------------------------------------
 	// General convenience methods for working with Strings
@@ -101,7 +103,7 @@ public abstract class StringUtils {
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not <code>null</code>,
-	 *         its length is greater than 0, and it does not contain whitespace only
+	 * its length is greater than 0, and it does not contain whitespace only
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static boolean hasText(CharSequence str) {
@@ -124,7 +126,7 @@ public abstract class StringUtils {
 	 *
 	 * @param str the String to check (may be <code>null</code>)
 	 * @return <code>true</code> if the String is not <code>null</code>, its length is
-	 *         greater than 0, and it does not contain whitespace only
+	 * greater than 0, and it does not contain whitespace only
 	 * @see #hasText(CharSequence)
 	 */
 	public static boolean hasText(String str) {
@@ -136,7 +138,7 @@ public abstract class StringUtils {
 	 *
 	 * @param str the CharSequence to check (may be <code>null</code>)
 	 * @return <code>true</code> if the CharSequence is not empty and
-	 *         contains at least 1 whitespace character
+	 * contains at least 1 whitespace character
 	 * @see java.lang.Character#isWhitespace
 	 */
 	public static boolean containsWhitespace(CharSequence str) {
@@ -157,7 +159,7 @@ public abstract class StringUtils {
 	 *
 	 * @param str the String to check (may be <code>null</code>)
 	 * @return <code>true</code> if the String is not empty and
-	 *         contains at least 1 whitespace character
+	 * contains at least 1 whitespace character
 	 * @see #containsWhitespace(CharSequence)
 	 */
 	public static boolean containsWhitespace(String str) {
@@ -248,7 +250,7 @@ public abstract class StringUtils {
 	/**
 	 * Trim all occurences of the supplied leading character from the given String.
 	 *
-	 * @param str			  the String to check
+	 * @param str              the String to check
 	 * @param leadingCharacter the leading character to be trimmed
 	 * @return the trimmed String
 	 */
@@ -266,7 +268,7 @@ public abstract class StringUtils {
 	/**
 	 * Trim all occurences of the supplied trailing character from the given String.
 	 *
-	 * @param str			   the String to check
+	 * @param str               the String to check
 	 * @param trailingCharacter the trailing character to be trimmed
 	 * @return the trimmed String
 	 */
@@ -286,7 +288,7 @@ public abstract class StringUtils {
 	 * Test if the given String starts with the specified prefix,
 	 * ignoring upper/lower case.
 	 *
-	 * @param str	the String to check
+	 * @param str    the String to check
 	 * @param prefix the prefix to look for
 	 * @see java.lang.String#startsWith
 	 */
@@ -309,7 +311,7 @@ public abstract class StringUtils {
 	 * Test if the given String ends with the specified suffix,
 	 * ignoring upper/lower case.
 	 *
-	 * @param str	the String to check
+	 * @param str    the String to check
 	 * @param suffix the suffix to look for
 	 * @see java.lang.String#endsWith
 	 */
@@ -333,8 +335,8 @@ public abstract class StringUtils {
 	 * Test whether the given string matches the given substring
 	 * at the given index.
 	 *
-	 * @param str	   the original string (or StringBuilder)
-	 * @param index	 the index in the original string to start matching against
+	 * @param str       the original string (or StringBuilder)
+	 * @param index     the index in the original string to start matching against
 	 * @param substring the substring to match at the given index
 	 */
 	public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
@@ -410,7 +412,7 @@ public abstract class StringUtils {
 	/**
 	 * Delete any character in a given String.
 	 *
-	 * @param inString	  the original String
+	 * @param inString      the original String
 	 * @param charsToDelete a set of characters to delete.
 	 *                      E.g. "az\n" will delete 'a's, 'z's and new lines.
 	 * @return the resulting String
@@ -439,7 +441,7 @@ public abstract class StringUtils {
 	 *
 	 * @param str the input String (e.g. "myString")
 	 * @return the quoted String (e.g. "'myString'"),
-	 *         or <code>null<code> if the input was <code>null</code>
+	 * or <code>null<code> if the input was <code>null</code>
 	 */
 	public static String quote(String str) {
 		return (str != null ? "'" + str + "'" : null);
@@ -451,10 +453,14 @@ public abstract class StringUtils {
 	 *
 	 * @param obj the input Object (e.g. "myString")
 	 * @return the quoted String (e.g. "'myString'"),
-	 *         or the input object as-is if not a String
+	 * or the input object as-is if not a String
 	 */
 	public static Object quoteIfString(Object obj) {
 		return (obj instanceof String ? quote((String) obj) : obj);
+	}
+
+	public static String doubleQuote(String str) {
+		return "\"" + str + "\"";
 	}
 
 	/**
@@ -472,7 +478,7 @@ public abstract class StringUtils {
 	 * "this:name:is:qualified" returns "qualified" if using a ':' separator.
 	 *
 	 * @param qualifiedName the qualified name
-	 * @param separator	 the separator
+	 * @param separator     the separator
 	 */
 	public static String unqualify(String qualifiedName, char separator) {
 		return qualifiedName.substring(qualifiedName.lastIndexOf(separator) + 1);
@@ -552,7 +558,7 @@ public abstract class StringUtils {
 	 *
 	 * @param path the file path (may be <code>null</code>)
 	 * @return the path with stripped filename extension,
-	 *         or <code>null</code> if none
+	 * or <code>null</code> if none
 	 */
 	public static String stripFilenameExtension(String path) {
 		if (path == null) {
@@ -566,7 +572,7 @@ public abstract class StringUtils {
 	 * Apply the given relative path to the given path,
 	 * assuming standard Java folder separation (i.e. "/" separators).
 	 *
-	 * @param path		 the path to start from (usually a full file path)
+	 * @param path         the path to start from (usually a full file path)
 	 * @param relativePath the relative path to apply
 	 *                     (relative to the full file path above)
 	 * @return the full file path that results from applying the relative path
@@ -786,7 +792,7 @@ public abstract class StringUtils {
 	 *
 	 * @param collection the Collection to copy
 	 * @return the String array (<code>null</code> if the passed-in
-	 *         Collection was <code>null</code>)
+	 * Collection was <code>null</code>)
 	 */
 	public static String[] toStringArray(Collection<String> collection) {
 		if (collection == null) {
@@ -801,7 +807,7 @@ public abstract class StringUtils {
 	 *
 	 * @param enumeration the Enumeration to copy
 	 * @return the String array (<code>null</code> if the passed-in
-	 *         Enumeration was <code>null</code>)
+	 * Enumeration was <code>null</code>)
 	 */
 	public static String[] toStringArray(Enumeration<String> enumeration) {
 		if (enumeration == null) {
@@ -855,8 +861,8 @@ public abstract class StringUtils {
 	 * @param toSplit   the string to split
 	 * @param delimiter to split the string up with
 	 * @return a two element array with index 0 being before the delimiter, and
-	 *         index 1 being after the delimiter (neither element includes the delimiter);
-	 *         or <code>null</code> if the delimiter wasn't found in the given input String
+	 * index 1 being after the delimiter (neither element includes the delimiter);
+	 * or <code>null</code> if the delimiter wasn't found in the given input String
 	 */
 	public static String[] split(String toSplit, String delimiter) {
 		if (!hasLength(toSplit) || !hasLength(delimiter)) {
@@ -878,10 +884,10 @@ public abstract class StringUtils {
 	 * <p>Will trim both the key and value before adding them to the
 	 * <code>Properties</code> instance.
 	 *
-	 * @param array	 the array to process
+	 * @param array     the array to process
 	 * @param delimiter to split each element using (typically the equals symbol)
 	 * @return a <code>Properties</code> instance representing the array contents,
-	 *         or <code>null</code> if the array to process was null or empty
+	 * or <code>null</code> if the array to process was null or empty
 	 */
 	public static Properties splitArrayElementsIntoProperties(String[] array, String delimiter) {
 		return splitArrayElementsIntoProperties(array, delimiter, null);
@@ -894,13 +900,13 @@ public abstract class StringUtils {
 	 * <p>Will trim both the key and value before adding them to the
 	 * <code>Properties</code> instance.
 	 *
-	 * @param array		 the array to process
-	 * @param delimiter	 to split each element using (typically the equals symbol)
+	 * @param array         the array to process
+	 * @param delimiter     to split each element using (typically the equals symbol)
 	 * @param charsToDelete one or more characters to remove from each element
 	 *                      prior to attempting the split operation (typically the quotation mark
 	 *                      symbol), or <code>null</code> if no removal should occur
 	 * @return a <code>Properties</code> instance representing the array contents,
-	 *         or <code>null</code> if the array to process was <code>null</code> or empty
+	 * or <code>null</code> if the array to process was <code>null</code> or empty
 	 */
 	public static Properties splitArrayElementsIntoProperties(
 			String[] array, String delimiter, String charsToDelete) {
@@ -930,7 +936,7 @@ public abstract class StringUtils {
 	 * tokens. A delimiter is always a single character; for multi-character
 	 * delimiters, consider using <code>delimitedListToStringArray</code>
 	 *
-	 * @param str		the String to tokenize
+	 * @param str        the String to tokenize
 	 * @param delimiters the delimiter characters, assembled as String
 	 *                   (each of those characters is individually considered as delimiter).
 	 * @return an array of the tokens
@@ -949,15 +955,15 @@ public abstract class StringUtils {
 	 * tokens. A delimiter is always a single character; for multi-character
 	 * delimiters, consider using <code>delimitedListToStringArray</code>
 	 *
-	 * @param str			   the String to tokenize
-	 * @param delimiters		the delimiter characters, assembled as String
+	 * @param str               the String to tokenize
+	 * @param delimiters        the delimiter characters, assembled as String
 	 *                          (each of those characters is individually considered as delimiter)
-	 * @param trimTokens		trim the tokens via String's <code>trim</code>
+	 * @param trimTokens        trim the tokens via String's <code>trim</code>
 	 * @param ignoreEmptyTokens omit empty tokens from the result array
 	 *                          (only applies to tokens that are empty after trimming; StringTokenizer
 	 *                          will not consider subsequent delimiters as token in the first place).
 	 * @return an array of the tokens (<code>null</code> if the input String
-	 *         was <code>null</code>)
+	 * was <code>null</code>)
 	 * @see java.util.StringTokenizer
 	 * @see java.lang.String#trim()
 	 * @see #delimitedListToStringArray
@@ -988,7 +994,7 @@ public abstract class StringUtils {
 	 * be considered as single delimiter string, rather than as bunch of potential
 	 * delimiter characters - in contrast to <code>tokenizeToStringArray</code>.
 	 *
-	 * @param str	   the input String
+	 * @param str       the input String
 	 * @param delimiter the delimiter between elements (this is a single delimiter,
 	 *                  rather than a bunch individual delimiter characters)
 	 * @return an array of the tokens in the list
@@ -1004,8 +1010,8 @@ public abstract class StringUtils {
 	 * be considered as single delimiter string, rather than as bunch of potential
 	 * delimiter characters - in contrast to <code>tokenizeToStringArray</code>.
 	 *
-	 * @param str		   the input String
-	 * @param delimiter	 the delimiter between elements (this is a single delimiter,
+	 * @param str           the input String
+	 * @param delimiter     the delimiter between elements (this is a single delimiter,
 	 *                      rather than a bunch individual delimiter characters)
 	 * @param charsToDelete a set of characters to delete. Useful for deleting unwanted
 	 *                      line breaks: e.g. "\r\n\f" will delete all new lines and line feeds in a String.
@@ -1147,6 +1153,13 @@ public abstract class StringUtils {
 	 */
 	public static String arrayToCommaDelimitedString(Object[] arr) {
 		return arrayToDelimitedString(arr, ",");
+	}
+
+	public static String cleanSpecialCharacters(String original) {
+		if (hasLength(original)) {
+			return original.replaceAll(SPECIAL_CHARS, "");
+		}
+		return "";
 	}
 
 }

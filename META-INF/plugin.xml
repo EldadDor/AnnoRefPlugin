@@ -5,9 +5,9 @@
       Find the SQLRef id and usage in
       The XML File and Corresponding class file
       ]]></description>
-	<version>4.0.0</version>
+	<version>4.0.2</version>
 	<vendor>EldadDor-IDI</vendor>
-	<idea-version since-build="8000"/>
+	<idea-version since-build="129.713"/>
 
 
 	<extensions defaultExtensionNs="com.intellij">
@@ -28,13 +28,18 @@
 							  serviceImplementation="com.idi.intellij.plugin.query.sqlref.component.SQLRefMessageBusAccessor"/>-->
 		<!--<codeInsight.lineMarkerProvider language="XML" implementationClass="com.idi.intellij.plugin.query.sqlref.codeInsight.SQLRefXmlQueryLineMarkerProviderder"/>-->
 		<projectConfigurable instance="com.idi.intellij.plugin.query.sqlref.config.SQLRefConfigurationConfig"
-		                     id="SQLRefConfiguration" displayName="SQLRef" order="last">
+		                     id="AnnoRefConfigurationConfig" displayName="SQLRef" order="last">
 		</projectConfigurable>
 
 		<localInspection language="JAVA"
 		                 implementationClass="com.idi.intellij.plugin.query.sqlref.inspection.SQLRefClassInspection"
-		                 shortName="SQLRefCreator" displayName="convert @SQL to @SQLRef" level="INFO"
-		                 enabledByDefault="true" groupName="AnnoRef conversion" order="last"/>
+		                 shortName="AnnoRefConverter" displayName="convert @SQL to @SQLRef" level="INFO"
+		                 enabledByDefault="true" groupName="AnnoRef" order="last"/>
+		<localInspection language="XML"
+		                 implementationClass="com.idi.intellij.plugin.query.sqlref.inspection.SQLRefXmlInspection"
+		                 shortName="AnnoRefClassCreator" displayName="Create AnnoRef class to unused Xml Tag"
+		                 level="WARNING"
+		                 enabledByDefault="true" groupName="AnnoRef" order="last"/>
 		<intentionAction>
 			<className>com.idi.intellij.plugin.query.sqlref.intention.SQLRefConversionIntentionAction</className>
 			<category>Other</category>
@@ -84,9 +89,9 @@
 				<interface-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigurationStorage</interface-class>
 			</component>-->
 		<!--<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings
+			<implementation-class>com.idi.intellij.plugin.query.sqlref.persist.AnnoRefConfigSettingss
 			</implementation-class>
-			<interface-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings</interface-class>
+			<interface-class>com.idi.intellij.plugin.query.sqlref.persist.AnnoRefConfigSettingss</interface-class>
 		</component>-->
 		<!--<component>
 			<implementation-class>com.idi.intellij.plugin.query.sqlref.util.SQLRefNamingUtil</implementation-class>

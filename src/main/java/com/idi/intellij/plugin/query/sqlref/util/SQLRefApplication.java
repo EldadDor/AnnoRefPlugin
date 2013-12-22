@@ -1,6 +1,5 @@
 package com.idi.intellij.plugin.query.sqlref.util;
 
-import com.google.common.collect.Sets;
 import com.idi.intellij.plugin.query.sqlref.index.listeners.ProgressChangedListener;
 import com.idi.intellij.plugin.query.sqlref.index.progress.SQLRefProgressIndicator;
 import com.idi.intellij.plugin.query.sqlref.index.progress.SQLRefProgressRunnable;
@@ -8,31 +7,31 @@ import com.idi.intellij.plugin.query.sqlref.model.ClassReferenceCache;
 import com.idi.intellij.plugin.query.sqlref.model.ReferenceCollectionManager;
 import com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings;
 import com.intellij.ProjectTopics;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.TaskInfo;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootAdapter;
 import com.intellij.openapi.roots.ModuleRootEvent;
 import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.impl.ModulesOrderEnumerator;
+import com.intellij.openapi.vcs.changes.RunnableBackgroundableWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.Processor;
 import org.jetbrains.annotations.TestOnly;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -43,22 +42,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefApplication {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefApplication.class.getName());
-
+	private static final Logger logger = Logger.getInstance(SQLRefApplication.class.getName());
 	private static final Map<String, ReferenceCollectionManager> sqlRefProjectReferencesManager = new ConcurrentHashMap<String, ReferenceCollectionManager>();
 	private static final Map<String, ClassReferenceCache> classesRefCacheProjectManager = new ConcurrentHashMap<String, ClassReferenceCache>();
 	private static final AtomicInteger scannerCounter = new AtomicInteger(0);
+	private static final AtomicBoolean isResetRunning = new AtomicBoolean(false);
 
 	@Deprecated
 	public static <T> T getInstance(Class<T> type) {
 		return ServiceManager.getService(type);
 	}
 
-
 	public static <T> T getInstance(Project project, Class<T> type) {
 		return ServiceManager.getService(project, type);
 	}
-
 
 	public static PsiFile getPsiFileFromVirtualFile(VirtualFile virtualFile, Project project) {
 		return PsiDocumentManager.getInstance(project).getPsiFile(FileDocumentManager.getInstance().getDocument(virtualFile));
@@ -98,16 +95,13 @@ public class SQLRefApplication {
 			public void rootsChanged(ModuleRootEvent event) {
 				if (SQLRefConfigSettings.getInstance(project).getSqlRefState().ENABLE_AUTO_SYNC) {
 					logger.info("registerForProjectRootChanges()_rootsChanged(): event=" + event.isCausedByFileTypesChange());
-					final Project project = (Project) event.getSource();
-//					Set<Module> moduleList = getModules(project);
-//					SQLRefProjectModulesCollection modulesRepo = ServiceManager.getService(project, SQLRefProjectModulesCollection.class);
-//					Pair<Set<Module>, Set<Module>> differentiate = modulesRepo.differentiate(moduleList);
-					final SQLRefProgressIndicator sqlRefProgressIndicator = new SQLRefProgressIndicator(project, AnnoRefBundle.message("annoRef.progress.reindex"),
+					final Project projectSource = (Project) event.getSource();
+					final SQLRefProgressIndicator sqlRefProgressIndicator = new SQLRefProgressIndicator(projectSource, AnnoRefBundle.message("annoRef.progress.reindex"),
 							PerformInBackgroundOption.DEAF, AnnoRefBundle.message("annoRef.progress.reindex.cancel"), "", true);
-//					Runnable process = new SQLRefProgressRunnable(project, differentiate, new ProgressChangedListener() {
-					Runnable process = new SQLRefProgressRunnable(project,  new ProgressChangedListener() {
+					TaskInfo taskInfoWrapper = null;
+					final ProgressChangedListener progressListener = new ProgressChangedListener() {
 						@Override
-						public void changeMade(boolean isChanged) {
+						public synchronized void changeMade(boolean isChanged) {
 							if (isChanged) {
 								sqlRefProgressIndicator.setFraction(sqlRefProgressIndicator.getFraction() + 0.01d);
 								if (logger.isDebugEnabled()) {
@@ -115,24 +109,22 @@ public class SQLRefApplication {
 								}
 							}
 						}
-					});
+					};
+					Runnable process = new SQLRefProgressRunnable(projectSource, taskInfoWrapper, progressListener);
 					if (ApplicationManager.getApplication().isDispatchThread()) {
-						ProgressManager.getInstance().runProcess(process, sqlRefProgressIndicator);
-						sqlRefProgressIndicator.setFraction(1);
+						taskInfoWrapper = new RunnableBackgroundableWrapper(projectSource, "SQLRef project root reset", process);
+						if (sqlRefProgressIndicator.isFinished(taskInfoWrapper)) {
+							sqlRefProgressIndicator.setFraction(1);
+						} else {
+							ProgressManager.getInstance().runProcess(process, sqlRefProgressIndicator);
+						}
 					}
+				} else {
+					logger.info("registerForProjectRootChanges(): Auto_Sync not enabled");
 				}
-				logger.info("registerForProjectRootChanges(): Auto_Sync not enabled");
-			}
-
-			private Set<Module> getModules(Project project) {
-				Module[] modules = ModuleManager.getInstance(project).getModules();
-				Set<Module> moduleList = Sets.newHashSet();
-				Collections.addAll(moduleList, modules);
-				return moduleList;
 			}
 		});
 	}
-
 
 	@TestOnly
 	private static void moduleEnumeratorInfo(Project project, Set<Module> moduleList) {

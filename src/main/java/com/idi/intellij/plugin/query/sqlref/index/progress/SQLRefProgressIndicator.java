@@ -1,6 +1,5 @@
 package com.idi.intellij.plugin.query.sqlref.index.progress;
 
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.PerformInBackgroundOption;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
@@ -16,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefProgressIndicator extends BackgroundableProcessIndicator {
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefProgressIndicator.class.getName());
+	private static final Logger logger = Logger.getInstance(SQLRefProgressIndicator.class.getName());
 
 	private Project project;
 
@@ -25,10 +24,22 @@ public class SQLRefProgressIndicator extends BackgroundableProcessIndicator {
 	                               @Nls String backgroundStopTooltip, boolean cancellable) {
 		super(project, progressTitle, option, cancelButtonText, backgroundStopTooltip, cancellable);
 		this.project = project;
-
 	}
 
+	@Override
+	public boolean isRunning() {
+		return super.isRunning();
+	}
 
+	@Override
+	public void processFinish() {
+		super.processFinish();
+	}
+
+	@Override
+	public void setFraction(double v) {
+		super.setFraction(v);
+	}
 
 	/*public class SQLRefProgressRunnable implements Runnable {
 

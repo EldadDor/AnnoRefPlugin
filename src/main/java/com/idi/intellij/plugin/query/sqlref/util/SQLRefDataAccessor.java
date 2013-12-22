@@ -8,7 +8,6 @@ import com.idi.intellij.plugin.query.sqlref.model.ReferenceCollectionManager;
 import com.idi.intellij.plugin.query.sqlref.model.SQLRefReference;
 import com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings;
 import com.intellij.codeInsight.AnnotationUtil;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -53,7 +52,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefDataAccessor implements ProjectComponent {
-	private final static Logger log = LoggerFactory.getInstance().getLoggerInstance(SQLRefDataAccessor.class.getName());
+	private static final Logger log = Logger.getInstance(SQLRefDataAccessor.class.getName());
 
 	private static final String PLUGIN_NAME = "SQLRef";
 	public Project project;
@@ -157,6 +156,8 @@ public class SQLRefDataAccessor implements ProjectComponent {
 	private void showNotFindIdErrorMessage(String sqlRef) {
 		WindowManager.getInstance().getStatusBar(project).setInfo("Can't find a reference sql with id : " + sqlRef);
 		WindowManager.getInstance().getStatusBar(project).fireNotificationPopup(constructAMessagePopUp(), Color.orange);
+		final JFrame frame = WindowManager.getInstance().getFrame(project);
+//		NotificationsManagerImpl.createBalloon();
 	}
 
 	@NotNull
@@ -250,7 +251,7 @@ public class SQLRefDataAccessor implements ProjectComponent {
 			if (classChild instanceof PsiModifierListOwner && ((PsiModifierListOwner) classChild).getModifierList().getApplicableAnnotations().length >= 1) {
 				final PsiModifierList annoList = ((PsiModifierListOwner) classChild).getModifierList();
 				PsiAnnotation psiAnnotation = AnnotationUtil.findAnnotation((PsiModifierListOwner) classChild,
-						SQLRefConfigSettings.getInstance(project).getSqlRefState().SQLREF_ANNOTATION_FQN);
+						SQLRefConfigSettings.getInstance(project).getSqlRefState().ANNOREF_ANNOTATION_FQN);
 				if (psiAnnotation != null) {
 					log.info("psiAnnotation=" + psiAnnotation.findAttributeValue("refId"));
 					final PsiElement annoElement = psiFile.findElementAt(psiAnnotation.getTextOffset() + psiAnnotation.getText().split("=")[1].length());

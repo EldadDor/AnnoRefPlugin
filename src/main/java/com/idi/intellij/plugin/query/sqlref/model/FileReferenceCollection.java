@@ -1,6 +1,5 @@
 package com.idi.intellij.plugin.query.sqlref.model;
 
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiFile;
@@ -18,8 +17,9 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * Time: 20:12:21
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class FileReferenceCollection {
-	private final static Logger logger= LoggerFactory.getInstance().getLoggerInstance(FileReferenceCollection.class.getName());
+	private final static Logger logger = Logger.getInstance(FileReferenceCollection.class.getName());
 
 
 	private PsiFile referencedFile;
@@ -50,6 +50,7 @@ public class FileReferenceCollection {
 		if (this.referencedFile == null && referencedFile != null) {
 			logger.info("setReferencedFile(): referencedFile= " + referencedFile.getName());
 			this.referencedFile = referencedFile;
+
 		}
 	}
 
@@ -80,7 +81,7 @@ public class FileReferenceCollection {
 
 	public SQLRefReference putSQLRefIntoCollection(@NotNull SQLRefReference reference) {
 		String key = StringUtil.stripQuotesAroundValue(reference.getXmlPsiElement().getText());
-			logger.info("putSQLRefIntoCollection(): key=" +key + " ref=" +reference);
+		logger.info("putSQLRefIntoCollection(): key=" + key + " ref=" + reference);
 		return queriesIdMap.put(key, reference);
 	}
 

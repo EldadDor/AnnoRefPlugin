@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 /**
  *
  */
+@Deprecated
 public class SQLRefMessageBusListener extends MessageListenerList {
 	private static final Logger LOGGER = Logger.getInstance(SQLRefMessageBusListener.class.getName());
 

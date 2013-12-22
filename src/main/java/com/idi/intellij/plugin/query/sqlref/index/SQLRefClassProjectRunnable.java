@@ -19,9 +19,12 @@ public class SQLRefClassProjectRunnable implements Runnable {
 
 	@Override
 	public void run() {
-		SQLRefClassFileIndex sqlRefClassFileIndex = new SQLRefClassFileIndex(project);
-		SQLRefApplication.addScanner();
-		sqlRefClassFileIndex.indexSQLRef();
-		SQLRefApplication.removeScanner();
+		try {
+			SQLRefClassFileIndex sqlRefClassFileIndex = new SQLRefClassFileIndex(project);
+			SQLRefApplication.addScanner();
+			sqlRefClassFileIndex.indexSQLRef();
+		} finally {
+			SQLRefApplication.removeScanner();
+		}
 	}
 }

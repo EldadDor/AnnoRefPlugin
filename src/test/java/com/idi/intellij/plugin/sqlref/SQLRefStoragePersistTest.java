@@ -14,7 +14,7 @@ import org.junit.Test;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefStoragePersistTest {
-//	    private final static Logger logger= LoggerFactory.getInstance().getLoggerInstance(SQLRefStoragePersistTest.class.getName());
+//	    private final static Logger logger= Logger.getInstance(SQLRefStoragePersistTest.class.getName());
 
 
 	@Test

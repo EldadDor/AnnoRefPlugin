@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+	<component name="SQLRefSettings">
+		<option name="ENABLE_SQLREF_FQN_OVERRIDE" value="true"/>
+		<option name="SQLREF_ANNOTATION_FQN" value="com.idi.astro.train.annotation.SQLRef"/>
+	</component>
+</application>
+

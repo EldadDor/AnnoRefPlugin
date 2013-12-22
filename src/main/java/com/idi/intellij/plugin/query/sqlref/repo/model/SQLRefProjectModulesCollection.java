@@ -1,7 +1,6 @@
 package com.idi.intellij.plugin.query.sqlref.repo.model;
 
 import com.google.common.collect.Sets;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -23,7 +22,7 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefProjectModulesCollection implements ProjectComponent {
-	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefProjectModulesCollection.class.getName());
+	private static final Logger logger = Logger.getInstance(SQLRefProjectModulesCollection.class.getName());
 
 	private Set<Module> projectModules = Sets.newHashSet();
 

@@ -51,7 +51,7 @@ public class ConvertToAnnoRefDialog extends DialogWrapper {
 	};
 
 	@NonNls
-	private static final String RECENTS_KEY = "CreateClassDialog.RecentsKey";
+	private static final String RECENTS_KEY = "AnnoRefCreateClassDialog.RecentsKey";
 
 	public ConvertToAnnoRefDialog(Project project, boolean canBeParent, String targetPackageName) {
 		super(project, canBeParent);

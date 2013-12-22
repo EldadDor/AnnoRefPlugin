@@ -1,7 +1,6 @@
 package com.idi.intellij.plugin.query.sqlref.index;
 
 import com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,21 +19,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefRepository implements ProjectComponent {
-	private static final Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefRepository.class.getName());
+	private static final Logger logger = Logger.getInstance(SQLRefRepository.class.getName());
 
-	private Map<ID, SQLRefReference> xmlRepository = new ConcurrentHashMap<ID, SQLRefReference>();
+	//	private Map<ID, SQLRefReference> xmlRepository = new ConcurrentHashMap<ID, SQLRefReference>();
 	private Map<ID, SQLRefReference> classRepository = new ConcurrentHashMap<ID, SQLRefReference>();
 	private Map<String, SQLRefReference> sqlRefReferenceMap = new ConcurrentHashMap<String, SQLRefReference>();
 
 
 	public void resetAllProjectOnModulesChange() {
 		logger.info("resetAllProjectOnModulesChange():");
-		xmlRepository.clear();
+//		xmlRepository.clear();
 		classRepository.clear();
 		sqlRefReferenceMap.clear();
 	}
 
-	public boolean removeClassFromRepository(ID classID) {
+/*	public boolean removeClassFromRepository(ID classID) {
 		logger.info("removeClassFromRepository(): classID=" + classID.toString());
 		if (classRepository.containsKey(classID)) {
 			SQLRefReference sqlRefReference = classRepository.get(classID);
@@ -54,37 +53,38 @@ public class SQLRefRepository implements ProjectComponent {
 			}
 		}
 		return false;
-	}
+	}*/
 
-	public void addXmlFileInformationToRepository(String refID, ID xmlFileID, VirtualFile xmlVF, PsiElement xmlAttribElement) {
-		logger.info("addXmlFileInformationToRepository(): refID=" + refID);
+	public void addXmlFileInformationToRepository(String refID, VirtualFile xmlVF, PsiElement xmlAttribElement) {
+//		logger.info("addXmlFileInformationToRepository(): refID=" + refID);
 		if (sqlRefReferenceMap.containsKey(refID)) {
 			SQLRefReference sqlRefReference = sqlRefReferenceMap.get(refID);
-			logger.info("addXmlFileInformationToRepository(): sqlRefReference exists=" + sqlRefReference);
-			sqlRefReference.addXmlInformation(xmlFileID, xmlVF, xmlAttribElement);
-			xmlRepository.put(xmlFileID, sqlRefReference);
+//			logger.info("addXmlFileInformationToRepository(): sqlRefReference exists=" + sqlRefReference);
+			sqlRefReference.addXmlInformation(xmlVF, xmlAttribElement);
+//			xmlRepository.put(xmlFileID, sqlRefReference);
 		} else {
+
 			SQLRefReference sqlRefReference = new SQLRefReference(refID);
-			sqlRefReference.addXmlInformation(xmlFileID, xmlVF, xmlAttribElement);
-			logger.info("addXmlFileInformationToRepository(): sqlRefReference new=" + sqlRefReference);
+			sqlRefReference.addXmlInformation(xmlVF, xmlAttribElement);
+//			logger.info("addXmlFileInformationToRepository(): sqlRefReference new=" + sqlRefReference);
 			sqlRefReferenceMap.put(refID, sqlRefReference);
-			xmlRepository.put(xmlFileID, sqlRefReference);
+//			xmlRepository.put(xmlFileID, sqlRefReference);
 		}
 	}
 
-	public void addClassFileInformationToRepository(String refID, ID classFileID, VirtualFile classVF, PsiElement annoElement) {
-		logger.info("addClassFileInformationToRepository(): refID=" + refID);
+	public void addClassFileInformationToRepository(String refID, VirtualFile classVF, PsiElement annoElement) {
+//		logger.info("addClassFileInformationToRepository(): refID=" + refID);
 		if (sqlRefReferenceMap.containsKey(refID)) {
 			SQLRefReference sqlRefReference = sqlRefReferenceMap.get(refID);
-			logger.info("addClassFileInformationToRepository(): sqlRefReference exists=" + sqlRefReference);
-			sqlRefReference.addClassInformation(classFileID.toString(), classVF, annoElement);
-			classRepository.put(classFileID, sqlRefReference);
+//			logger.info("addClassFileInformationToRepository(): sqlRefReference exists=" + sqlRefReference);
+			sqlRefReference.addClassInformation(classVF, annoElement);
+//			classRepository.put(classFileID, sqlRefReference);
 		} else {
 			SQLRefReference sqlRefReference = new SQLRefReference(refID);
-			sqlRefReference.addClassInformation(classFileID.toString(), classVF, annoElement);
-			logger.info("addClassFileInformationToRepository(): sqlRefReference new=" + sqlRefReference);
+			sqlRefReference.addClassInformation(classVF, annoElement);
+//			logger.info("addClassFileInformationToRepository(): sqlRefReference new=" + sqlRefReference);
 			sqlRefReferenceMap.put(refID, sqlRefReference);
-			classRepository.put(classFileID, sqlRefReference);
+//			classRepository.put(classFileID, sqlRefReference);
 		}
 	}
 

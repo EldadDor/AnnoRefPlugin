@@ -1,6 +1,5 @@
 package com.idi.intellij.plugin.query.sqlref.util;
 
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.Map;
@@ -15,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SQLRefPluginManager {
 
-	private final static Logger logger = LoggerFactory.getInstance().getLoggerInstance(SQLRefPluginManager.class.getName());
+	private final static Logger logger = Logger.getInstance(SQLRefPluginManager.class.getName());
 
 	public static Map<String, SQLRefApplication> projectBasePathMap = new ConcurrentHashMap<String, SQLRefApplication>(1);
 

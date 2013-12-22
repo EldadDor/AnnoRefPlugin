@@ -8,7 +8,6 @@ import com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings;
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefNamingUtil;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
-import com.intellij.idea.LoggerFactory;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -29,68 +28,37 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefClassLineMarkerProvider implements LineMarkerProvider {
-	private static final Logger log = LoggerFactory.getInstance().getLoggerInstance(SQLRefClassLineMarkerProvider.class.getName());
+	private static final Logger log = Logger.getInstance(SQLRefClassLineMarkerProvider.class.getName());
 
 	@Nullable
 	@Override
 	public LineMarkerInfo<PsiElement> getLineMarkerInfo(@NotNull PsiElement element) {
-		PsiFile psiFile = element.getContainingFile();
 		/*if (log.isDebugEnabled()) {
 			log.debug("getLineMarkerInfo(): element=" + element);
 		}*/
-		Project project = ProjectUtil.guessProjectForFile(psiFile.getVirtualFile());
 		if (element instanceof PsiModifierList) {
 			PsiAnnotation[] annotations = ((PsiAnnotationOwner) element).getAnnotations();
 			for (PsiAnnotation annotation : annotations) {
-				if (SQLRefConfigSettings.getInstance(project).getSqlRefState().SQLREF_ANNOTATION_FQN.equals(annotation.getQualifiedName())) {
+				PsiFile psiFile = element.getContainingFile();
+				Project project = ProjectUtil.guessProjectForFile(psiFile.getVirtualFile());
+				if (SQLRefConfigSettings.getInstance(project).getSqlRefState().ANNOREF_ANNOTATION_FQN.equals(annotation.getQualifiedName())) {
 					String cleanedAnnoRef = SQLRefNamingUtil.cleanAnnoRefForName(annotation.getContainingFile(), annotation);
 //					log.info("Found annoRef, cleaned=" + cleanedAnnoRef);
-					com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference sqlRefReferenceForID = ServiceManager.getService(psiFile.getProject(), SQLRefRepository.class).getSQLRefReferenceForID(cleanedAnnoRef);
-					if (sqlRefReferenceForID.getXmlQueryElements().isEmpty()) {
-						return null;
+					if (cleanedAnnoRef != null) {
+						com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference sqlRefReferenceForID = ServiceManager.getService(psiFile.getProject(), SQLRefRepository.class).getSQLRefReferenceForID(cleanedAnnoRef);
+						if (sqlRefReferenceForID.getXmlQueryElements().isEmpty()) {
+							return null;
+						}
+						PsiElement[] elements = new PsiElement[sqlRefReferenceForID.getXmlQueryElements().size()];
+						sqlRefReferenceForID.getXmlQueryElements().toArray(elements);
+						return SQLRefIdLineMarkerInfo.create(annotation, elements, SQLRefConstants.ANNO_REF_COMPONENT_ICON_XML, null);
 					}
-					PsiElement[] elements = new PsiElement[sqlRefReferenceForID.getXmlQueryElements().size()];
-					sqlRefReferenceForID.getXmlQueryElements().toArray(elements);
-					return SQLRefIdLineMarkerInfo.create(element, elements, SQLRefConstants.ANNO_REF_COMPONENT_ICON_XML, null);
 				}
 			}
 		}
 		return null;
 	}
 
-
-	/*@Nullable
-	@Override
-	public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
-		PsiFile psiFile = element.getContainingFile();
-		Project project = ProjectUtil.guessProjectForFile(psiFile.getVirtualFile());
-		if (psiFile instanceof PsiClass) {
-			SQLRefNamingUtil.isPropitiousClassFile(psiFile, project);
-			for (PsiElement classChild : psiFile.getChildren()) {
-				if (classChild instanceof PsiModifierListOwner && ((PsiModifierListOwner) classChild).getModifierList().getApplicableAnnotations().length >= 1) {
-					PsiAnnotation psiAnnotation = AnnotationUtil.findAnnotation((PsiModifierListOwner) classChild,
-							SQLRefConfigSettings.getInstance(project).getSqlRefState().SQLREF_ANNOTATION_FQN);
-					if (psiAnnotation != null) {
-						log.info("psiAnnotation=" + psiAnnotation.findAttributeValue("refId"));
-						final PsiElement annoElement = psiFile.findElementAt(psiAnnotation.getTextOffset() + psiAnnotation.getText().split("=")[1].length());
-//						final String cleanedAnno = SQLRefApplication.getInstance(project, SQLRefNamingUtil.class).cleanSQLRefAnnotationForValue(annoElement);
-						final String cleanedAnno = SQLRefNamingUtil.cleanSQLRefAnnotationForValue(annoElement);
-						if (cleanedAnno == null) {
-							continue;
-						}
-						if (annoElement != null) {
-							ClassReferenceCache.getInstance(project).addClassReferenceToCache(annoElement.getContainingFile().getVirtualFile(), cleanedAnno, annoElement);
-							for (final String xmlFileName : ReferenceCollectionManager.getInstance(project).getQueriesIdValue().keySet()) {
-//								return SQLRefIdLineMarkerInfo.create(element, sqlRef.getPsiElementsArray(), SQLRefConstants.ANNO_REF_COMPONENT_ICON_CLASS, null);
-
-							}
-						}
-					}
-				}
-			}
-		}
-		return null;
-	}*/
 
 	@Override
 	public void collectSlowLineMarkers(@NotNull List<PsiElement> elements, @NotNull Collection<LineMarkerInfo> result) {

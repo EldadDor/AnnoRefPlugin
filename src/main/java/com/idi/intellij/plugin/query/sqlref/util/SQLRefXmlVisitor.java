@@ -2,9 +2,8 @@ package com.idi.intellij.plugin.query.sqlref.util;
 
 import com.idi.intellij.plugin.query.sqlref.common.XmlParsingPhaseEnum;
 import com.idi.intellij.plugin.query.sqlref.index.listeners.XmlVisitorListener;
-import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.XmlRecursiveElementVisitor;
@@ -12,7 +11,6 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlElement;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,19 +21,17 @@ import org.jetbrains.annotations.NotNull;
  * To change this template use File | Settings | File Templates.
  */
 public class SQLRefXmlVisitor extends XmlRecursiveElementVisitor {
-
+	private static final Logger logger = Logger.getInstance(SQLRefXmlVisitor.class.getName());
+	private static SQLRefXmlVisitor instance;
 	@NotNull
 	private XmlParsingPhaseEnum phase = XmlParsingPhaseEnum.WAITING;
 	private Project project;
-	private Boolean assigner = true;
+	private Boolean inspector = false;
 	//	private ProgressIndicator progressIndicator;
 //    private static JBReentrantReadWriteLock lock = LockFactory.createReadWriteLock();
-	private boolean soDisplayProgress = false;
+//	private volatile boolean isMultipleAttributes;
 	private boolean isFirstEncounter;
 	private XmlVisitorListener xmlVisitorListener;
-
-
-	private static SQLRefXmlVisitor instance;
 
 	public static SQLRefXmlVisitor getInstance(Project project) {
 		try {
@@ -46,27 +42,23 @@ public class SQLRefXmlVisitor extends XmlRecursiveElementVisitor {
 			instance.project = project;
 			return instance;
 		} catch (Exception ex) {
-			System.out.println("Error : " + ex.getMessage());
+			logger.error("SQLRefXmlVisitor(): Error=" + ex.getMessage(), ex);
 			return null;
 		}
 	}
 
-	public void setXmlVisitorListener(XmlVisitorListener xmlVisitorListener) {
+	public SQLRefXmlVisitor setXmlVisitorListener(XmlVisitorListener xmlVisitorListener) {
 		this.xmlVisitorListener = xmlVisitorListener;
+		return instance;
 	}
 
-	public void setProgressIndicator(ProgressIndicator progressIndicator) {
-//		this.progressIndicator = progressIndicator;
-		soDisplayProgress = true;
+	public Boolean istInspector() {
+		return inspector;
 	}
 
-
-	public Boolean getAssigner() {
-		return assigner;
-	}
-
-	public void setAssigner(Boolean assigner) {
-		this.assigner = assigner;
+	public SQLRefXmlVisitor setInspector(Boolean inspector) {
+		this.inspector = inspector;
+		return instance;
 	}
 
 	public void setProject(Project project) {
@@ -75,14 +67,6 @@ public class SQLRefXmlVisitor extends XmlRecursiveElementVisitor {
 
 	@Override
 	public void visitElement(PsiElement element) {
-//		if (soDisplayProgress) {
-//			progressIndicator.setFraction(0.0 + (1 / 30));
-        /*try {
-  //				Thread.sleep((long) progressIndicator.getFraction() / 10);
-              } catch (InterruptedException e) {
-                  e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-  //			}
-          }*/
 		if (element != null) {
 			super.visitElement(element);
 		}
@@ -90,42 +74,25 @@ public class SQLRefXmlVisitor extends XmlRecursiveElementVisitor {
 
 	@Override
 	public void visitFile(PsiFile file) {
-		try {
-//			lock.writeLock().lock();
-			/*	if (soDisplayProgress)
-		     {
-                   progressIndicator.setFraction(0.0 + (1 / 20));
-               }*/
-			super.visitFile(file);
-		} finally {
-			soDisplayProgress = false;
-//			lock.writeLock().unlock();
-		}
+		super.visitFile(file);
+
 	}
 
 	@Override
 	public void visitXmlTag(XmlTag tag) {
-        /*	if (soDisplayProgress) {
-              progressIndicator.setFraction(0.0 + (1 / 30));
-          }*/
-//		System.out.println("xmlTag.getName() = " + tag.getName());
-//		System.out.println("phase = " + phase);
-        /*	if (tag.getName().equals(XmlParsingPhaseEnum.QUERIES_TAG.getXmlElement())) {
-              phase = XmlParsingPhaseEnum.QUERIES_TAG;
-          }*/
 		if (tag.getName().equals(XmlParsingPhaseEnum.QUERY_TAG.getXmlElement())) {
 			phase = XmlParsingPhaseEnum.QUERY_TAG;
+		/*	if (tag.getAttributes().length == 2) {
+				isMultipleAttributes = true;
+			} else {
+				isMultipleAttributes = false;
+			}*/
 		}
 		super.visitXmlTag(tag);
 	}
 
 	@Override
 	public void visitXmlElement(XmlElement element) {
-        /*if (soDisplayProgress) {
-              progressIndicator.setFraction(0.0 + (1 / 45));
-          }*/
-//		System.out.println("value");
-//		System.out.println("phase = " + phase);
 		if (XmlParsingPhaseEnum.QUERY_TAG.equals(phase) && XmlParsingPhaseEnum.ID_ATTRIBUTE.getXmlElement().equals(element.getText())) {
 			phase = XmlParsingPhaseEnum.ID_ATTRIBUTE;
 		}
@@ -134,37 +101,28 @@ public class SQLRefXmlVisitor extends XmlRecursiveElementVisitor {
 
 	@Override
 	public void visitXmlAttributeValue(XmlAttributeValue value) {
-        /*if (soDisplayProgress) {
-              progressIndicator.setFraction(0.0 + (1 / 40));
-          }*/
-//		System.out.println("phase = " + phase);
-//		System.out.println("xmlAttributeValue.getText() = " + value.getText());
-		if (XmlParsingPhaseEnum.ID_ATTRIBUTE.equals(phase) && value.getValue().length() != 0) {
+		if (XmlParsingPhaseEnum.ID_ATTRIBUTE.equals(phase) && !value.getValue().isEmpty()) {
 			phase = XmlParsingPhaseEnum.ID_VALUE;
-//			SQLRefReference refReference = new SQLRefReference(value, visitedFile, currentFileRefCollection);
-			com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference refReference =
-					new com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference(value.getValue());
-
-//			refReference.addXmlFile(SQLRefApplication.getVirtualFileFromPsiFile(visitedFile, project));
-//			currentIndexedSQLRef = refReference;
-//			System.out.println("refReference = " + refReference.getXmlPsiElement().getText());
-			if (!isFirstEncounter) {
+			/*if (!isFirstEncounter) {
 				String containingFilePath = StringUtils.cleanPath(value.getContainingFile().getVirtualFile().getPath());
 				Project guessedProject = ProjectUtil.guessProjectForFile(value.getContainingFile().getVirtualFile());
 				String parentPath = PathUtil.getParentPath(containingFilePath);
 				System.out.println("containingFilePath= " + containingFilePath + "\nparentPath = " + parentPath + "\nguessedProject: " + guessedProject);
-			}
+			}*/
+//			if (istInspector()) {
+//				if (isMultipleAttributes) {
+			logger.info("visitXmlAttributeValue(): multipleAttributes Found For RefId=" + value.getValue());
+//					xmlVisitorListener.foundDoubleAttributeValidRefId(value.getValue(), value);
+//				} else {
 			xmlVisitorListener.foundValidRefId(value.getValue(), value);
-//			putQueryReferenceToFileRefManager(visitedFile.getName(), refReference);
+//				}
+//			}
 		}
 		super.visitXmlAttributeValue(value);
 	}
 
 	@Override
 	public void visitXmlDocument(XmlDocument document) {
-        /*if (soDisplayProgress) {
-              progressIndicator.setFraction(0.0 + (1 / 20));
-          }*/
 		super.visitXmlDocument(document);
 	}
 

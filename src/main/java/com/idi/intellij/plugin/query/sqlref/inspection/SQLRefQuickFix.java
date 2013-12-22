@@ -3,7 +3,10 @@ package com.idi.intellij.plugin.query.sqlref.inspection;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiModifierList;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,7 +34,15 @@ public class SQLRefQuickFix implements LocalQuickFix {
 	@Override
 	public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
 		PsiElement psiElement = descriptor.getPsiElement();
+		final TextRange textRange = psiElement.getTextRange();
 
+		if (psiElement instanceof PsiModifierList) {
+			final PsiAnnotation[] annotations = ((PsiModifierList) psiElement).getAnnotations();
+			for (PsiAnnotation annotation : annotations) {
+
+			}
+			annotations[0].getParameterList().getAttributes()[0].getValue();
+		}
 		//To change body of implemented methods use File | Settings | File Templates.
 	}
 }
