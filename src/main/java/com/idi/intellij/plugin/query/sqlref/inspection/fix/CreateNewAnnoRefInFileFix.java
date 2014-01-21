@@ -6,9 +6,13 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +46,9 @@ public class CreateNewAnnoRefInFileFix extends LocalQuickFixBase {
 //		if (psiElement instanceof PsiModifierList) {
 			/*final PsiAnnotation[] annotations = ((PsiModifierList) psiElement).getAnnotations();
 			for (PsiAnnotation annotation : annotations) {*/
+		final String fileInProvidedPath = FileUtil.findFileInProvidedPath(classModule.getModuleFilePath());
+		Pattern pattern = Pattern.compile("^(.*(-queries.xml)$)", Pattern.CASE_INSENSITIVE);
+		FileUtil.findFilesByMask(pattern, new File(fileInProvidedPath != null ? fileInProvidedPath : "default-queries.xml"));
 		annoRefId = String.valueOf(annoRefAnnotation.getParameterList().getAttributes()[0].getValue());
 		final CreateNewAnnoRefIdInXmlDialog annoRefIdInXmlDialog = new CreateNewAnnoRefIdInXmlDialog(project,
 				classModule, classPackageName, annoRefId);
