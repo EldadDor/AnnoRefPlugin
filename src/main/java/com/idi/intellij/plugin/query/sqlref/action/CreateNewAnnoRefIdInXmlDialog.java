@@ -27,7 +27,7 @@ import java.awt.event.ActionEvent;
  * To change this template use File | Settings | File Templates.
  */
 public class CreateNewAnnoRefIdInXmlDialog extends DialogWrapper {
-	private final static Logger logger = Logger.getInstance(CreateNewAnnoRefIdInXmlDialog.class.getName());
+	private static final Logger logger = Logger.getInstance(CreateNewAnnoRefIdInXmlDialog.class.getName());
 
 	private String packageName;
 	private Project project;
@@ -58,8 +58,9 @@ public class CreateNewAnnoRefIdInXmlDialog extends DialogWrapper {
 		final PsiDirectory[] psiDirectories = aPackage.getDirectories();
 		for (PsiDirectory psiDirectory : psiDirectories) {
 			final Module moduleForPsiElement = ModuleUtil.findModuleForPsiElement(psiDirectory);
-			if (moduleForPsiElement.getName().equals(module.getName()))
+			if (moduleForPsiElement.getName().equals(module.getName())) {
 				logger.info(psiDirectory.getName());
+			}
 		}
 		final PsiFile containingFile = aPackage.getContainingFile();
 

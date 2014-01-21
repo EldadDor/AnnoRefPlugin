@@ -447,6 +447,15 @@ public abstract class StringUtils {
 		return (str != null ? "'" + str + "'" : null);
 	}
 
+	public static String cleanQuote(String str) {
+		if (str != null) {
+			if (str.startsWith("") && str.endsWith("")) {
+				return str.substring(1, str.length() - 1);
+			}
+		}
+		return str;
+	}
+
 	/**
 	 * Turn the given Object into a String with single quotes
 	 * if it is a String; keeping the Object as-is else.

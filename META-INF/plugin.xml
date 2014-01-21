@@ -2,13 +2,30 @@
 	<name>SQLRef Usage</name>
 	<description>
 		<![CDATA[
-      Find the SQLRef id and usage in
-      The XML File and Corresponding class file
+  SQLRef plugin, an Ad Hoc version for the AnnoRef plugin.
+  To be used in IDI for the SQLRef query infrastructure
       ]]></description>
-	<version>4.0.2</version>
+	<version>4.0.7</version>
 	<vendor>EldadDor-IDI</vendor>
 	<idea-version since-build="129.713"/>
 
+	<change-notes>
+		<![CDATA[
+	      <b>Version 4.0.7</b>
+	      <ul>
+	        <li>Unused ProblemHighlight For Unused Annotation ref</li>
+	      </ul>
+			<b>Version 4.0.5</b>
+	      <ul>
+	        <li>Compatible with IDEA 13</li>
+	        <li>CreateAnnoRefClass For Unused Tag Fix now works</li>
+	      </ul>
+
+	      <b>Version 4.0.2</b>
+	      <ul><li>Compatible with IDEA 12</li></ul>
+
+	    ]]>
+	</change-notes>
 
 	<extensions defaultExtensionNs="com.intellij">
 		<errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>

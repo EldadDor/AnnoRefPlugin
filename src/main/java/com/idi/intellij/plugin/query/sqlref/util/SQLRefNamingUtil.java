@@ -8,6 +8,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlFile;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
@@ -47,7 +48,7 @@ public class SQLRefNamingUtil {
 	private static String cleanSQLRefQuotes(PsiAnnotation annoRefValue) {
 		String firstStrip;
 		if (annoRefValue != null && annoRefValue.getText().length() > 1 && annoRefValue.getText().contains("=")) {
-			firstStrip = org.apache.commons.lang.StringUtils.stripEnd(annoRefValue.getText().split("=")[1], ")");
+			firstStrip = StringUtils.stripEnd(annoRefValue.getText().split("=")[1], ")");
 		} else {
 			return null;
 		}
@@ -59,7 +60,7 @@ public class SQLRefNamingUtil {
 		if (firstStrip != null) {
 			sndStrip = StringUtil.stripQuotesAroundValue(firstStrip);
 		}
-		if (sndStrip != null && sndStrip.length() > 2 && !org.apache.commons.lang.StringUtils.containsOnly("'", sndStrip)) {
+		if (sndStrip != null && sndStrip.length() > 2 && !StringUtils.containsOnly("'", sndStrip)) {
 			return StringUtil.stripQuotesAroundValue(sndStrip).substring(2, sndStrip.length());
 		}
 		return null;
@@ -119,31 +120,24 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
+
 	public static PsiAnnotation getAnnotationForPropitiousClassFile(PsiFile psiFile, ClassVisitorListener visitorListener, String classFQN) {
 		try {
 			if (psiFile instanceof PsiJavaFile) {
 				for (PsiElement classChild : psiFile.getChildren()) {
 					if (classChild instanceof PsiClass && ((PsiModifierListOwner) classChild).hasModifierProperty(PsiModifier.PUBLIC)) {
 						final PsiAnnotation psiAnno = getPropitiousClassElementAnnotation((PsiClass) classChild, classFQN);
-					/*	final PsiModifierList annoRefChild = ((PsiModifierListOwner) classChild).getModifierList();
-						PsiAnnotation psiAnno = AnnotationUtil.findAnnotation(((PsiModifierListOwner) annoRefChild),
-								SQLRefConfigSettings.getInstance(project).getSqlRefState().ANNOREF_ANNOTATION_FQN);*/
 						if (psiAnno != null) {
-							if (classFQN.equals(SQLRefConfigSettings.getInstance(psiFile.getProject()).getSqlRefState().
-									ANNO_ANNOTATION_FQN)) {
-								return psiAnno;
-							} else {
-								String qualifiedName = psiAnno.getQualifiedName();
-								if (qualifiedName != null) {
-									final String[] sQLRefArray = qualifiedName.split("\\.");
-									if (isValidSQLRefId(psiAnno, sQLRefArray)) {
-										final String cleanedAnno = cleanAnnoRefForName(psiFile, psiAnno);
-										if (cleanedAnno != null) {
-											if (visitorListener != null) {
-												visitorListener.foundValidAnnotation(psiAnno);
-											}
-											return psiAnno;
+							String qualifiedName = psiAnno.getQualifiedName();
+							if (qualifiedName != null) {
+								final String[] sQLRefArray = qualifiedName.split("\\.");
+								if (isValidSQLRefId(psiAnno, sQLRefArray)) {
+									final String cleanedAnno = cleanAnnoRefForName(psiFile, psiAnno);
+									if (cleanedAnno != null) {
+										if (visitorListener != null) {
+											visitorListener.foundValidAnnotation(psiAnno);
 										}
+										return psiAnno;
 									}
 								}
 							}
@@ -153,6 +147,26 @@ public class SQLRefNamingUtil {
 			}
 		} catch (Exception e) {
 			logger.error("PsiFile scanning for Propitiously failed : " + e.getMessage(), e);
+		}
+		return null;
+	}
+
+	public static PsiAnnotation getAnnotationForConversionClassFile(PsiFile psiFile, ClassVisitorListener visitorListener, String classFQN) {
+		try {
+			if (psiFile instanceof PsiJavaFile) {
+				for (PsiElement classChild : psiFile.getChildren()) {
+					if (classChild instanceof PsiClass && ((PsiModifierListOwner) classChild).hasModifierProperty(PsiModifier.PUBLIC)) {
+						final PsiAnnotation psiAnno = getPropitiousClassElementAnnotation((PsiClass) classChild, classFQN);
+						if (psiAnno != null) {
+							if (classFQN.equals(SQLRefConfigSettings.getInstance(psiFile.getProject()).getSqlRefState().ANNO_ANNOTATION_FQN)) {
+								return psiAnno;
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("PsiFile scanning for ConversionClass failed : " + e.getMessage(), e);
 		}
 		return null;
 	}

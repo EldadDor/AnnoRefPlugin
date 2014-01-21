@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SQLRefPluginManager {
 
-	private final static Logger logger = Logger.getInstance(SQLRefPluginManager.class.getName());
+	private static final Logger logger = Logger.getInstance(SQLRefPluginManager.class.getName());
 
 	public static Map<String, SQLRefApplication> projectBasePathMap = new ConcurrentHashMap<String, SQLRefApplication>(1);
 

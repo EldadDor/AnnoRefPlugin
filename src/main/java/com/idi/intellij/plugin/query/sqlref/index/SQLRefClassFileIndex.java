@@ -50,6 +50,7 @@ public class SQLRefClassFileIndex {
 
 	private void scanClassFile(VirtualFile classFile) {
 		String classFileName = classFile.getName();
+		logger.info("scanClassFile(): classFileName=" + classFileName);
 		final PsiElement[] annoElement = new PsiElement[1];
 		String sqlRefIdInClass = SQLRefNamingUtil.isPropitiousClassFile(SQLRefApplication.getPsiFileFromVirtualFile(classFile, project), new ClassVisitorListener() {
 			@Override

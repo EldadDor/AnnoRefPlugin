@@ -30,7 +30,7 @@ public class CreateNewAnnoRefInFileFix extends LocalQuickFixBase {
 	public CreateNewAnnoRefInFileFix(@NotNull String name, PsiAnnotation annoRefAnnotation, Module classTargetModule, String classPackageName) {
 		super(name);
 		this.annoRefAnnotation = annoRefAnnotation;
-		this.classModule = classTargetModule;
+		classModule = classTargetModule;
 		this.classPackageName = classPackageName;
 	}
 
