@@ -1,12 +1,12 @@
 package com.idi.intellij.plugin.query.sqlref.action;
 
-import com.idi.intellij.plugin.query.sqlref.util.SQLRefApplication;
-import com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor;
+import com.idi.intellij.plugin.query.sqlref.component.SPViewMainPanel;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.GuiUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,7 +28,13 @@ public class findSqlRefUsageAction extends AnAction {
 	@Override
 	public void actionPerformed(@NotNull AnActionEvent event) {
 		Project project = (Project) event.getDataContext().getData(PlatformDataKeys.PROJECT.getName());
-		SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).initializeSQLRefData(event.getDataContext());
+		final SPViewMainPanel mainPanel = new SPViewMainPanel("Test_SP");
+		mainPanel.createUI();
+
+		GuiUtils.makeDialogPanel(mainPanel.getMyPanel()).setVisible(true);
+
+//		ContentManagerUtil.getContentManagerFromContext(event.getDataContext(), false);
+//		SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).initializeSQLRefData(event.getDataContext());
 	}
 
 }
