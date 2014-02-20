@@ -5,7 +5,7 @@
   SQLRef & SP Viewer plugin, an Ad Hoc version for the AnnoRef plugin.
   To be used in IDI for the @SQLRef/@SQL/@SP query infrastructure
       ]]></description>
-	<version>4.2.2</version>
+	<version>4.2.3</version>
 	<vendor>EldadDor-IDI</vendor>
 	<idea-version since-build="129.713"/>
 	<depends>com.intellij.javaee</depends>
