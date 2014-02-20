@@ -22,6 +22,7 @@ import com.intellij.openapi.vfs.VirtualFile;
  * Time: 15:08:31
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class SQLRefNavigationResetAction extends AnAction {
 	private static final Logger LOGGER = Logger.getInstance(SQLRefNavigationResetAction.class.getName());
 
@@ -45,7 +46,7 @@ public class SQLRefNavigationResetAction extends AnAction {
 
 							SQLRefApplication.resetProjectClassesAndReferences(project);
 							progress.setFraction(0.2);
-							SQLRefApplication.initializeManagersForProject(project);
+							SQLRefApplication.getInstance().initializeManagersForProject(project);
 							progress.setFraction(0.3);
 							final VirtualFile[] xmlVfToScan = PackageIndex.getInstance(project).getDirectoriesByPackageName("queries", true);
 							progress.setFraction(0.4);

@@ -16,6 +16,12 @@
 			<artifactId>xstream</artifactId>
 			<version>1.4.2</version>
 			<scope>compile</scope>
+
+		</dependency>
+		<dependency>
+			<groupId>jsyntaxpane</groupId>
+			<artifactId>jsyntaxpane</artifactId>
+			<version>0.9.6</version>
 		</dependency>
 	</dependencies>
 	<build>

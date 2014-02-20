@@ -70,8 +70,7 @@ public class CreateAnnoRefClassForUnusedTagFix extends LocalQuickFixBase {
 //		final PsiExpressionTrimRenderer psiExpressionTrimRenderer = new PsiExpressionTrimRenderer(new StringBuilder());
 //		psiExpressionTrimRenderer.visitFile(targetClass.getContainingFile());
 
-		setAnnotationParameter(targetClass,
-				SQLRefConfigSettings.getInstance(project).getSqlRefState().ANNOREF_ANNOTATION_FQN,
+		setAnnotationParameter(targetClass, SQLRefConfigSettings.getInstance(project).getSqlRefState().ANNOREF_ANNOTATION_FQN,
 				SQLRefConfigSettings.getInstance(project).getSqlRefState().ANNOREF_ANNOTATION_ATTRIBUTE_ID,
 				String.valueOf(StringUtils.doubleQuote(refIdName)));
 		final PsiElementFactory psiElementFactory = JavaPsiFacade.getInstance(project).getElementFactory();

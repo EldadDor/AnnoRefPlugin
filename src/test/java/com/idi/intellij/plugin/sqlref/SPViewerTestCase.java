@@ -1,6 +1,5 @@
 package com.idi.intellij.plugin.sqlref;
 
-import com.idi.intellij.plugin.query.sqlref.config.SPViewPanelForm;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 
 import javax.swing.*;
@@ -11,9 +10,9 @@ import java.awt.*;
  */
 public class SPViewerTestCase extends LightCodeInsightFixtureTestCase {
 	public void testPanelViewConstruction() throws Exception {
-		final SPViewPanelForm panelForm = new SPViewPanelForm();
+//		final SPViewPanelForm panelForm = new SPViewPanelForm();
 		final JFrame frame = new JFrame("SPViewMainPanel");
-		frame.setContentPane(panelForm.getMainPanel());
+//		frame.setContentPane(panelForm.getMainPanel());
 		frame.setSize(new Dimension(700, 500));
 		frame.pack();
 		frame.setVisible(true);
@@ -21,13 +20,23 @@ public class SPViewerTestCase extends LightCodeInsightFixtureTestCase {
 	}
 
 	public static void main(String[] args) {
-		final SPViewPanelForm panelForm = new SPViewPanelForm();
-		final JFrame frame = new JFrame("SPViewMainPanel");
-		frame.setContentPane(panelForm.getMainPanel());
-		frame.setSize(new Dimension(700, 500));
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);
+//		final SPViewPanelForm panelForm = new SPViewPanelForm();
+		JFrame f = new JFrame(SPViewerTestCase.class.getName());
+		final Container c = f.getContentPane();
+		c.setLayout(new BorderLayout());
+
+//		DefaultSyntaxKit.initKit();
+
+		final JEditorPane codeEditor = new JEditorPane();
+		JScrollPane scrPane = new JScrollPane(codeEditor);
+		c.add(scrPane, BorderLayout.CENTER);
+		c.doLayout();
+		codeEditor.setContentType("text/java");
+		codeEditor.setText("public static void main(String[] args) {\n}");
+
+		f.setSize(800, 600);
+		f.setVisible(true);
+		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
 	}
 }

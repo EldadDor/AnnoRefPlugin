@@ -20,8 +20,6 @@ public interface SQLRefConstants {
 	Icon ANNO_REF_MESSAGE_ICON_E = IconLoader.findIcon("/icons/ex_mark_red_16.png");
 	String SQL_REF_ANNOTATION_FQN = "com.idi.framework";
 	String SQL_REF_ANNOTATION_VALUE = "refId";
-	String SQL_REF_NAME = "SQLRef";
-	Color MessagePopupBackgroundColor = JBColor.getHSBColor(30, 160, 130);
-
-
+	String ANNO_REF_NAME = "AnnoRef";
+	Color MessagePopupBackgroundColor = JBColor.getHSBColor(74, 116, 200);
 }

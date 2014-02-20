@@ -151,16 +151,14 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
-	public static PsiAnnotation getAnnotationForConversionClassFile(PsiFile psiFile, ClassVisitorListener visitorListener, String classFQN) {
+	public static PsiAnnotation getAnnotationForConfiguredClassFile(PsiFile psiFile, String classFQN) {
 		try {
 			if (psiFile instanceof PsiJavaFile) {
 				for (PsiElement classChild : psiFile.getChildren()) {
 					if (classChild instanceof PsiClass && ((PsiModifierListOwner) classChild).hasModifierProperty(PsiModifier.PUBLIC)) {
 						final PsiAnnotation psiAnno = getPropitiousClassElementAnnotation((PsiClass) classChild, classFQN);
 						if (psiAnno != null) {
-							if (classFQN.equals(SQLRefConfigSettings.getInstance(psiFile.getProject()).getSqlRefState().ANNO_ANNOTATION_FQN)) {
-								return psiAnno;
-							}
+							return psiAnno;
 						}
 					}
 				}

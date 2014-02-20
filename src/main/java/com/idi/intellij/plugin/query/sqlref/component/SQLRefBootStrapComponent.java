@@ -6,6 +6,7 @@ import com.idi.intellij.plugin.query.sqlref.index.SQLRefClassProjectRunnable;
 import com.idi.intellij.plugin.query.sqlref.index.SQLRefIndexProjectRunnable;
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefApplication;
 import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -55,13 +56,14 @@ public class SQLRefBootStrapComponent implements ProjectComponent {
 		StartupManager.getInstance(project).registerPostStartupActivity(new Runnable() {
 			@Override
 			public void run() {
-				SQLRefApplication.initializeManagersForProject(project);
+				SQLRefApplication.getInstance().initializeManagersForProject(project);
 				stopwatch.stop();
 				logger.info("STOPWATCH run elapsed=" + stopwatch.elapsedMillis());
 			}
 		});
 
 		logger.info("STOPWATCH last elapsed=" + stopwatch.elapsedMillis());
+		ServiceManager.getService(project, SPViewContentStateManager.class);
 	}
 
 	@Override

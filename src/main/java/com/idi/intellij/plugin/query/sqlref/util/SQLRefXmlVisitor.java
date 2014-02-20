@@ -111,7 +111,7 @@ public class SQLRefXmlVisitor extends XmlRecursiveElementVisitor {
 			}*/
 //			if (istInspector()) {
 //				if (isMultipleAttributes) {
-			logger.info("visitXmlAttributeValue(): multipleAttributes Found For RefId=" + value.getValue());
+//					logger.info("visitXmlAttributeValue(): multipleAttributes Found For RefId=" + value.getValue());
 //					xmlVisitorListener.foundDoubleAttributeValidRefId(value.getValue(), value);
 //				} else {
 			xmlVisitorListener.foundValidRefId(value.getValue(), value);

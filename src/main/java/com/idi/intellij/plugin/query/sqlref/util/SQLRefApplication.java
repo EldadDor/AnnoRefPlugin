@@ -5,8 +5,10 @@ import com.idi.intellij.plugin.query.sqlref.index.progress.SQLRefProgressIndicat
 import com.idi.intellij.plugin.query.sqlref.index.progress.SQLRefProgressRunnable;
 import com.idi.intellij.plugin.query.sqlref.model.ClassReferenceCache;
 import com.idi.intellij.plugin.query.sqlref.model.ReferenceCollectionManager;
+import com.idi.intellij.plugin.query.sqlref.notification.AnnoRefNotifications;
 import com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings;
 import com.intellij.ProjectTopics;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -26,6 +28,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.Processor;
+import com.intellij.util.messages.impl.MessageListenerList;
 import org.jetbrains.annotations.TestOnly;
 
 import java.util.Map;
@@ -47,10 +50,19 @@ public class SQLRefApplication {
 	private static final Map<String, ClassReferenceCache> classesRefCacheProjectManager = new ConcurrentHashMap<String, ClassReferenceCache>();
 	private static final AtomicInteger scannerCounter = new AtomicInteger(0);
 	private static final AtomicBoolean isResetRunning = new AtomicBoolean(false);
+	private MessageListenerList<Notifications> notificationsMessageListenerList;
+	private static SQLRefApplication instance;
 
 	@Deprecated
 	public static <T> T getInstance(Class<T> type) {
 		return ServiceManager.getService(type);
+	}
+
+	public static SQLRefApplication getInstance() {
+		if (instance == null) {
+			instance = new SQLRefApplication();
+		}
+		return instance;
 	}
 
 	public static <T> T getInstance(Project project, Class<T> type) {
@@ -81,11 +93,12 @@ public class SQLRefApplication {
 		logger.info("removeScanner(): scannerCounter=" + scannerCounter.decrementAndGet());
 	}
 
-	public static void initializeManagersForProject(Project project) {
+	public void initializeManagersForProject(Project project) {
 		createNewClassesRefCacheForProject(project);
 		if (isNotScanning()) {
 			registerForProjectRootChanges(project);
 		}
+		registerNotificationsListener(project);
 		logger.info("initializeManagersForProject(): Finished initialize");
 	}
 
@@ -97,7 +110,7 @@ public class SQLRefApplication {
 					logger.info("registerForProjectRootChanges()_rootsChanged(): event=" + event.isCausedByFileTypesChange());
 					final Project projectSource = (Project) event.getSource();
 					final SQLRefProgressIndicator sqlRefProgressIndicator = new SQLRefProgressIndicator(projectSource, AnnoRefBundle.message("annoRef.progress.reindex"),
-							PerformInBackgroundOption.DEAF, AnnoRefBundle.message("annoRef.progress.reindex.cancel"), "", true);
+							PerformInBackgroundOption.ALWAYS_BACKGROUND, AnnoRefBundle.message("annoRef.progress.reindex.cancel"), "", true);
 					TaskInfo taskInfoWrapper = null;
 					final ProgressChangedListener progressListener = new ProgressChangedListener() {
 						@Override
@@ -107,7 +120,13 @@ public class SQLRefApplication {
 								if (logger.isDebugEnabled()) {
 									logger.debug("changeMade(): currentFraction()= " + sqlRefProgressIndicator.getFraction());
 								}
+
 							}
+						}
+
+						@Override
+						public void failedProcess() {
+							logger.info("failedProcess(): indexing SQLRef");
 						}
 					};
 					Runnable process = new SQLRefProgressRunnable(projectSource, taskInfoWrapper, progressListener);
@@ -124,7 +143,15 @@ public class SQLRefApplication {
 				}
 			}
 		});
+
 	}
+
+	private void registerNotificationsListener(Project project) {
+		project.getMessageBus().connect(project).subscribe(Notifications.TOPIC, new AnnoRefNotifications());
+//		notificationsMessageListenerList = new MessageListenerList<Notifications>(project.getMessageBus(), Notifications.TOPIC);
+//		notificationsMessageListenerList.add(new AnnoRefNotifications());
+	}
+
 
 	@TestOnly
 	private static void moduleEnumeratorInfo(Project project, Set<Module> moduleList) {

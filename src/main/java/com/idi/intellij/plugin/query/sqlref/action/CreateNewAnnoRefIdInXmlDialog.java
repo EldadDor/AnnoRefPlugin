@@ -109,20 +109,20 @@ public class CreateNewAnnoRefIdInXmlDialog extends DialogWrapper {
 
 		private void initCenterPanel() {
 			setLayout(this.gridBagLayout1);
-			this.fPackageText.setMinimumSize(new Dimension(350, 21));
-			this.fPackageText.setPreferredSize(new Dimension(130, 21));
-			this.fAnnoRefIdLabel.setText("AnnoRef ID:");
-			this.fAnnoRefFileLabel.setText("AnnoRef Selected File:");
-			this.fPackageNameLabel.setText("Package Name:");
-			add(this.fAnnoRefFileLabel, new GridBagConstraints(0, 0, 1, 1, 0.0D, 0.0D, 15, 0, new Insets(5, 5, 0, 5), 0, 0));
-			add(this.fAnnoRefFileText, new GridBagConstraints(1, 0, 1, 1, 0.0D, 0.0D, 15, 1, new Insets(5, 5, 0, 5), 0, 0));
-			add(this.fFileSelectionButton, new GridBagConstraints(2, 0, 1, 1, 0.0D, 0.0D, 15, 1, new Insets(5, 5, 0, 5), 0, 0));
+			fPackageText.setMinimumSize(new Dimension(350, 21));
+			fPackageText.setPreferredSize(new Dimension(130, 21));
+			fAnnoRefIdLabel.setText("AnnoRef ID:");
+			fAnnoRefFileLabel.setText("AnnoRef Selected File:");
+			fPackageNameLabel.setText("Package Name:");
+			add(fAnnoRefFileLabel, new GridBagConstraints(0, 0, 1, 1, 0.0D, 0.0D, 15, 0, new Insets(5, 5, 0, 5), 0, 0));
+			add(fAnnoRefFileText, new GridBagConstraints(1, 0, 1, 1, 0.0D, 0.0D, 15, 1, new Insets(5, 5, 0, 5), 0, 0));
+			add(fFileSelectionButton, new GridBagConstraints(2, 0, 1, 1, 0.0D, 0.0D, 15, 1, new Insets(5, 5, 0, 5), 0, 0));
 
-			add(this.fPackageNameLabel, new GridBagConstraints(0, 2, 1, 1, 0.0D, 0.0D, 10, 1, new Insets(5, 5, 0, 5), 0, 0));
-			add(this.fPackageText, new GridBagConstraints(1, 2, 1, 1, 1.0D, 0.0D, 10, 2, new Insets(5, 0, 0, 0), 0, 0));
+			add(fPackageNameLabel, new GridBagConstraints(0, 2, 1, 1, 0.0D, 0.0D, 10, 1, new Insets(5, 5, 0, 5), 0, 0));
+			add(fPackageText, new GridBagConstraints(1, 2, 1, 1, 1.0D, 0.0D, 10, 2, new Insets(5, 0, 0, 0), 0, 0));
 //			add(this.fPackageSelectionButton, new GridBagConstraints(2, 2, 1, 1, 0.0D, 0.0D, 10, 1, new Insets(5, 5, 0, 5), 0, 0));
-			add(this.fAnnoRefIdLabel, new GridBagConstraints(0, 3, 1, 1, 0.0D, 0.0D, 10, 1, new Insets(5, 5, 0, 5), 0, 0));
-			add(this.fAnnoRefIdText, new GridBagConstraints(1, 3, 1, 1, 0.0D, 0.0D, 10, 1, new Insets(5, 5, 0, 5), 0, 0));
+			add(fAnnoRefIdLabel, new GridBagConstraints(0, 3, 1, 1, 0.0D, 0.0D, 10, 1, new Insets(5, 5, 0, 5), 0, 0));
+			add(fAnnoRefIdText, new GridBagConstraints(1, 3, 1, 1, 0.0D, 0.0D, 10, 1, new Insets(5, 5, 0, 5), 0, 0));
 		}
 	}
 

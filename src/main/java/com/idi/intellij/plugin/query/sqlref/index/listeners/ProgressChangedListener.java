@@ -10,4 +10,5 @@ package com.idi.intellij.plugin.query.sqlref.index.listeners;
 public interface ProgressChangedListener {
 	void changeMade(boolean isChanged);
 
+	void failedProcess();
 }

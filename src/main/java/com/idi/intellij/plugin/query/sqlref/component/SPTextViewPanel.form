@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.idi.intellij.plugin.query.sqlref.component.SPTextViewPanel">
+  <grid id="27dc6" binding="spViewFormPanel" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="20" y="20" width="594" height="400"/>
+    </constraints>
+    <properties>
+      <preferredSize width="500" height="200"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <vspacer id="88fe0">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="10.0" weighty="10.0"/>
+        </constraints>
+      </vspacer>
+      <component id="17a91" class="javax.swing.JSeparator">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="2" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="200.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="881f2" class="javax.swing.JTextField" binding="textAreaBody">
+        <constraints>
+          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="78225" class="javax.swing.JButton" binding="submitButton" default-binding="true">
+        <constraints>
+          <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <text value="Submit"/>
+        </properties>
+      </component>
+      <component id="9d388" class="javax.swing.JSeparator">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <preferredSize width="0" height="20"/>
+        </properties>
+      </component>
+      <grid id="a20e2" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="62f4e" class="javax.swing.JButton" binding="button2" default-binding="true">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <horizontalTextPosition value="0"/>
+              <icon value="nodes/collapseNode.png"/>
+              <text value=""/>
+              <verticalAlignment value="3"/>
+            </properties>
+          </component>
+          <component id="2ddbe" class="javax.swing.JButton" binding="button1" default-binding="true">
+            <constraints border-constraint="South"/>
+            <properties>
+              <hideActionText value="true"/>
+              <icon value="nodes/expandNode.png"/>
+              <text value=""/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <component id="41440" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <text value="Enter SP Name:"/>
+        </properties>
+      </component>
+      <component id="48a19" class="javax.swing.JTextArea" binding="textArea1" custom-create="true" default-binding="true">
+        <constraints>
+          <grid row="4" column="2" row-span="1" col-span="2" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="50"/>
+          </grid>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+      </component>
+    </children>
+  </grid>
+</form>

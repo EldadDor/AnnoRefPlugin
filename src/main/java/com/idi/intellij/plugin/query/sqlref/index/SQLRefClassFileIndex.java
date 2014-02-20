@@ -50,7 +50,7 @@ public class SQLRefClassFileIndex {
 
 	private void scanClassFile(VirtualFile classFile) {
 		String classFileName = classFile.getName();
-		logger.info("scanClassFile(): classFileName=" + classFileName);
+//		logger.info("scanClassFile(): classFileName="+classFileName);
 		final PsiElement[] annoElement = new PsiElement[1];
 		String sqlRefIdInClass = SQLRefNamingUtil.isPropitiousClassFile(SQLRefApplication.getPsiFileFromVirtualFile(classFile, project), new ClassVisitorListener() {
 			@Override
@@ -60,7 +60,7 @@ public class SQLRefClassFileIndex {
 		}, SQLRefConfigSettings.getInstance(project).getSqlRefState().ANNOREF_ANNOTATION_FQN);
 		if (sqlRefIdInClass != null) {
 //				showVFInfo(classFile);
-			logger.info("scanClassFile(): sqlRefIdInClass=" + sqlRefIdInClass);
+//			logger.info("scanClassFile(): sqlRefIdInClass=" + sqlRefIdInClass);
 //				final ID classFileNameKey = StubIndexKey.createIndexKey(classFileName);
 			ServiceManager.getService(project, SQLRefRepository.class).addClassFileInformationToRepository(sqlRefIdInClass, classFile, annoElement[0]);
 		}

@@ -1,5 +1,6 @@
 package com.idi.intellij.plugin.query.sqlref.index;
 
+import com.idi.intellij.plugin.query.sqlref.common.SPViewIndexHelper;
 import com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -22,6 +23,7 @@ public class SQLRefRepository implements ProjectComponent {
 	private static final Logger logger = Logger.getInstance(SQLRefRepository.class.getName());
 
 	//	private Map<ID, SQLRefReference> xmlRepository = new ConcurrentHashMap<ID, SQLRefReference>();
+	private Map<String, SPViewIndexHelper> spViewIndexHelperMap = new ConcurrentHashMap<String, SPViewIndexHelper>();
 	private Map<ID, SQLRefReference> classRepository = new ConcurrentHashMap<ID, SQLRefReference>();
 	private Map<String, SQLRefReference> sqlRefReferenceMap = new ConcurrentHashMap<String, SQLRefReference>();
 
@@ -32,6 +34,21 @@ public class SQLRefRepository implements ProjectComponent {
 		classRepository.clear();
 		sqlRefReferenceMap.clear();
 	}
+
+	public void addSPViewIndexToRepo(String spName, SPViewIndexHelper spViewIndexHelper) {
+		if (spName != null && !spName.isEmpty()) {
+			spViewIndexHelperMap.put(spName, spViewIndexHelper);
+		}
+
+	}
+
+	public SPViewIndexHelper getSPViewIndexByName(String spName) {
+		if (spViewIndexHelperMap.containsKey(spName)) {
+			return spViewIndexHelperMap.get(spName);
+		}
+		return null;
+	}
+
 
 /*	public boolean removeClassFromRepository(ID classID) {
 		logger.info("removeClassFromRepository(): classID=" + classID.toString());

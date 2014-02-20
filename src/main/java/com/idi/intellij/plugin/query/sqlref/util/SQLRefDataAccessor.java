@@ -314,7 +314,9 @@ public class SQLRefDataAccessor implements ProjectComponent {
 				if (fileEditor instanceof TextEditor) {
 					Editor editor = ((TextEditor) fileEditor).getEditor();
 //					TextAttributes attributes = new TextAttributes(editor.getColorsScheme().getDefaultForeground(), null, Color.red, EffectType.WAVE_UNDERSCORE, Font.PLAIN);
-					TextAttributes attributes = new TextAttributes(new JBColor(new Color(205, 230, 230), new Color(0, 50, 50)), null, JBColor.MAGENTA, EffectType.WAVE_UNDERSCORE, Font.PLAIN);
+					final JBColor foregroundColor = new JBColor(new Color(230, 44, 14), new Color(230, 44, 14));
+					final JBColor backgroundColor = new JBColor(new Color(99, 185, 230), new Color(99, 185, 230));
+					TextAttributes attributes = new TextAttributes(foregroundColor, backgroundColor, null, EffectType.WAVE_UNDERSCORE, Font.PLAIN);
 					TextRange annoRefTextRange = new TextRange(annoElement.getTextRange().getStartOffset(), annoElement.getTextRange().getEndOffset());
 					RangeHighlighter rangeHighlighter = editor.getMarkupModel().addRangeHighlighter(annoElement.getTextRange().getStartOffset(),
 							annoElement.getTextRange().getEndOffset(), HighlighterLayer.FIRST, attributes, HighlighterTargetArea.EXACT_RANGE);

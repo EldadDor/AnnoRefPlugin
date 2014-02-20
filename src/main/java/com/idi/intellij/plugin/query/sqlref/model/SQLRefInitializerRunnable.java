@@ -32,7 +32,7 @@ public class SQLRefInitializerRunnable implements Runnable {
 	@Override
 	public void run() {
 		SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).setProject(project);
-		SQLRefApplication.initializeManagersForProject(project);
+		SQLRefApplication.getInstance().initializeManagersForProject(project);
 		final VirtualFile[] xmlVfToScan = PackageIndex.getInstance(project).getDirectoriesByPackageName("queries", true);
 		SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, xmlVfToScan);
 		final VirtualFile[] classVfToScan = PackageIndex.getInstance(project).getDirectoriesByPackageName("com.idi", true);

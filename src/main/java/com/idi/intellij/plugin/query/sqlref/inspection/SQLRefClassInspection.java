@@ -7,6 +7,8 @@ import com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefReference;
 import com.idi.intellij.plugin.query.sqlref.util.AnnoRefBundle;
 import com.idi.intellij.plugin.query.sqlref.util.SQLRefNamingUtil;
 import com.idi.intellij.plugin.query.sqlref.util.StringUtils;
+import com.intellij.codeInsight.documentation.DocumentationComponent;
+import com.intellij.codeInsight.documentation.DocumentationManager;
 import com.intellij.codeInspection.*;
 import com.intellij.javaee.dataSource.DataSource;
 import com.intellij.javaee.dataSource.DataSourceManager;
@@ -26,6 +28,9 @@ import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,8 +64,7 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 		final List<ProblemDescriptor> problemDescriptorList = new ArrayList<ProblemDescriptor>();
 		if (file instanceof PsiJavaFile) {
 			logger.info("checkFile(): file=" + file);
-
-			PsiAnnotation psiAnnotation = SQLRefNamingUtil.getAnnotationForConversionClassFile(file, null, SQLRefConfigSettings.getInstance(file.getProject()).getSqlRefState().
+			PsiAnnotation psiAnnotation = SQLRefNamingUtil.getAnnotationForConfiguredClassFile(file, SQLRefConfigSettings.getInstance(file.getProject()).getSqlRefState().
 					ANNO_ANNOTATION_FQN);
 			if (psiAnnotation != null) {
 				logger.info("checkFile(): conversionClassFile=" + file.getName());
@@ -68,17 +72,26 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 				final PsiNameValuePair psiNameValuePair = psiAnnotation.getParameterList().getAttributes()[0];
 				final SQLRefReference sqlRefReferenceForID = ServiceManager.getService(file.getProject(), SQLRefRepository.class).getSQLRefReferenceForID(psiNameValuePair.getValue().getText());
 				problemDescriptorList.add(addProblemDescriptorForConversionCandidate((PsiClassOwner) file, manager, psiAnnotation, module));
+			/*	try {
+					datasourceTest(file.getProject());
+				} catch (Exception e) {
+					logger.error("checkFile(): Exception=" + e.getMessage(), e);
+				}*/
 			} else {
 				logger.info("checkFile(): propitiousClassFile=" + file.getName());
 				psiAnnotation = SQLRefNamingUtil.getAnnotationForPropitiousClassFile(file, null, SQLRefConfigSettings.getInstance(file.getProject()).getSqlRefState().
 						ANNOREF_ANNOTATION_FQN);
-				final Module module = ModuleUtil.findModuleForPsiElement(psiAnnotation.getContainingFile());
-				final PsiNameValuePair psiNameValuePair = psiAnnotation.getParameterList().getAttributes()[0];
-				final String cleanAnnoRefId = StringUtils.cleanQuote(psiNameValuePair.getValue().getText());
-				final SQLRefReference sqlRefReferenceForID = ServiceManager.getService(file.getProject(), SQLRefRepository.class).getSQLRefReferenceForID(cleanAnnoRefId);
-				problemDescriptorList.add(addProblemDescriptorForUnUsedClass(psiAnnotation, module, ((PsiClassOwner) file).getPackageName(), psiNameValuePair, sqlRefReferenceForID, manager));
+				if (psiAnnotation != null) {
+					final Module module = ModuleUtil.findModuleForPsiElement(psiAnnotation.getContainingFile());
+					final PsiNameValuePair psiNameValuePair = psiAnnotation.getParameterList().getAttributes()[0];
+					final String cleanAnnoRefId = StringUtils.cleanQuote(psiNameValuePair.getValue().getText());
+					final SQLRefReference sqlRefReferenceForID = ServiceManager.getService(file.getProject(), SQLRefRepository.class).getSQLRefReferenceForID(cleanAnnoRefId);
+					problemDescriptorList.add(addProblemDescriptorForUnUsedClass(psiAnnotation, module, ((PsiClassOwner) file).getPackageName(), psiNameValuePair, sqlRefReferenceForID, manager));
+				}
 			}
-			return problemDescriptorList.toArray(new ProblemDescriptor[problemDescriptorList.size()]);
+			if (!problemDescriptorList.isEmpty() && problemDescriptorList.get(0) != null) {
+				return problemDescriptorList.toArray(new ProblemDescriptor[problemDescriptorList.size()]);
+			}
 		}
 		return super.checkFile(file, manager, isOnTheFly);
 	}
@@ -102,6 +115,12 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 					ProblemHighlightType.LIKE_UNUSED_SYMBOL, true);
 		}
 		return null;
+	}
+
+	public void createDocument(Project project) {
+		final DocumentationManager documentationManager = DocumentationManager.getInstance(project);
+		final DocumentationComponent component = new DocumentationComponent(documentationManager);
+
 	}
 
 
@@ -146,8 +165,29 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 
 	public void datasourceTest(Project project) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 		DataSourceManager dataSourceManager = DataSourceManager.getInstance(project);
-
-		DataSource dataSource = dataSourceManager.getDataSourceByName("BB21_TST");
+		DataSource dataSource = dataSourceManager.getDataSourceByName("TEST");
+		String query = "exec sp_helptext ?";
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = dataSource.getConnection(project).prepareStatement(query);
+			stmt.setString(1, "ADD_PAY");
+			rs = stmt.executeQuery();
+			StringBuilder b = new StringBuilder();
+			while (rs.next()) {
+				b.append(rs.getString("Text"));
+				System.out.println(b.toString());
+			}
+		} catch (Exception e) {
+			logger.error("datasourceTest(): Exception=" + e.getMessage(), e);
+		} finally {
+			try {
+				rs.close();
+				stmt.close();
+			} catch (SQLException e) {
+				logger.error("datasourceTest(): Exception=" + e.getMessage(), e);
+			}
+		}
 		Method getConnectionMethod = dataSource.getClass().getDeclaredMethod("getConnection", Project.class, ServerInstance.class);
 		getConnectionMethod.setAccessible(true);
 		Connection conn = (Connection) getConnectionMethod.invoke(dataSource, project, null);
