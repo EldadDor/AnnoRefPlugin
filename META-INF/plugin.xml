@@ -1,57 +1,35 @@
 <idea-plugin version="2">
-	<name>AnnoRef</name>
-	<description>
-		<![CDATA[
-  SQLRef & SP Viewer plugin, an Ad Hoc version for the AnnoRef plugin.
-  To be used in IDI for the @SQLRef/@SQL/@SP query infrastructure
-      ]]></description>
-	<version>4.2.3</version>
-	<vendor>EldadDor-IDI</vendor>
-	<idea-version since-build="129.713"/>
-	<depends>com.intellij.javaee</depends>
-	<depends>com.intellij.sql</depends>
-	<change-notes>
-		<![CDATA[
-	   		<b>Version 4.2.2</b>
-		       <ul>
-		        <li>Can open AnnoRef settings from SPViewer panel</li>
-		        <li>Added the SPViewer to tools menu (shortcut CTRL-SHIFT-P</li>
-		      </ul>
-		    <b>Version 4.2.1</b>
-		       <ul>
-		        <li>Added new caret selection for @SP value after first click was made</li>
-		        <li>SP View ToolWindow works with Intellij Content & Document (No more Swing)</li>
-		        <li>Goto @SP declaration with Intellij defaults,same goes when drilling down the exec SPs</li>
-		      </ul>
-			<b>Version 4.1.5</b>
-		       <ul>
-		        <li>New popup for the SP displayed is available with sybase language support!</li>
-		      </ul>
-	        <b>Version 4.1.2</b>
-			    <ul>
-		        <li>SPViewer more features</li>
-		        <li>Drill down to exec procedure in viewed procedure with CTRL-Click</li>
-		        <li>TextField for submitting any store procedure and viewing it in new tab</li>
-		      </ul>
-	        <b>Version 4.1.1</b>
-		       <ul>
-		        <li>SPViewer new feature</li>
-		        <li>Allows Store Procedure viewing by Ctrl-DoubleClick the @SP annotation</li>
-		        <li>Configure the desired DataSource taken from the configured DataSources </li>
-		      </ul>
-	        <b>Version 4.0.7</b>
-		        <ul>
-		        <li>Unused ProblemHighlight For Unused Annotation ref</li>
-		      </ul>
-			<b>Version 4.0.5</b>
-		        <ul>
-		        <li>Compatible with IDEA 13</li>
-		        <li>CreateAnnoRefClass For Unused Tag Fix now works (Still a little buggy, but does works ok)</li>
-		      </ul>
-	        <b>Version 4.0.2</b>
-	        <ul><li>Compatible with IDEA 12</li></ul>
+	<name>IDI-IdeaPlugin</name>
+	<id>IDIPlugin</id>
+	<version>4.7.8</version>
+	<category>IDI</category>
+	<description><![CDATA[
+	      A Proprietary version for the AnnoRef plugin.
+	       <ul>
+	       <li>@SQLRef To Xml navigation</li>
+	       <li>SP Viewer plugin with CTRL-Click from @SP</li>
+	       <li>QueryUtils navigation/completion/usages</li>
+	       <li>Many Inspections</li>
+	       </ul>
+	      ]]>
+	</description>
 
-	    ]]>
+	<vendor>EldadDor-IDI</vendor>
+	<idea-version since-build="140.1010"/>
+	<depends>com.intellij.javaee</depends>
+	<change-notes><![CDATA[
+      <b>Version 4.7.8</b>
+      <ul>
+          <li>Bug fix:  <i>Editor of class com.intellij.openapi.editor.impl.EditorImpl hasn't been released</li>
+     </ul>
+      <b>Version 4.7.7</b>
+      <ul>
+        <li>Compatible with IDEA 14.1.4</li>
+      </ul>
+       <ul>
+        <li>More features added</li>
+      </ul>
+	]]>
 	</change-notes>
 
 	<!--
@@ -61,66 +39,106 @@
 
 	<extensions defaultExtensionNs="com.intellij">
 
+
 		<errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
-		<projectService serviceInterface="com.idi.intellij.plugin.query.sqlref.component.SQLRefFileEditorListener"
-		                serviceImplementation="com.idi.intellij.plugin.query.sqlref.component.SQLRefFileEditorListener"/>
-		<projectService serviceInterface="com.idi.intellij.plugin.query.sqlref.component.SQLRefFileSystemListener"
-		                serviceImplementation="com.idi.intellij.plugin.query.sqlref.component.SQLRefFileSystemListener"/>
-		<projectService serviceInterface="com.idi.intellij.plugin.query.sqlref.component.SPViewContentStateManager"
-		                serviceImplementation="com.idi.intellij.plugin.query.sqlref.component.SPViewContentStateManager"/>
+		<projectService serviceInterface="com.idi.intellij.plugin.query.annoref.component.SQLRefFileEditorListener"
+						serviceImplementation="com.idi.intellij.plugin.query.annoref.component.SQLRefFileEditorListener"/>
+		<projectService serviceInterface="com.idi.intellij.plugin.query.annoref.component.SQLRefFileSystemListener"
+						serviceImplementation="com.idi.intellij.plugin.query.annoref.component.SQLRefFileSystemListener"/>
+		<projectService serviceInterface="com.idi.intellij.plugin.query.annoref.component.SPViewContentStateManager"
+						serviceImplementation="com.idi.intellij.plugin.query.annoref.component.SPViewContentStateManager"/>
 		<!--<projectService serviceInterface="com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor"
 		                serviceImplementation="com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor"/>-->
+		<completion.contributor language="any"
+								implementationClass="com.idi.intellij.plugin.query.annoref.common.AnnoRefCompletionContributor"
+								id="annoRefCompletion" order="before javaClassReference"/>
+
 		<codeInsight.lineMarkerProvider language="XML"
-		                                implementationClass="com.idi.intellij.plugin.query.sqlref.codeInsight.SQLRefXmlQueryLineMarkerProvider"
-		                                order="last"/>
+										implementationClass="com.idi.intellij.plugin.query.annoref.codeInsight.SQLRefXmlQueryLineMarkerProvider"
+										order="last"/>
 		<codeInsight.lineMarkerProvider language="JAVA"
-		                                implementationClass="com.idi.intellij.plugin.query.sqlref.codeInsight.SQLRefClassLineMarkerProvider"
-		                                order="last"/>
-		<projectConfigurable instance="com.idi.intellij.plugin.query.sqlref.config.SQLRefConfigurationConfig"
-		                     id="AnnoRefConfigurationConfig" displayName="AnnoRef" order="last">
+										implementationClass="com.idi.intellij.plugin.query.annoref.codeInsight.SQLRefClassLineMarkerProvider"
+										order="last"/>
+		<codeInsight.lineMarkerProvider language="JAVA"
+										implementationClass="com.idi.intellij.plugin.query.annoref.codeInsight.AnnoRefMethodArgsCallLineMarkerProvider"
+										order="last"/>
+		<projectConfigurable instance="com.idi.intellij.plugin.query.annoref.config.AnnoRefConfigurationConfig"
+							 id="AnnoRefConfigurationConfig" groupId="tools" displayName="IDI Plugin Settings"
+							 order="last">
 		</projectConfigurable>
 
-		<elementDescriptionProvider
-				implementation="com.idi.intellij.plugin.query.sqlref.lang.AnnoRefUsageDescriptionProvider"/>
+		<postStartupActivity implementation="com.idi.intellij.plugin.query.annoref.component.SQLRefBootStrapComponent"/>
 
-		<annotator language="JAVA"
-		           implementationClass="com.idi.intellij.plugin.query.sqlref.lang.AnnoRefHighlightingAnnotator"/>
+		<!--<elementDescriptionProvider
+				implementation="com.idi.intellij.plugin.query.sqlref.lang.AnnoRefUsageDescriptionProvider"/>-->
+
+		<!--<annotator language="JAVA"
+		           implementationClass="com.idi.intellij.plugin.query.sqlref.lang.AnnoRefHighlightingAnnotator"/>-->
 		<localInspection language="JAVA"
-		                 implementationClass="com.idi.intellij.plugin.query.sqlref.inspection.SQLRefClassInspection"
-		                 shortName="AnnoRefConverter" displayName="convert @SQL to @SQLRef" level="INFO"
-		                 enabledByDefault="true" groupName="AnnoRef" order="last"/>
+						 implementationClass="com.idi.intellij.plugin.query.annoref.inspection.SQLRefClassInspection"
+						 shortName="AnnoRefConverter" displayName="convert @SQL to @SQLRef" level="INFO"
+						 enabledByDefault="true" groupName="IDI" order="last"/>
+		<localInspection language="JAVA"
+						 implementationClass="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefMethodUtilCallInspection"
+						 shortName="AnnoRefMethodUtilCall" displayName="convert @SQL to @SQLRef" level="INFO"
+						 enabledByDefault="true" groupName="IDI" order="last"/>
 		<localInspection language="XML"
-		                 implementationClass="com.idi.intellij.plugin.query.sqlref.inspection.SQLRefXmlInspection"
-		                 shortName="AnnoRefClassCreator" displayName="Create AnnoRef class to unused Xml Tag"
-		                 level="WARNING"
-		                 enabledByDefault="true" groupName="AnnoRef" order="last"/>
-		<intentionAction>
+						 implementationClass="com.idi.intellij.plugin.query.annoref.inspection.SQLRefXmlInspection"
+						 shortName="AnnoRefClassCreator" displayName="Create AnnoRef class to unused Xml Tag"
+						 level="WARNING"
+						 enabledByDefault="true" groupName="IDI" order="last"/>
+		<localInspection language="JAVA"
+						 implementationClass="com.idi.intellij.plugin.query.annoref.inspection.RemovableCandidateInspection"
+						 shortName="RemovableCandidateInspector"
+						 displayName="Mark RemovableCandidate elements with line"
+						 level="WARNING"
+						 enabledByDefault="true" groupName="IDI" order="last"/>
+
+		<localInspection language="SQL" groupName="IDI" enabledByDefault="true" shortName="AnnoRefSqlInspection"
+						 displayName="AnnoRefSqlInspection"
+						 implementationClass="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefSqlInspection"/>
+		<!--<intentionAction>
 			<className>com.idi.intellij.plugin.query.sqlref.intention.SQLRefConversionIntentionAction</className>
 			<category>Other</category>
-		</intentionAction>
+		</intentionAction>-->
 		<gotoDeclarationHandler
-				implementation="com.idi.intellij.plugin.query.sqlref.codeInsight.StoreProcExecViewHandler"/>
+				implementation="com.idi.intellij.plugin.query.annoref.codeInsight.StoreProcExecViewHandler"/>
+		<usageTargetProvider
+				implementation="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefUsagesTargetProvider"/>
+		<findUsagesHandlerFactory
+				implementation="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefFindUsagesHandlerFactory"
+				id="annoRef"
+				order="last, before default"/>
+		<!--<findUsagesHandlerFactory implementation="com.idi.intellij.plugin.query.sqlref.inspection.AnnoRefFindUsagesHandlerFactory" order="last"/>-->
+		<lang.findUsagesProvider language="XML"
+								 implementationClass="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefInXmlRefUsagesProvider"
+								 order="first"/>
+		<lang.findUsagesProvider language="JAVA"
+								 implementationClass="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefInJavaFindUsagesProvider"
+								 order="first"/>
+
+		<lang.documentationProvider language="JAVA"
+									implementationClass="com.idi.intellij.plugin.query.annoref.codeInsight.MyJavaDocumentationProvider"/>
+		<documentationProvider
+				implementation="com.idi.intellij.plugin.query.annoref.codeInsight.MyJavaDocumentationProvider"
+				order="last"/>
+
 	</extensions>
 
 
 	<application-components>
 		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefProjectManager
+			<implementation-class>com.idi.intellij.plugin.query.annoref.component.SQLRefProjectManager
 			</implementation-class>
 		</component>
 		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefMessageBusAccessor
+			<implementation-class>com.idi.intellij.plugin.query.annoref.component.SQLRefMessageBusAccessor
 			</implementation-class>
 		</component>
 		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings
+			<implementation-class>com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings
 			</implementation-class>
-			<interface-class>com.idi.intellij.plugin.query.sqlref.persist.SQLRefConfigSettings</interface-class>
-		</component>
-
-		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.notification.AnnoRefNotifications
-			</implementation-class>
+			<interface-class>com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings</interface-class>
 		</component>
 
 
@@ -129,38 +147,45 @@
 	<project-components>
 		<component>
 			<implementation-class>
-				com.idi.intellij.plugin.query.sqlref.component.XmlRepositorySyncComponent
+				com.idi.intellij.plugin.query.annoref.component.XmlRepositorySyncComponent
 			</implementation-class>
 		</component>
 		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.util.SQLRefDataAccessor</implementation-class>
+			<implementation-class>com.idi.intellij.plugin.query.annoref.util.SQLRefDataAccessor</implementation-class>
 		</component>
 		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.component.SQLRefBootStrapComponent
+			<implementation-class>com.idi.intellij.plugin.query.annoref.index.SQLRefRepository</implementation-class>
+			<interface-class>com.idi.intellij.plugin.query.annoref.index.SQLRefRepository</interface-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.annoref.repo.model.SQLReferencesCollection
 			</implementation-class>
 		</component>
 		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.index.SQLRefRepository</implementation-class>
-			<interface-class>com.idi.intellij.plugin.query.sqlref.index.SQLRefRepository</interface-class>
-		</component>
-		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.repo.model.SQLReferencesCollection
+			<implementation-class>com.idi.intellij.plugin.query.annoref.repo.model.SQLRefProjectModulesCollection
 			</implementation-class>
 		</component>
 		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.repo.model.SQLRefProjectModulesCollection
+			<implementation-class>com.idi.intellij.plugin.query.annoref.connection.DataSourceAccessorComponent
 			</implementation-class>
 		</component>
 		<component>
-			<implementation-class>com.idi.intellij.plugin.query.sqlref.component.DataSourceAccessorComponent
+			<implementation-class>com.idi.intellij.plugin.query.annoref.notification.AnnoRefNotifications
 			</implementation-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.annoref.util.SybaseLanguageManager
+			</implementation-class>
+		</component>
+		<component>
+			<implementation-class>com.idi.intellij.plugin.query.annoref.util.SPDiffManager</implementation-class>
 		</component>
 	</project-components>
 
 
 	<actions>
-		<action id="Open SPViewer" class="com.idi.intellij.plugin.query.sqlref.action.SPViewerOpenToolWindowAction"
-		        text="Open SPViewer" description="Open store procedure viewer navigator">
+		<action id="Open SPViewer" class="com.idi.intellij.plugin.query.annoref.action.SPViewerOpenToolWindowAction"
+				text="Open SPViewer" description="Open store procedure viewer navigator">
 			<keyboard-shortcut first-keystroke="ctrl shift p" keymap="$default"/>
 			<add-to-group group-id="ToolsMenu" anchor="last"/>
 		</action>

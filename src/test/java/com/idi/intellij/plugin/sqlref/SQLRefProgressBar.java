@@ -62,6 +62,10 @@ public class SQLRefProgressBar {
 		});
 	}
 
+	public static void main(String[] args) {
+		SQLRefProgressBar spb = new SQLRefProgressBar();
+	}
+
 	class ButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent ae) {
 			button.setEnabled(false);
@@ -70,9 +74,5 @@ public class SQLRefProgressBar {
 			label.setText(str);
 			timer.start();
 		}
-	}
-
-	public static void main(String[] args) {
-		SQLRefProgressBar spb = new SQLRefProgressBar();
 	}
 }

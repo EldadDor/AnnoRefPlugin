@@ -1,0 +1,150 @@
+/*
+ * User: eldad.Dor
+ * Date: 13/11/2014 12:53
+ 
+ *
+ * Copyright (2005) IDI. All rights reserved.
+ * This software is a proprietary information of Israeli Direct Insurance.
+ * Created by IntelliJ IDEA. 
+ */
+package com.idi.intellij.plugin.query.annoref.connection;
+
+import com.idi.intellij.plugin.query.annoref.util.TimeUtil;
+import com.intellij.javaee.dataSource.DataSource;
+import com.intellij.javaee.dataSource.DataSourceManager;
+import com.intellij.openapi.project.Project;
+
+import java.lang.ref.WeakReference;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+/**
+ * @author eldad
+ * @date 13/11/2014
+ */
+public class ConnectionPool {
+	private DataSource dataSource = new CopyOnWriteArrayList<DataSource>();
+
+	public boolean initDataSource(Project project, String dataSourceName, boolean initialize) {
+		if (dataSourceName.isEmpty()) {
+			dataSource = null;
+			return false;
+		}
+		if (initialize || dataSource == null) {
+			DataSourceManager dataSourceManager = DataSourceManager.getInstance(project);
+			dataSource = dataSourceManager.getDataSourceByName(dataSourceName);
+			if (dataSource == null) {
+				LOGGER.info("initDataSource(): No DataSource with name=" + dataSourceName + " was found!");
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	private class ConnectionWrapper {
+		private Connection connection;
+		private long lastCheckTimestamp;
+		private long lastAccessTimestamp;
+		private boolean isValid = true;
+		private boolean isBusy = false;
+
+		private ConnectionWrapper(Connection connection) {
+			this.connection = connection;
+			long currentTimeMillis = System.currentTimeMillis();
+			this.lastCheckTimestamp = currentTimeMillis;
+			this.lastAccessTimestamp = currentTimeMillis;
+		}
+
+		public boolean isValid() {
+			long currentTimeMillis = System.currentTimeMillis();
+			if (TimeUtil.isOlderThan(this.lastAccessTimestamp, TimeUtil.TEN_SECONDS)) {
+				lastCheckTimestamp = currentTimeMillis;
+				try {
+					if (connection != null && !connection.isClosed()) {
+						isValid = true;
+					}
+				} catch (SQLException e) {
+				}
+
+			}
+			return isValid;
+		}
+
+		public int getIdleMinutes() {
+			long idleTimeMillis = System.currentTimeMillis() - this.lastAccessTimestamp;
+			return (int) (idleTimeMillis / TimeUtil.ONE_MINUTE);
+		}
+
+		public Connection getConnection() {
+			lastAccessTimestamp = System.currentTimeMillis();
+			return connection;
+		}
+
+		public void closeConnection() {
+			public static void closeConnection(connection)
+	  {
+	    if (connection != null)
+	      new SimpleBackgroundTask(connection)
+	      {
+	        public void execute() {
+	          try {
+	            connection.close();
+	          } catch (Throwable e) {
+
+	          }
+	        }
+	      }
+	      .start();
+	  }
+			ConnectionUtil.closeConnection(this.connection);
+		}
+
+		public void setAutoCommit(boolean autoCommit) throws SQLException {
+			this.connection.setAutoCommit(autoCommit);
+		}
+
+		public boolean isClosed() throws SQLException {
+			return this.connection.isClosed();
+		}
+
+		public boolean isBusy() {
+			return this.isBusy;
+		}
+
+		public void setBusy(boolean isFree) {
+			this.isBusy = isFree;
+		}
+
+		public void keepAlive() {
+			this.lastAccessTimestamp = System.currentTimeMillis();
+		}
+	}
+
+	private static class ConnectionPoolCleanTask extends TimerTask {
+		List<WeakReference<ConnectionPool>> connectionPools = new CopyOnWriteArrayList();
+
+		public void run() {
+			for (WeakReference connectionPoolRef : this.connectionPools) {
+				ConnectionPool connectionPool = (ConnectionPool) connectionPoolRef.get();
+				if ((connectionPool != null) && (TimeUtil.isOlderThan(connectionPool.lastAccessTimestamp, TimeUtil.FIVE_MINUTES))) {
+					for (ConnectionPool.ConnectionWrapper connection : connectionPool.poolConnections) {
+						if (connection.isBusy()) return;
+					}
+
+					for (ConnectionPool.ConnectionWrapper connection : connectionPool.poolConnections) {
+						connection.closeConnection();
+					}
+					connectionPool.poolConnections.clear();
+				}
+			}
+		}
+
+		public void registerConnectionPool(ConnectionPool connectionPool) {
+			this.connectionPools.add(new WeakReference(connectionPool));
+		}
+	}
+}

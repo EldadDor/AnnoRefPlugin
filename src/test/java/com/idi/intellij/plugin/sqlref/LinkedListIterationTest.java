@@ -9,7 +9,7 @@
  */
 package com.idi.intellij.plugin.sqlref;
 
-import org.junit.Test;
+//import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -20,7 +20,7 @@ import java.util.ListIterator;
  */
 public class LinkedListIterationTest {
 
-	@Test
+	//	@Test
 	public void testLinkedListIteration() throws Exception {
 		final LinkedList<String> list = new LinkedList<String>();
 

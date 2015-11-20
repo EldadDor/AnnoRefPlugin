@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.idi.intellij.plugin.query.annoref.config.MessageBoxPopup">
+  <grid id="27dc6" binding="panel1" default-binding="true" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties>
+      <preferredSize width="200" height="100"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <component id="95a26" class="javax.swing.JLabel">
+        <constraints border-constraint="North"/>
+        <properties>
+          <preferredSize width="29" height="50"/>
+          <text value="Label"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

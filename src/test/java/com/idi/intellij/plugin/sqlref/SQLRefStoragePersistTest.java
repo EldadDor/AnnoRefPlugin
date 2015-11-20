@@ -1,9 +1,9 @@
 package com.idi.intellij.plugin.sqlref;
 
-import com.idi.intellij.plugin.query.sqlref.persist.SQLRefSettings;
+import com.idi.intellij.plugin.query.annoref.persist.AnnoRefSettings;
 import com.intellij.util.xmlb.XmlSerializer;
 import org.jdom.Element;
-import org.junit.Test;
+//import org.junit.Test;
 
 
 /**
@@ -17,9 +17,9 @@ public class SQLRefStoragePersistTest {
 //	    private final static Logger logger= Logger.getInstance(SQLRefStoragePersistTest.class.getName());
 
 
-	@Test
+	//	@Test
 	public void sqlRefConfigSettingsTest() {
-		SQLRefSettings configSettings = new SQLRefSettings();
+		AnnoRefSettings configSettings = new AnnoRefSettings();
 		Element serialize = XmlSerializer.serialize(configSettings);
 		System.out.println("serialize = " + serialize);
 	}

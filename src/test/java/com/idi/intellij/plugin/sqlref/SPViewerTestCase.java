@@ -1,14 +1,13 @@
 package com.idi.intellij.plugin.sqlref;
 
-import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
-
 import javax.swing.*;
 import java.awt.*;
 
 /**
  * Created by EAD-MASTER on 2/1/14.
  */
-public class SPViewerTestCase extends LightCodeInsightFixtureTestCase {
+//public class SPViewerTestCase extends LightCodeInsightFixtureTestCase {
+public class SPViewerTestCase  {
 	public void testPanelViewConstruction() throws Exception {
 //		final SPViewPanelForm panelForm = new SPViewPanelForm();
 		final JFrame frame = new JFrame("SPViewMainPanel");

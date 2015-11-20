@@ -9,7 +9,7 @@
  */
 package com.idi.intellij.plugin.sqlref;
 
-import com.idi.intellij.plugin.query.sqlref.config.SPViewPanelForm;
+import com.idi.intellij.plugin.query.annoref.config.SPViewPanelForm;
 
 import javax.swing.*;
 import java.awt.*;

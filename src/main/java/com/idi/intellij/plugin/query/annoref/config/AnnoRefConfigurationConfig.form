@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.idi.intellij.plugin.query.annoref.config.AnnoRefConfigurationConfig">
+  <grid id="27dc6" binding="SQLRefPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="726" height="660"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <tabbedpane id="3e90f" binding="tabbedPane1" default-binding="true">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="200" height="200"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="b7acd" layout-manager="FormLayout">
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <rowspec value="top:4dlu:noGrow"/>
+            <rowspec value="center:max(d;4px):noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <colspec value="left:4dlu:noGrow"/>
+            <colspec value="fill:max(d;4px):noGrow"/>
+            <constraints>
+              <tabbedpane title="General Settings"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="8514a" layout-manager="FormLayout">
+                <rowspec value="center:d:grow"/>
+                <rowspec value="top:4dlu:noGrow"/>
+                <rowspec value="center:d:grow"/>
+                <colspec value="fill:d:grow"/>
+                <colspec value="left:4dlu:noGrow"/>
+                <colspec value="fill:d:grow"/>
+                <colspec value="left:4dlu:noGrow"/>
+                <colspec value="fill:max(d;4px):noGrow"/>
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="de3dd" class="javax.swing.JCheckBox" binding="enableConversion">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms defaultalign-horz="false"/>
+                    </constraints>
+                    <properties>
+                      <enabled value="false"/>
+                      <text value="Enable Anno To AnnoRef Conversion"/>
+                    </properties>
+                  </component>
+                  <component id="7fb32" class="javax.swing.JCheckBox" binding="enableUtilsClassScanCheckBox">
+                    <constraints>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="10" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms defaultalign-horz="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Enable Util Class Scan"/>
+                      <toolTipText value="Scanning for Util class on project load (will be disabled if autosync is disabled) "/>
+                    </properties>
+                  </component>
+                  <component id="43fd5" class="javax.swing.JCheckBox" binding="autosyncProjectRootCheckBox" default-binding="true">
+                    <constraints>
+                      <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms defaultalign-horz="false"/>
+                    </constraints>
+                    <properties>
+                      <label value="Autosync Project Root"/>
+                      <text value="Autosync Project Root"/>
+                      <toolTipText value="autosync the project when root changes, like when adding or removing module via maven pom structure"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="a2326" layout-manager="FormLayout">
+                <rowspec value="center:d:grow"/>
+                <rowspec value="top:4dlu:noGrow"/>
+                <rowspec value="center:d:grow"/>
+                <colspec value="fill:d:grow"/>
+                <colspec value="left:4dlu:noGrow"/>
+                <colspec value="fill:d:grow"/>
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties>
+                  <minimumSize width="100" height="27"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="f1dd3" class="javax.swing.JCheckBox" binding="includeAllLibrariesCheckbox">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="10" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms defaultalign-horz="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Deep Scan (include all dependencies)"/>
+                    </properties>
+                  </component>
+                  <component id="f0dd2" class="javax.swing.JCheckBox" binding="enableSqlValidation">
+                    <constraints>
+                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="10" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms defaultalign-horz="false"/>
+                    </constraints>
+                    <properties>
+                      <enabled value="false"/>
+                      <text value="Enable SQL to Model validation"/>
+                      <toolTipText value="Still in development stage"/>
+                    </properties>
+                  </component>
+                  <component id="89d9f" class="javax.swing.JCheckBox" binding="enableAnnotationFQNOverrideCheckBox" default-binding="true">
+                    <constraints>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms defaultalign-horz="false"/>
+                    </constraints>
+                    <properties>
+                      <actionCommand value="Enable Annotations' FQN Override"/>
+                      <text value="Enable Annotations' FQN Overide"/>
+                      <toolTipText value="When disabled, the FQN for the SQLRef FQN will be the default com.idi"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="65841" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <forms/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="a1042" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Select UI Property"/>
+                    </properties>
+                  </component>
+                  <component id="e7010" class="javax.swing.JComboBox" binding="uiPropertiesComboBox">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                </children>
+              </grid>
+              <grid id="d286a" layout-manager="FormLayout">
+                <rowspec value="center:d:noGrow"/>
+                <rowspec value="top:4dlu:noGrow"/>
+                <rowspec value="center:max(d;4px):noGrow"/>
+                <colspec value="fill:d:grow"/>
+                <colspec value="left:4dlu:noGrow"/>
+                <colspec value="fill:d:grow"/>
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <forms top="5" left="0" bottom="5" right="0"/>
+                </constraints>
+                <properties>
+                  <minimumSize width="71" height="40"/>
+                  <preferredSize width="71" height="80"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="1ff9c" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
+                      <forms defaultalign-horz="false"/>
+                    </constraints>
+                    <properties>
+                      <horizontalAlignment value="2"/>
+                      <text value="Current Color"/>
+                    </properties>
+                  </component>
+                  <component id="bc6ff" class="javax.swing.JLabel" binding="selectedUIPropertyColor">
+                    <constraints>
+                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms/>
+                    </constraints>
+                    <properties>
+                      <horizontalAlignment value="2"/>
+                      <text value=""/>
+                    </properties>
+                  </component>
+                  <component id="ed960" class="javax.swing.JButton" binding="resetToDefaultsButton" default-binding="true">
+                    <constraints>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                      <forms defaultalign-horz="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Reset To Defaults"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+          <grid id="d34d0" binding="mainSettingsPanel" layout-manager="GridLayoutManager" row-count="17" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="2" left="2" bottom="2" right="2"/>
+            <constraints>
+              <tabbedpane title="Advance Settings"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="39b2e" class="javax.swing.JTextField" binding="annoRefFQN">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <background color="-1"/>
+                  <editable value="false"/>
+                  <enabled value="false"/>
+                  <margin top="2" left="2" bottom="2" right="2"/>
+                  <toolTipText value="The FQN for the annotation to use"/>
+                </properties>
+              </component>
+              <component id="be76e" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="AnnoRef annotation's fully qualifed name: "/>
+                </properties>
+              </component>
+              <component id="ee075" class="javax.swing.JTextField" binding="annoRefAttributeId">
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <toolTipText value="The annotation attribute name to use for reference in the corresponding xml file id"/>
+                </properties>
+              </component>
+              <component id="2248c" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Annotation Attribute Id name:"/>
+                  <toolTipText value=""/>
+                </properties>
+              </component>
+              <component id="abbf2" class="javax.swing.JTextField" binding="annoFQN">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <background color="-1"/>
+                  <editable value="false"/>
+                  <enabled value="false"/>
+                </properties>
+              </component>
+              <component id="b9d59" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Initial annotation's fully qualifed name:"/>
+                </properties>
+              </component>
+              <component id="8886d" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="15" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Xml structure baselines: "/>
+                  <toolTipText resource-bundle="annoconfig" key="xml.structure.example"/>
+                </properties>
+              </component>
+              <component id="b602e" class="javax.swing.JTextArea" binding="xmlSchemaTextArea">
+                <constraints>
+                  <grid row="16" column="0" row-span="1" col-span="5" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="50"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <background color="-6500"/>
+                </properties>
+              </component>
+              <component id="2f4a9" class="javax.swing.JCheckBox" binding="annoRefEnableSuper">
+                <constraints>
+                  <grid row="8" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <selected value="true"/>
+                  <text value="Enable Super interface/class "/>
+                </properties>
+              </component>
+              <component id="972e5" class="javax.swing.JTextField" binding="annoRefSuperFQN">
+                <constraints>
+                  <grid row="9" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="bb209" class="javax.swing.JTextField" binding="spViewText">
+                <constraints>
+                  <grid row="11" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="1bbbe" class="javax.swing.JLabel" binding="spViewFQNLabel">
+                <constraints>
+                  <grid row="10" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="SP Viewer fully qualified name:"/>
+                </properties>
+              </component>
+              <component id="52591" class="javax.swing.JLabel" binding="spViewDefaultLabel">
+                <constraints>
+                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="SP DataSource value:"/>
+                </properties>
+              </component>
+              <component id="95c96" class="javax.swing.JComboBox" binding="spDataSourceComboBox">
+                <constraints>
+                  <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <model/>
+                </properties>
+              </component>
+              <component id="282b7" class="javax.swing.JButton" binding="testConnectionBtn">
+                <constraints>
+                  <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Test Connection"/>
+                </properties>
+              </component>
+              <component id="df056" class="javax.swing.JLabel" binding="colorChooserLabel">
+                <constraints>
+                  <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Define color for annotation highlight:"/>
+                </properties>
+              </component>
+              <component id="dc845" class="javax.swing.JTextField" binding="colorSelectedTextBox">
+                <constraints>
+                  <grid row="13" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <editable value="true"/>
+                  <text value=""/>
+                </properties>
+              </component>
+              <component id="56afa" class="javax.swing.JTextField" binding="annoRefXmlAttributeId">
+                <constraints>
+                  <grid row="7" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="5c8bd" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Xml Attribute Id name:"/>
+                </properties>
+              </component>
+              <component id="82f5e" class="javax.swing.JComboBox" binding="connectionPoolComboBox">
+                <constraints>
+                  <grid row="14" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="d1ec8" class="javax.swing.JLabel" binding="connectionPoolLabel">
+                <constraints>
+                  <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Choose Plugin connection method:"/>
+                </properties>
+              </component>
+              <component id="86370" class="javax.swing.JCheckBox" binding="colorSelectedHighlightCheckBox">
+                <constraints>
+                  <grid row="13" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <enabled value="true"/>
+                  <text value="Enable Highlighting"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+        </children>
+      </tabbedpane>
+    </children>
+  </grid>
+</form>
