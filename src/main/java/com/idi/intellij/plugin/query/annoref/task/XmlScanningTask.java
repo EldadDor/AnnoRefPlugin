@@ -35,7 +35,6 @@ import com.intellij.psi.impl.source.parsing.xml.XmlBuilderDriver;
  * @author eldad
  * @date 03/01/2015
  */
-//public class XmlScanningTask implements IDITask {
 public class XmlScanningTask extends IDIAbstractTask {
 	private static final Logger logger = Logger.getInstance(XmlScanningTask.class.getName());
 	private int xmlRefCount;
@@ -84,6 +83,7 @@ public class XmlScanningTask extends IDIAbstractTask {
 				scanXmlFile(xmlFile);
 				progressIndicator.indicateChange();
 			}
+			IDITaskManager.clearRunningTask(SQLRefConstants.ANNO_REF_XML);
 			ServiceManager.getService(project, AnnoRefNotifications.class).notifyAnnoRefIndex(project, SQLRefConstants.ANNO_REF_XML, xmlRefCount);
 			return true;
 		} catch (Exception e) {
@@ -99,14 +99,13 @@ public class XmlScanningTask extends IDIAbstractTask {
 
 	@Override
 	public String getTaskName() {
-		return getClass().getSimpleName();
+		return SQLRefConstants.ANNO_REF_XML;
 	}
 
 
 	private void scanXmlFile(final VirtualFile xmlFile) {
 		String xmlFileName = xmlFile.getPresentableName();
-		if (
-				SQLRefNamingUtil.isMatchFileName(xmlFileName, AnnoRefConfigSettings.getInstance(project).getAnnoRefState().QUERIES_REGEX)) {
+		if (SQLRefNamingUtil.isMatchFileName(xmlFileName, AnnoRefConfigSettings.getInstance(project).getAnnoRefState().QUERIES_REGEX)) {
 			XmlVisitorListener xmlVisitorListener = new XmlVisitorListener() {
 				@Override
 				public void foundValidRefId(String refID, PsiElement xmlAttributeElement) {

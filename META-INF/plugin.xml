@@ -17,8 +17,9 @@
 	<vendor>EldadDor-IDI</vendor>
 	<idea-version since-build="140.1010"/>
 	<depends>com.intellij.javaee</depends>
+	<depends>org.jetbrains.idea.maven</depends>
 	<change-notes><![CDATA[
-      <b>Version 4.7.8</b>
+      <b>Version 4.8.0</b>
       <ul>
           <li>Bug fix:  <i>Editor of class com.intellij.openapi.editor.impl.EditorImpl hasn't been released</li>
      </ul>
@@ -87,12 +88,12 @@
 						 shortName="AnnoRefClassCreator" displayName="Create AnnoRef class to unused Xml Tag"
 						 level="WARNING"
 						 enabledByDefault="true" groupName="IDI" order="last"/>
-		<localInspection language="JAVA"
+	<!--	<localInspection language="JAVA"
 						 implementationClass="com.idi.intellij.plugin.query.annoref.inspection.RemovableCandidateInspection"
 						 shortName="RemovableCandidateInspector"
 						 displayName="Mark RemovableCandidate elements with line"
 						 level="WARNING"
-						 enabledByDefault="true" groupName="IDI" order="last"/>
+						 enabledByDefault="true" groupName="IDI" order="last"/>-->
 
 		<localInspection language="SQL" groupName="IDI" enabledByDefault="true" shortName="AnnoRefSqlInspection"
 						 displayName="AnnoRefSqlInspection"

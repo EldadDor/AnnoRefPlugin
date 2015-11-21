@@ -35,8 +35,6 @@ import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.progress.util.ProgressWindow;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.IdeFrame;
-import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.scope.processor.FilterElementProcessor;
@@ -87,7 +85,8 @@ public class ClassScanningTask extends IDIAbstractTask {
 		return runComputableTask();
 	}
 
-	private void runTask() {
+	@Override
+	public void runTask() {
 		if (filesCollection == null || filesCollection.isEmpty()) {
 			logger.info("runTask(): No Class Files were Found to index, maybe since project loading wasn't finished?");
 			return;
@@ -119,6 +118,7 @@ public class ClassScanningTask extends IDIAbstractTask {
 			/*	if (!classFiles.isEmpty() && progressChangedListener != null) {
 					progressChangedListener.finishedProcess();
 				}*/
+			IDITaskManager.clearRunningTask(SQLRefConstants.ANNO_REF_CLASS);
 			ServiceManager.getService(project, AnnoRefNotifications.class).notifyAnnoRefIndex(project, SQLRefConstants.ANNO_REF_CLASS, filesCount);
 			ServiceManager.getService(project, AnnoRefNotifications.class).notifyAnnoRefIndex(project, SQLRefConstants.ANNO_REF_UTIL_CLASS, classUtilRefCount);
 		} catch (Exception e) {
@@ -131,7 +131,7 @@ public class ClassScanningTask extends IDIAbstractTask {
 	}
 
 	private boolean runComputableTask() {
-		final IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(project);
+//		final IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(project);
 
 		logger.info("run(): Java classes to scan=" + filesCollection.size());
 		filesCount = 0;
@@ -139,8 +139,8 @@ public class ClassScanningTask extends IDIAbstractTask {
 		try {
 			for (final VirtualFile classFile : filesCollection) {
 				final FileType fileTypeByFile = FileTypeManager.getInstance().getFileTypeByFile(classFile);
-				if (fileTypeByFile instanceof JavaFileType) {
-				}
+			/*	if (fileTypeByFile instanceof JavaFileType) {
+				}*/
 				scanClassFile(classFile);
 				progressListener.indicateChange();
 				/*	if (progressChangedListener != null) {
@@ -171,16 +171,13 @@ public class ClassScanningTask extends IDIAbstractTask {
 
 	@Override
 	public String getTaskName() {
-		return getClass().getSimpleName();
+		return SQLRefConstants.ANNO_REF_CLASS;
 	}
 
 	private void scanClassFile(VirtualFile classFile) {
-		String classFileName = classFile.getName();
 		final PsiElement[] annoElement = new PsiElement[1];
 		final Map<String, Map<String, PsiMethod>>[] methodPropertiesMap = new Map[]{new HashMap<String, Map<String, PsiMethod>>()};
-		PsiFile psiFile1 = PsiManager.getInstance(project).findFile(classFile);
 		final PsiFile psiFile = SQLRefApplication.getPsiFileFromVirtualFile(classFile, project);
-
 		String sqlRefIdInClass = SQLRefNamingUtil.isPropitiousClassFile(psiFile, new ClassVisitorListener() {
 			@Override
 			public void foundValidAnnotation(PsiElement classRef) {
@@ -218,7 +215,7 @@ public class ClassScanningTask extends IDIAbstractTask {
 						logger.debug("scanClassFile(): psiImportStatement.getQualifiedName()=" + psiImportStatement.getQualifiedName());
 					}
 					final FilterElementProcessor processor = new FilterElementProcessor(new StringLiteralElementFilter());
-					final boolean processed = PsiTreeUtil.processElements(psiFile, processor);
+//					final boolean processed = PsiTreeUtil.processElements(psiFile, processor);
 					final List<PsiElement> results = processor.getResults();
 					if (!results.isEmpty()) {
 						for (final PsiElement psiElement : results) {

@@ -106,7 +106,10 @@ public class SQLRefXmlInspection extends LocalInspectionTool {
 			Module moduleForPsiElement = ModuleUtil.findModuleForPsiElement(xmlAttributeElement.getContainingFile());
 			String classTargetName = StringUtil.capitalizeWithJavaBeanConvention(sqlRefReferenceForID.getSqlRefId());
 			String packageName = "com.idi";
-			PsiDirectory directoryInModule = PackageUtil.findPossiblePackageDirectoryInModule(moduleForPsiElement, packageName);
+			PsiDirectory directoryInModule = null;
+			if (moduleForPsiElement != null) {
+				directoryInModule = PackageUtil.findPossiblePackageDirectoryInModule(moduleForPsiElement, packageName);
+			}
 			ProblemDescriptor problemDescriptor = manager.createProblemDescriptor(xmlAttributeElement.getContext(),
 					AnnoRefBundle.message("annoRef.xml.inspection.unused.tag"),
 					new CreateAnnoRefClassForUnusedTagFix("Create AnnoRef Class for unused ref", "AnnoRef", packageName, classTargetName, moduleForPsiElement, directoryInModule),
@@ -141,7 +144,7 @@ public class SQLRefXmlInspection extends LocalInspectionTool {
 	}
 
 	@Override
-	public void inspectionStarted(LocalInspectionToolSession session, boolean isOnTheFly) {
+	public void inspectionStarted(@NotNull LocalInspectionToolSession session, boolean isOnTheFly) {
 		super.inspectionStarted(session, isOnTheFly);
 	}
 

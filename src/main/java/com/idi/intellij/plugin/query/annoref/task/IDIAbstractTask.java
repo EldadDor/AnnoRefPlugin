@@ -51,7 +51,7 @@ public abstract class IDIAbstractTask implements IDITask {
 		long start = System.currentTimeMillis();
 		if (annoRefState.DEEP_SCAN_ENABLED) {
 			GlobalSearchScope librariesScope = ProjectScope.getLibrariesScope(project);
-			PsiClass contextBaseClass = JavaPsiFacade.getInstance(project).findClass(annoRefState.ANNO_REF_SUPER_INTERFACE, GlobalSearchScope.projectScope(project));
+//			PsiClass contextBaseClass = JavaPsiFacade.getInstance(project).findClass(annoRefState.ANNO_REF_SUPER_INTERFACE, GlobalSearchScope.projectScope(project));
 			GlobalSearchScope searchScope = GlobalSearchScopesCore.projectProductionScope(project).union(librariesScope);
 			filesCollection = FileTypeIndex.getFiles(fileType, searchScope);
 		} else {

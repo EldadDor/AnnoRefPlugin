@@ -33,8 +33,8 @@ public class AnnoRefBackgroundWorker {
 		try {
 //			IDITaskManager.runInBackground(project, "xml scanning", false, new XmlScanningTask(project));
 //			IDITaskManager.runInBackground(project, "class scanning", false, new ClassScanningTask(project));
-			IDITaskManager.run(project, AnnoRefBundle.message("annoRef.progress.reindex"), new XmlScanningTask(project));
-			IDITaskManager.run(project, AnnoRefBundle.message("annoRef.progress.reindex"), new ClassScanningTask(project));
+			IDITaskManager.runCompute(project, AnnoRefBundle.message("annoRef.progress.reindex"), new XmlScanningTask(project));
+			IDITaskManager.runCompute(project, AnnoRefBundle.message("annoRef.progress.reindex"), new ClassScanningTask(project));
 		} catch (Exception e) {
 			log.error(e);
 		}

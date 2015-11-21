@@ -22,6 +22,8 @@ public interface IDITask {
 
 	boolean runComputableTask(IDIProgressIndicator progressIndicator) throws IDIProcessCancelledException;
 
+	void runTask();
+
 	int numOfFiles();
 
 	void setProgressListener(IndicateProgressListener progressListener);

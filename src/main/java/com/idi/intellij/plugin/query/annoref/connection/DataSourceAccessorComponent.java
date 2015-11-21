@@ -231,17 +231,14 @@ public class DataSourceAccessorComponent implements ProjectComponent {
 		if (connection != null) {
 			try {
 				final String query = AnnoRefBundle.message("annoRef.sp.testConnection");
-				if (connection != null) {
-					PreparedStatement stmt = connection.prepareStatement(query);
-					ResultSet resultSet = stmt.executeQuery();
-					if (resultSet.next()) {
-						return true;
-					}
+				PreparedStatement stmt = connection.prepareStatement(query);
+				ResultSet resultSet = stmt.executeQuery();
+				if (resultSet.next()) {
+					return true;
 				} else {
 					ServiceManager.getService(project, AnnoRefNotifications.class).notifyAnnoRefError(project, AnnoRefBundle.message("annoRef.datasource.test.connect.error", dataSource.getName()));
 				}
 			} catch (Exception e) {
-
 				LOGGER.error("testConnection(): Exception=" + e.getMessage(), e);
 			} finally {
 				try {

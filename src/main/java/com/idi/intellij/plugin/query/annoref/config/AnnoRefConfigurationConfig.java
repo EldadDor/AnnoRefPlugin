@@ -257,9 +257,7 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 				}
 				final Color color = JColorChooser.showDialog(SQLRefPanel, "Select Color For Annotation SyntaxHighlighting", defaultColor);
 				final String toHexString = ColorUtil.toHexString(color);
-				if (color != null) {
-					colorSelectedTextBox.setText(toHexString);
-				}
+				colorSelectedTextBox.setText(toHexString);
 			}
 		});
 	}

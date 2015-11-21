@@ -85,8 +85,14 @@ public class SQLRefNamingUtil {
 					if (classChild instanceof PsiClass && ((PsiModifierListOwner) classChild).hasModifierProperty(PsiModifier.PUBLIC)) {
 						PsiAnnotation psiAnno = AnnotationUtil.findAnnotation(((PsiModifierListOwner) classChild), AnnoRefConfigSettings.getInstance(psiFile.getProject()).
 								getAnnoRefState().ANNOREF_ANNOTATION_FQN);
-						String qualifiedName = psiAnno.getQualifiedName();
-						final String[] sQLRefArray = qualifiedName.split("\\.");
+						String qualifiedName = null;
+						if (psiAnno != null) {
+							qualifiedName = psiAnno.getQualifiedName();
+						}
+						String[] sQLRefArray = new String[0];
+						if (qualifiedName != null) {
+							sQLRefArray = qualifiedName.split("\\.");
+						}
 						if (isValidSQLRefId(psiAnno, sQLRefArray)) {
 							return psiAnno;
 						}
@@ -101,9 +107,8 @@ public class SQLRefNamingUtil {
 
 	public static String isPropitiousClassFile(PsiFile psiFile, ClassVisitorListener visitorListener, final String classFQN) {
 		try {
-
-			final PsiClass childOfType = PsiTreeUtil.findChildOfType(psiFile, PsiClass.class);
-			if (psiFile instanceof PsiJavaFile && psiFile.getChildren() != null) {
+//			final PsiClass childOfType = PsiTreeUtil.findChildOfType(psiFile, PsiClass.class);
+			if (psiFile instanceof PsiJavaFile) {
 				for (PsiElement classChild : psiFile.getChildren()) {
 					if (classChild instanceof PsiClass && ((PsiModifierListOwner) classChild).hasModifierProperty(PsiModifier.PUBLIC)) {
 						final PsiModifierListOwner psiModifierListOwner = (PsiModifierListOwner) classChild;
@@ -409,11 +414,7 @@ public class SQLRefNamingUtil {
 
 	public static PsiAnnotation isAnnoRefAnnotationValid(PsiElement psiElement) {
 		if (psiElement instanceof PsiClass) {
-			if (psiElement instanceof PsiModifierListOwner
-					&& ((PsiModifierListOwner) psiElement).getModifierList() != null
-					&& ((PsiModifierListOwner) psiElement).getModifierList().getAnnotations() != null
-					&& ((PsiModifierListOwner) psiElement).getModifierList().getAnnotations().length > 0) {
-				final PsiAnnotation[] annotations = ((PsiModifierListOwner) psiElement).getModifierList().getAnnotations();
+			if (((PsiModifierListOwner) psiElement).getModifierList() != null && ((PsiModifierListOwner) psiElement).getModifierList().getAnnotations().length > 0) {
 				final List<String> annoRefAnnotationToScan = getAnnoRefAnnotationToScan(psiElement.getProject());
 				for (final String annotationFQN : annoRefAnnotationToScan) {
 					final PsiAnnotation annotation = AnnotationUtil.findAnnotation(((PsiModifierListOwner) psiElement), annotationFQN);

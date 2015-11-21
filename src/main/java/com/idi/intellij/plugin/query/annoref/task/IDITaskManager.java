@@ -9,6 +9,7 @@
  */
 package com.idi.intellij.plugin.query.annoref.task;
 
+import com.google.common.collect.Maps;
 import com.idi.intellij.plugin.query.annoref.util.AnnoRefBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -23,6 +24,7 @@ import com.intellij.openapi.startup.StartupManager;
 import com.intellij.util.DisposeAwareRunnable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -36,13 +38,20 @@ import java.util.concurrent.Future;
  */
 public class IDITaskManager {
 	private static final Logger log = Logger.getInstance(IDITaskManager.class.getName());
-	private final BackgroundTaskQueue myUpdatingQueue = new BackgroundTaskQueue(null, AnnoRefBundle.message("annoRef.progress.reindex"));
-
+	private static final BackgroundTaskQueue myUpdatingQueue = new BackgroundTaskQueue(null, AnnoRefBundle.message("annoRef.progress.reindex"));
+	private static final Map<String, IndicateProgressListener> runningTasksMap = Maps.newConcurrentMap();
 
 	public interface IDITaskHandler {
 		void waitFor();
 	}
 
+	public static boolean isTaskActive(String task) {
+		return (runningTasksMap.containsKey(task));
+	}
+
+	public static void clearRunningTask(String task) {
+		runningTasksMap.remove(task);
+	}
 
 	/*public static void run(final Project project, String title, final IDITask task) throws IDIProcessCancelledException {
 		final Exception[] canceledEx = new Exception[1];
@@ -125,6 +134,7 @@ public class IDITaskManager {
 			@Override
 			public void run(@NotNull ProgressIndicator progressIndicator) {
 				final IDIProgressIndicator idiProgressIndicator = new IDIProgressIndicator(progressIndicator, task.numOfFiles());
+				runningTasksMap.put(task.getTaskName(), idiProgressIndicator);
 				DumbService.getInstance(project).runReadActionInSmartMode(new Runnable() {
 					@Override
 					public void run() {
@@ -138,6 +148,9 @@ public class IDITaskManager {
 				});
 			}
 		};
+		if (!myUpdatingQueue.isTestMode()) {
+			myUpdatingQueue.run(task1);
+		}
 //		final BackgroundableProcessIndicator backgroundableProcessIndicator = new BackgroundableProcessIndicator(task1);
 
 	/*	final Task.Modal task1 = new Task.Modal(project, title, true) {
@@ -163,29 +176,29 @@ public class IDITaskManager {
 //
 //		} else {
 
-		final DumbService dumbService = DumbService.getInstance(project);
+	/*	final DumbService dumbService = DumbService.getInstance(project);
 		log.info("runCompute(): IDITask=" + task + " IsDumb=" + dumbService.isDumb());
 		if (dumbService.isDumb()) {
-			final ProgressWindow indicator = new ProgressWindowWithNotification(true, true, project, title);
+//			final ProgressWindow indicator = new ProgressWindowWithNotification(true, true, project, title);
 			dumbService.smartInvokeLater(new Runnable() {
 				@Override
 				public void run() {
 //							task.run(backgroundableProcessIndicator);
-					task.run(indicator);
+					task.runTask();
 				}
 			});
 		} else {
 			log.info("runCompute(): running Smart");
 			ProgressManager.getInstance().run(task1);
 		}
-		/*	ProgressManager.getInstance().runProcess(new Runnable() {
+		*//*	ProgressManager.getInstance().runProcess(new Runnable() {
 				@Override
 				public void run() {
 					task.run(backgroundableProcessIndicator);
 				}
 			}, backgroundableProcessIndicator);
-		}*/
-		/*ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+		}*//*
+		*//*ApplicationManager.getApplication().invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -194,8 +207,8 @@ public class IDITaskManager {
 					log.error("e=" + e.getMessage(), e);
 				}
 			}
-		}, ModalityState.defaultModalityState());*/
-		/*ProgressManager.getInstance().executeProcessUnderProgress(new Runnable() {
+		}, ModalityState.defaultModalityState());*//*
+		*//*ProgressManager.getInstance().executeProcessUnderProgress(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -204,8 +217,8 @@ public class IDITaskManager {
 					log.error("e=" + e.getMessage(), e);
 				}
 			}
-		}, indicator);*/
-//		return backgroundTask.is();
+		}, indicator);*//*
+//		return backgroundTask.is();*/
 		return true;
 //		return DumbService.getInstance(project).runReadActionInSmartMode(computable);
 //			}

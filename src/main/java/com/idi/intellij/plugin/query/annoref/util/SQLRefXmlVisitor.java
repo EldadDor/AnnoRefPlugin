@@ -34,17 +34,11 @@ public class SQLRefXmlVisitor extends XmlRecursiveElementVisitor {
 	private XmlVisitorListener xmlVisitorListener;
 
 	public static SQLRefXmlVisitor getInstance(Project project) {
-		try {
-			if (instance == null) {
-				instance = new SQLRefXmlVisitor();
-			} else {
-			}
-			instance.project = project;
-			return instance;
-		} catch (Exception ex) {
-			logger.error("SQLRefXmlVisitor(): Error=" + ex.getMessage(), ex);
-			return null;
+		if (instance == null) {
+			instance = new SQLRefXmlVisitor();
 		}
+		instance.project = project;
+		return instance;
 	}
 
 	public SQLRefXmlVisitor setXmlVisitorListener(XmlVisitorListener xmlVisitorListener) {

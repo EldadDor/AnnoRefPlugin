@@ -171,8 +171,6 @@ public class SPViewContentStateManager implements PersistentStateComponent<SPVie
 				}
 			} catch (SQLException e) {
 				logger.error("displayStorageProcedureText(): Error=" + e.getMessage(), e);
-			} finally {
-//				dbAccessor.closeConnection();
 			}
 		}
 		return new Pair<Boolean, Content>(true, alreadyOpenContent);
@@ -180,7 +178,7 @@ public class SPViewContentStateManager implements PersistentStateComponent<SPVie
 
 	private Content getSPViewContent(Project project, String spName, String spText, String contentName) {
 		final SPViewPanelForm spPanel = new SPViewPanelForm(spName, project);
-		final String spDataSourceName = AnnoRefConfigSettings.getInstance(project).getAnnoRefState().SP_DATA_SOURCE_NAME;
+//		final String spDataSourceName = AnnoRefConfigSettings.getInstance(project).getAnnoRefState().SP_DATA_SOURCE_NAME;
 		final Content newContent = ContentFactory.SERVICE.getInstance().createContent(spPanel.getMainPanel(), contentName, false);
 		newContent.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/syBaseLogo_3_sm.png")));
 		spPanel.setContent(newContent);

@@ -72,7 +72,7 @@ public class RemovableCandidateInspection extends BaseJavaBatchLocalInspectionTo
 	@Override
 	@NotNull
 	public String getShortName() {
-		return SHORT_NAME;
+		return RemovableCandidateInspection.class.getSimpleName();
 	}
 
 	@Override

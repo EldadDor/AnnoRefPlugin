@@ -102,17 +102,17 @@ public class SQLRefApplication {
 		project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter() {
 			@Override
 			public void rootsChanged(ModuleRootEvent event) {
-//				if (isLastIndexTimeIfLapsed(project, 1)) {
-				final Project projectSource = (Project) event.getSource();
-				if (AnnoRefConfigSettings.getInstance(project).getAnnoRefState().ENABLE_AUTO_SYNC) {
-					logger.info("rootsChanged(): ENABLE_AUTO_SYNC is on");
-					new AnnoRefBackgroundWorker().runInBackground(project);
-				} else {
-					logger.info("rootsChanged(): ENABLE_AUTO_SYNC is off");
-					doUpdateNotifications(projectSource);
+				if (isLastIndexTimeIfLapsed(project, 1)) {
+					final Project projectSource = (Project) event.getSource();
+					if (AnnoRefConfigSettings.getInstance(project).getAnnoRefState().ENABLE_AUTO_SYNC && !ApplicationManager.getApplication().isUnitTestMode()) {
+						logger.info("rootsChanged(): ENABLE_AUTO_SYNC is on");
+						new AnnoRefBackgroundWorker().runInBackground(project);
+					} else {
+						logger.info("rootsChanged(): ENABLE_AUTO_SYNC is off");
+						doUpdateNotifications(projectSource);
+					}
 				}
 			}
-//			}
 		});
 	}
 

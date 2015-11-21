@@ -60,10 +60,7 @@ public class StoreProcExecViewHandler extends GotoDeclarationHandlerBase {
 			final PsiElement firstParent = PsiTreeUtil.findFirstParent(paramPsiElement, new Condition<PsiElement>() {
 				@Override
 				public boolean value(PsiElement psiElement) {
-					if (psiElement instanceof PsiModifierListOwner) {
-						return true;
-					}
-					return false;
+					return psiElement instanceof PsiModifierListOwner;
 				}
 			});
 			if (paramPsiElement instanceof PsiJavaToken && ((PsiJavaToken) paramPsiElement).getTokenType() == JavaTokenType.STRING_LITERAL
@@ -104,7 +101,10 @@ public class StoreProcExecViewHandler extends GotoDeclarationHandlerBase {
 						toolWindow[0] = ToolWindowManager.getInstance(paramPsiElement.getProject()).getToolWindow(activeToolWindowId[0]);
 						final Content[] selectedContent = new Content[1];
 						selectedContent[0] = toolWindow[0].getContentManager().getSelectedContent();
-						final String selectedContentDisplayName = selectedContent[0].getDisplayName();
+						String selectedContentDisplayName = null;
+						if (selectedContent[0] != null) {
+							selectedContentDisplayName = selectedContent[0].getDisplayName();
+						}
 						if (paramPsiElement.getText() != null && !paramPsiElement.getText().isEmpty() && !(paramPsiElement.getText().contains("\n") || paramPsiElement.getText().contains("\t"))) {
 							final SPViewIndexHelper indexHelper = SQLRefApplication.getInstance(paramPsiElement.getProject(), SQLRefRepository.class).getSPViewIndexByName(selectedContentDisplayName);
 							if (indexHelper != null && !indexHelper.getIndices().isEmpty()) {
@@ -160,7 +160,6 @@ public class StoreProcExecViewHandler extends GotoDeclarationHandlerBase {
 
 	private void displaySPInToolWindow(Project project, final String cleanSpName, boolean dispatchThread) {
 		try {
-			isCurrentlyRunning.compareAndSet(true, false);
 			final String contentName = cleanSpName + "_" + AnnoRefConfigSettings.getInstance(project).getAnnoRefState().SP_DATA_SOURCE_NAME;
 			final SPViewContentStateManager contentStateManager = ServiceManager.getService(project, SPViewContentStateManager.class);
 			final Pair<Boolean, Content> contentPair = contentStateManager.fetchSpForContentDisplay(project, cleanSpName, contentName, dispatchThread);
@@ -183,69 +182,5 @@ public class StoreProcExecViewHandler extends GotoDeclarationHandlerBase {
 			isCurrentlyRunning.set(false);
 		}
 	}
-/*
-	private void displayStorageProcedureText(PsiFile psiFile, final Project project) {
-
-		final AnnoRefSettings sqlRefState = AnnoRefConfigSettings.getInstance(project).getAnnoRefState();
-		logger.info("displayStorageProcedureText(): PsiFile=" + psiFile.getName());
-		PsiAnnotation psiAnnotation = SQLRefNamingUtil.getAnnotationForConfiguredClassFile(psiFile, sqlRefState.
-				SP_VIEW_ANNOTATION_FQN);
-		if (psiAnnotation != null) {
-			logger.info("displayStorageProcedureText(): psiAnnotation=" + psiAnnotation.getQualifiedName());
-			final PsiNameValuePair psiNameValuePair = psiAnnotation.getParameterList().getAttributes()[0];
-			final String spName = psiNameValuePair.getValue().getText();
-			final String cleanSpName = StringUtils.cleanQuote(spName);
-			final SPViewContentStateManager contentStateManager = ServiceManager.getService(project, SPViewContentStateManager.class);
-			if (!activateAlreadyOpenContent(spName, contentStateManager)) {
-				UIUtil.invokeAndWaitIfNeeded(new Runnable() {
-					@Override
-					public void run() {
-						final DataSourceAccessorComponent dbAccessor = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class);
-						dbAccessor.initDataSource(project, sqlRefState.SP_DATA_SOURCE_NAME);
-						try {
-							String spText = dbAccessor.fetchSpForViewing(cleanSpName, project);
-							contentStateManager.addContent(getSPViewContent(project, spText), spName);
-							logger.info("displayStorageProcedureText(): SP_Name=" + cleanSpName);
-						} catch (SQLException e) {
-							logger.error("displayStorageProcedureText(): Error=" + e.getMessage(), e);
-						}
-					}
-				});
-			}
-		}
-	}*/
-/*
-	private boolean activateAlreadyOpenContent(String spName, final SPViewContentStateManager contentStateManager) {
-		final Content alreadyOpenContent = contentStateManager.getAlreadyOpenContent(spName);
-		if (alreadyOpenContent != null) {
-			UIUtil.invokeAndWaitIfNeeded(new Runnable() {
-				@Override
-				public void run() {
-					contentStateManager.reactivateContent(alreadyOpenContent);
-				}
-			});
-			return true;
-		}
-		return false;
-	}*/
-
-/*
-	private ToolWindow getRegisteredToolWindow(ToolWindowManager toolWindowManager) {
-		ToolWindow toolWindow = toolWindowManager.getToolWindow("SPViewer");
-		if (toolWindow == null) {
-			toolWindow = toolWindowManager.registerToolWindow("SPViewer", true, ToolWindowAnchor.BOTTOM);
-		}
-		return toolWindow;
-	}*/
-
-	/*private Content getSPViewContent(Project project, String spText) {
-		final SPViewPanelForm spPanel = new SPViewPanelForm(project);
-		final Content newContent = ContentFactory.SERVICE.getInstance().createContent(spPanel.getMainPanel(), "", false);
-		newContent.setIcon(IconLoader.findIcon("icons/syBaseLogo_36.png"));
-		spPanel.setContent(newContent);
-		spPanel.setTextForViewing(spText);
-		newContent.setDisposer(spPanel);
-		return newContent;
-	}*/
 
 }

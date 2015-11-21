@@ -41,7 +41,7 @@ public class SPViewerOpenToolWindowAction extends AnAction {
 	@Override
 	public void update(@NotNull AnActionEvent e) {
 //		final Color color = UIManager.("Tree.selectionForeground");
-		UIDefaults uiDefaults = UIManager.getDefaults();
+	/*	UIDefaults uiDefaults = UIManager.getDefaults();
 		uiDefaults.put("Tree.selectionForeground", Color.magenta);
 		uiDefaults.put("Tree.textForeground", Color.blue);
 		uiDefaults.put("Tree.textBackground", Color.YELLOW);
@@ -50,7 +50,7 @@ public class SPViewerOpenToolWindowAction extends AnAction {
 		uiDefaults.put("Tree.foreground", Color.CYAN);
 		uiDefaults.put("Table.focusCellHighlightBorder", Color.PINK);
 		uiDefaults.put("List.focusCellHighlightBorder", Color.orange);
-
+*/
 //		final Color color = UIManager.getColor("Tree.selectionForeground");
 		e.getPresentation().setEnabled(e.getDataContext().getData(PlatformDataKeys.EDITOR.getName()) != null);
 	}

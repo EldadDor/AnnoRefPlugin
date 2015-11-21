@@ -57,6 +57,11 @@ public class ModuleScanningTask extends IDIAbstractTask {
 		return false;
 	}
 
+	@Override
+	public void runTask() {
+
+	}
+
 
 
 /*	public Set<VirtualFilePointer> getCodeConfigurationFiles() {

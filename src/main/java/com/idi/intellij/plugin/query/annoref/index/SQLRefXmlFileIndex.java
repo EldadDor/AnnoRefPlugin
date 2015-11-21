@@ -46,40 +46,12 @@ public class SQLRefXmlFileIndex {
 		QUERIES_FILE_REGEX_PATTERN = AnnoRefConfigSettings.getInstance(project).getAnnoRefState().QUERIES_REGEX;
 	}
 
-	/*
-	public SQLRefXmlFileIndex(Project project, IDIProgressIndicator progressIndicator, int filesToBeScannedCount) {
-		this.project = project;
-		this.progressIndicator = progressIndicator;
-		this.filesToBeScannedCount = filesToBeScannedCount;
-	}
-*/
 	public SQLRefXmlFileIndex(Project project, IndexProgressChangedListener progressChangedListener) {
 		this.project = project;
 		this.progressChangedListener = progressChangedListener;
 		QUERIES_FILE_REGEX_PATTERN = AnnoRefConfigSettings.getInstance(project).getAnnoRefState().QUERIES_REGEX;
 	}
 
-	/*	public synchronized void indexSQLRef() {
-			logger.info("indexSQLRef():");
-			xmlRefCount = 0;
-			Collection<VirtualFile> xmlFiles = FileTypeIndex.getFiles(XmlFileType.INSTANCE, GlobalSearchScope.projectScope(project));
-			try {
-				for (final VirtualFile xmlFile : xmlFiles) {
-					scanXmlFile(xmlFile);
-					if (progressChangedListener != null) {
-						progressChangedListener.changeMade(true);
-					}
-				}
-				if (!xmlFiles.isEmpty() && progressChangedListener != null) {
-					progressChangedListener.finishedProcess();
-				}
-				ServiceManager.getService(project, AnnoRefNotifications.class).notifyAnnoRefIndex(project, SQLRefConstants.ANNO_REF_XML, xmlRefCount);
-			} catch (Exception e) {
-				if (progressChangedListener != null) {
-					progressChangedListener.failedProcess(e.getMessage());
-				}
-			}
-		}*/
 	public synchronized void indexSQLRef() {
 		logger.info("indexSQLRef():");
 		xmlRefCount = 0;
@@ -113,11 +85,6 @@ public class SQLRefXmlFileIndex {
 			SQLRefXmlVisitor.getInstance(project).setXmlVisitorListener(xmlVisitorListener).setInspector(false);
 			SQLRefXmlVisitor.getInstance(project).visitFile(SQLRefApplication.getPsiFileFromVirtualFile(xmlFile, project));
 			parseXmlForSql(xmlFile);
-
-			/*if (remove) {
-				ServiceManager.getService(project, SQLRefRepository.class).removeXmlFromRepository(indexKey);
-			} else {
-			}*/
 		}
 	}
 
