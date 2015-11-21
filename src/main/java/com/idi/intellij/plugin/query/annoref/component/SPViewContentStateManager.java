@@ -64,16 +64,15 @@ public class SPViewContentStateManager implements PersistentStateComponent<SPVie
 		StartupManager.getInstance(myProject).runWhenProjectIsInitialized(new Runnable() {
 			@Override
 			public void run() {
-				SQLRefSPView spView = SQLRefSPView.getInstance(project);
 				ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(SP_VIEW_TOOL_WINDOW_ID);
 				if (toolWindow == null) {
 					toolWindow = ToolWindowManager.getInstance(project).registerToolWindow(SP_VIEW_TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM);
 				}
 				toolWindow.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/syBaseLogo_3_sm.png")));
 				contentManager = toolWindow.getContentManager();
-				final ToolWindowContentUi windowContentUi = new ToolWindowContentUi((ToolWindowImpl) toolWindow);
+//				final ToolWindowContentUi windowContentUi = new ToolWindowContentUi((ToolWindowImpl) toolWindow);
 //				windowContentUi.
-				toolWindow.setTitle("");//todo  eldad >> check db name here?
+				toolWindow.setTitle("");
 				toolWindow.installWatcher(contentManager);
 //				new ContentManagerWatcher(toolWindow, contentManager);
 			}
