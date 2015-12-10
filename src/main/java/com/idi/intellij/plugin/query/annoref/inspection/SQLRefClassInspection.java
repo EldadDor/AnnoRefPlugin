@@ -105,7 +105,9 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 	}
 
 	private ProblemDescriptor addProblemDescriptorForConversionCandidate(PsiClassOwner file, InspectionManager manager, PsiAnnotation psiAnnotation, Module module) {
-		logger.info("addProblemDescriptorForConversionCandidate():");
+		if (logger.isDebugEnabled()) {
+			logger.debug("addProblemDescriptorForConversionCandidate():");
+		}
 		return manager.createProblemDescriptor(psiAnnotation.getContext(),
 				AnnoRefBundle.message("annoRef.conversion"),
 				new CreateNewAnnoRefInFileFix("Create A @SQLRef and move sql to xml file", psiAnnotation, module, file.getPackageName()),
@@ -115,7 +117,9 @@ public class SQLRefClassInspection extends LocalInspectionTool {
 
 	private ProblemDescriptor addProblemDescriptorForUnUsedClass(PsiAnnotation classAnnotation, Module module, String packageName, PsiElement classAnnotationElement,
 	                                                             SQLRefReference sqlRefReferenceForID, InspectionManager manager) {
-		logger.info("addProblemDescriptorForUnUsedClass():");
+		if (logger.isDebugEnabled()) {
+			logger.debug("addProblemDescriptorForUnUsedClass():");
+		}
 		if (sqlRefReferenceForID.getXmlQueryElements().isEmpty()) {
 			return manager.createProblemDescriptor(classAnnotationElement.getContext(),
 					AnnoRefBundle.message("annoRef.class.inspection.unused.class"),

@@ -12,8 +12,8 @@ import com.idi.intellij.plugin.query.annoref.index.progress.SQLRefProgressIndica
 import com.idi.intellij.plugin.query.annoref.model.FileReferenceCollection;
 import com.idi.intellij.plugin.query.annoref.model.ReferenceCollectionManager;
 import com.idi.intellij.plugin.query.annoref.model.SQLRefReference;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.QueriesXmlVisitor;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefDataAccessor;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefNamingUtil;
 import com.intellij.diagnostic.PluginException;
@@ -53,10 +53,10 @@ public class SQLRefFileSystemListener extends VirtualFileAdapter {
 			if (psiFile == null) {
 				return;
 			}
-			if (SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).isPropitiousXmlFile(psiFile)) {
+			if (AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).isPropitiousXmlFile(psiFile)) {
 				processXMLFileChange(event);
 			} else {
-				String propitiousClassFile = SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).isPropitiousClassFile(psiFile);
+				String propitiousClassFile = AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).isPropitiousClassFile(psiFile);
 				if (propitiousClassFile != null) {
 					processClassFileChange(propitiousClassFile, psiFile);
 				}
@@ -171,7 +171,7 @@ public class SQLRefFileSystemListener extends VirtualFileAdapter {
 		if (referenceInCollections != null) {
 			referenceInCollections.removeClassAnnoReference(psiFile.getName());
 			LOGGER.info("ReVisiting class file : " + psiFile.getName());
-			SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalAnnotatedClassReference(psiFile);
+			AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalAnnotatedClassReference(psiFile);
 		}
 	}
 

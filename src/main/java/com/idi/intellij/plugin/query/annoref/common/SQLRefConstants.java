@@ -24,6 +24,7 @@ public interface SQLRefConstants {
 	Icon DB_TEST_ICON = IconLoader.findIcon("/icons/Turtle.png");
 	Icon DB_UT_ICON = IconLoader.findIcon("/icons/starwars/darth.png");
 	Icon DB_YEST_ICON = IconLoader.findIcon("/icons/starwars/deathstar.png");
+	Icon DB_TRAIN_ICON = IconLoader.findIcon("icons/captainshield_4_13_dark.png");
 	Icon DB_REP_ICON = IconLoader.findIcon("/icons/starwars/yoda.png");
 	String SQL_REF_ANNOTATION_FQN = "com.idi.framework";
 

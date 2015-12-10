@@ -16,9 +16,9 @@ public class SQLRefPluginManager {
 
 	private static final Logger logger = Logger.getInstance(SQLRefPluginManager.class.getName());
 
-	public static Map<String, SQLRefApplication> projectBasePathMap = new ConcurrentHashMap<String, SQLRefApplication>(1);
+	public static Map<String, AnnRefApplication> projectBasePathMap = new ConcurrentHashMap<String, AnnRefApplication>(1);
 
-	public static SQLRefApplication getRequestedIdeaInstanceForProjectBasePath(String guessedProject) {
+	public static AnnRefApplication getRequestedIdeaInstanceForProjectBasePath(String guessedProject) {
 		if (projectBasePathMap.containsKey(guessedProject)) {
 			return projectBasePathMap.get(guessedProject);
 		}

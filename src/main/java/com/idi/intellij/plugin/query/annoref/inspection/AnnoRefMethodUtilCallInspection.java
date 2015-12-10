@@ -181,7 +181,7 @@ public class AnnoRefMethodUtilCallInspection extends LocalInspectionTool {
 		@Override
 		public void visitJavaToken(PsiJavaToken token) {
 //			super.visitJavaToken(token);
-			if (token.getTokenType().toString().equals("STRING_LITERAL")) {
+			if (token.getTokenType().equals(JavaTokenType.STRING_LITERAL)) {
 				final IElementType methodCallExpression = JavaElementType.METHOD_CALL_EXPRESSION;
 				final ASTNode parent = TreeUtil.findParent(token.getNode(), methodCallExpression);
 				if (parent instanceof PsiMethodCallExpression && ((PsiMethodCallExpression) parent).getMethodExpression() != null

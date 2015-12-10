@@ -16,8 +16,8 @@ import com.idi.intellij.plugin.query.annoref.common.SQLRefConstants;
 import com.idi.intellij.plugin.query.annoref.component.AnnoRefDataKey;
 import com.idi.intellij.plugin.query.annoref.component.SPViewContentStateManager;
 import com.idi.intellij.plugin.query.annoref.connection.DataSourceAccessorComponent;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.PsiDiffContentManager;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.StringUtils;
 import com.idi.intellij.plugin.query.annoref.util.SybaseLanguageManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -80,7 +80,7 @@ public class DiffSPViewAction extends IconWithTextAction {
 //		final JBList jbList = new JBList();
 		final CollectionListModel<DataSourcePojo> listModel = new CollectionListModel<DataSourcePojo>();
 //		jbList.setModel(listModel);
-		final Collection<String> availableConnections = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class).getAvailableConnections(project);
+		final Collection<String> availableConnections = AnnRefApplication.getInstance(project, DataSourceAccessorComponent.class).getAvailableConnections(project);
 		for (final String availableConnection : availableConnections) {
 			String substring;
 			if (availableConnection.indexOf("[") > 0) {
@@ -147,7 +147,7 @@ public class DiffSPViewAction extends IconWithTextAction {
 				try {
 					final String spTextForDiff = ServiceManager.getService(project, SPViewContentStateManager.class).
 							fetchSpTextForDBEnvironment(project, SPViewingInformation.getSpName(), selectedValue.getDbName());
-					final PsiFile diffPsiFile = SQLRefApplication.getInstance(project, SybaseLanguageManager.class).initializeSqlSyntaxForPsiFile(spTextForDiff);
+					final PsiFile diffPsiFile = AnnRefApplication.getInstance(project, SybaseLanguageManager.class).initializeSqlSyntaxForPsiFile(spTextForDiff);
 					final SimpleDiffRequest diffRequest = getSimpleDiffRequest(selectedValue, diffPsiFile, psiFile, SPViewingInformation);
 					final DiffTool diffTool = DiffManager.getInstance().getDiffTool();
 //					Window active = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
@@ -180,6 +180,9 @@ public class DiffSPViewAction extends IconWithTextAction {
 				if (StringUtils.startsWithIgnoreCase(value.getDbName(), "YEST")) {
 					return SQLRefConstants.DB_YEST_ICON;
 				}
+				if (StringUtils.startsWithIgnoreCase(value.getDbName(), "TRAIN")) {
+					return SQLRefConstants.DB_TRAIN_ICON;
+				}
 				if (StringUtils.startsWithIgnoreCase(value.getDbName(), "REP") || StringUtils.startsWithIgnoreCase(value.getDbName(), "REM")) {
 					return SQLRefConstants.DB_REP_ICON;
 				} else {
@@ -203,7 +206,7 @@ public class DiffSPViewAction extends IconWithTextAction {
 	}
 
 	private SimpleDiffRequest getSimpleDiffRequest(@NotNull final DataSourcePojo selectedValue,
-	                                               @NotNull final PsiFile diffPsiFile, @NotNull final PsiFile psiFile, @NotNull final SPViewingInformation SPViewingInformation) {
+			@NotNull final PsiFile diffPsiFile, @NotNull final PsiFile psiFile, @NotNull final SPViewingInformation SPViewingInformation) {
 		final SimpleDiffRequest diffRequest = PsiDiffContentManager.comparePsiElements(psiFile, diffPsiFile);
 		diffRequest.setWindowTitle("SP Comparison for " + SPViewingInformation.getSpName());
 		diffRequest.setContentTitles(SPViewingInformation.getDbName(), selectedValue.getDbName());

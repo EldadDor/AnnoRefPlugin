@@ -8,8 +8,8 @@ import com.idi.intellij.plugin.query.annoref.notification.AnnoRefNotifications;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefSettings;
 import com.idi.intellij.plugin.query.annoref.task.IDIProgressIndicator;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.AnnoRefBundle;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefNamingUtil;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefXmlVisitor;
 import com.intellij.ide.highlighter.XmlFileType;
@@ -83,7 +83,7 @@ public class SQLRefXmlFileIndex {
 				}
 			};
 			SQLRefXmlVisitor.getInstance(project).setXmlVisitorListener(xmlVisitorListener).setInspector(false);
-			SQLRefXmlVisitor.getInstance(project).visitFile(SQLRefApplication.getPsiFileFromVirtualFile(xmlFile, project));
+			SQLRefXmlVisitor.getInstance(project).visitFile(AnnRefApplication.getPsiFileFromVirtualFile(xmlFile, project));
 			parseXmlForSql(xmlFile);
 		}
 	}
@@ -92,7 +92,7 @@ public class SQLRefXmlFileIndex {
 		final AnnoRefSettings annoRefState = AnnoRefConfigSettings.getInstance(project).getAnnoRefState();
 		if (annoRefState.ENABLE_SQL_TO_MODEL_VALIDATION) {
 			logger.info(AnnoRefBundle.message("annoRef.xml.parse.sql.validation.enabled"));
-			final XmlBuilderDriver xmlBuilderDriver = new XmlBuilderDriver(SQLRefApplication.getPsiFileFromVirtualFile(xmlFile, project).getText());
+			final XmlBuilderDriver xmlBuilderDriver = new XmlBuilderDriver(AnnRefApplication.getPsiFileFromVirtualFile(xmlFile, project).getText());
 			xmlBuilderDriver.build(new AnnoRefXmlVisitor(project, xmlFile));
 		}
 		logger.info(AnnoRefBundle.message("annoRef.xml.parse..sql.validation.disabled"));

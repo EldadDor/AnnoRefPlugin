@@ -11,7 +11,7 @@ import com.idi.intellij.plugin.query.annoref.connection.ConnectionUtil;
 import com.idi.intellij.plugin.query.annoref.connection.DataSourceAccessorComponent;
 import com.idi.intellij.plugin.query.annoref.index.SQLRefRepository;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SybaseLanguageManager;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.Disposable;
@@ -42,13 +42,16 @@ import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by EAD-MASTER on 2/1/14.
  */
-public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
+public class SPViewPanelForm implements Disposable, org.picocontainer.Disposable, SPViewSubmitListener {
 	private static Logger logger = Logger.getInstance(SPViewPanelForm.class);
 	private Project project;
 	public static Project preInitializedProject;
@@ -77,13 +80,14 @@ public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
 	private List<Integer> endIndices = Lists.newLinkedList();
 	private VisualPosition currentPosition;
 
+	public static final Pattern SP_EXEC_IN_SP_REGEX = Pattern.compile("@(?!@)[A-Z]+_[A-Z_\\d]+|[A-Z]+[A-Z_\\d]+", Pattern.UNICODE_CASE);
 
 	public SPViewPanelForm(String spName, Project project) {
 		this.project = project;
 		this.spName = spName;
 		ConnectionUtil.initializeDefaultDataSource(project);
 		$$$setupUI$$$();
-		SQLRefApplication.getInstance(project, SQLRefRepository.class).addSPViewIndexToRepo(spName, indexHelper);
+		AnnRefApplication.getInstance(project, SQLRefRepository.class).addSPViewIndexToRepo(spName, indexHelper);
 		addGoUpListener();
 		addGoDownListener();
 		addPopOutWindowListener();
@@ -123,21 +127,9 @@ public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
 		if (project == null) {
 			project = preInitializedProject;
 		}
-		final DataSourceAccessorComponent dbAccessor = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class);
-		//		final AutoCompleteAdapter completeAdapter = new AutoCompleteAdapter(spNameTextField, dbAccessor.getStoreProceduresNames());
-//		final TextComponentAdaptor completeAdapter = new TextComponentAdaptor(spNameTextField, dbAccessor.getStoreProceduresNames());
+		final DataSourceAccessorComponent dbAccessor = AnnRefApplication.getInstance(project, DataSourceAccessorComponent.class);
 		final Collection<String> names = dbAccessor.getStoreProceduresNames();
 		textFieldWithAutoCompletion = SPTTextFieldWithAutoCompletion.createWithAutoCompletion(project, names, this);
-//		textFieldWithAutoCompletion = TextFieldWithAutoCompletion.create(project, names, true, "");
-//		spNameTextField.getInputMap().put(KeyStroke.getKeyStroke("TAB"), COMMIT_ACTION);
-		//		spNameTextField.getActionMap().put(COMMIT_ACTION, new AutoCompleteAdapter.CommitAction());
-//		final AutoCompleteDocument autoCompleteDocument = new AutoCompleteDocument(completeAdapter, false);
-//		topPanel.remove(spNameTextField);
-//		textFieldWithAutoCompletion.setMinimumSize(new Dimension(150, 20));
-//		textFieldWithAutoCompletion.setPreferredSize(new Dimension(150, 20));
-		//		topPanel.add(spNameTextField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-	/*	topPanel.add(textFieldWithAutoCompletion, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL,
-				GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));*/
 	}
 
 	private void addPopOutWindowListener() {
@@ -224,11 +216,12 @@ public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
 	public void setTextForViewing(String text) {
 		initializeSqlSyntax(text);
 		highLightSPExecText();
+		editor.putUserData(AnnoRefDataKey.SP_VIEW_COMPONENT, this);
 		textPaneBody.transferFocusUpCycle();
 	}
 
 	private void initializeSqlSyntax(String text) {
-		editor = SQLRefApplication.getInstance(project, SybaseLanguageManager.class).initializeSqlSyntaxForEditor(project, text);
+		editor = AnnRefApplication.getInstance(project, SybaseLanguageManager.class).initializeSqlSyntaxForEditor(project, text);
 		mainTextPanel.remove(textPaneBody);
 		initializeSPDiffPanel();
 		mainTextPanel.add(editor.getComponent(), new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER,
@@ -239,7 +232,6 @@ public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
 		final DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
 		final String dataSourceName = AnnoRefConfigSettings.getInstance(project).getAnnoRefState().SP_DATA_SOURCE_NAME;
 		editor.putUserData(AnnoRefDataKey.DATA_SOURCE_NAME_DATA_KEY, new SPViewingInformation(dataSourceName, spName));
-//		((UserDataHolder) dataContext).putUserData(AnnoRefDataKey.DATA_SOURCE_NAME_DATA_KEY, new SPViewingInformation(dataSourceName, spName));
 		final DiffSPViewAction diffSPViewAction = new DiffSPViewAction();
 		ShortcutSet ENTER_AND_CTRL_ENTER_SHORTCUT_SET = new CustomShortcutSet(KeyboardShortcut.fromString("control ENTER"));
 		diffSPViewAction.registerCustomShortcutSet(ENTER_AND_CTRL_ENTER_SHORTCUT_SET, editor.getComponent());
@@ -253,28 +245,35 @@ public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
 			final JBColor foregroundColor = new JBColor(new Color(230, 44, 14), new Color(230, 44, 14));
 			final JBColor backgroundColor = new JBColor(new Color(99, 185, 230), new Color(99, 185, 230));
 			TextAttributes attributes = new TextAttributes(foregroundColor, backgroundColor, null, EffectType.ROUNDED_BOX, Font.PLAIN);
-			RangeHighlighter rangeHighlighter = editor.getMarkupModel().addRangeHighlighter(startExec,
-					endExec, HighlighterLayer.FIRST, attributes, HighlighterTargetArea.EXACT_RANGE);
-			rangeHighlighter.getTargetArea();
+			RangeHighlighter rangeHighlighter = editor.getMarkupModel().addRangeHighlighter(startExec, endExec, HighlighterLayer.FIRST, attributes, HighlighterTargetArea.EXACT_RANGE);
+//			rangeHighlighter.getTargetArea();
 		}
 
 		indexHelper.initializeIterator(indexHelper);
 	}
 
-	private boolean searchForStartAndEndIndices(int start) {
+	private void searchForStartAndEndIndices(final int start) {
 		final String text = editor.getDocument().getText();
 		final int startExec = text.indexOf("exec", start);
 		if (startExec == -1) {
-			return false;
+			return;
 		}
-		startIndices.add(startExec);
-		final VisualPosition visualPosition = editor.offsetToVisualPosition(startExec);
-		indexHelper.add(visualPosition);
-		final int endExec = text.indexOf("\n", startExec);
-		final String spLinkText = text.substring(startExec + 6, endExec);
-		indexHelper.getSpLinkable().put(spLinkText, spLinkText);
-		endIndices.add(endExec);
-		return searchForStartAndEndIndices(endExec);
+		final int endExec = startExec + text.substring(startExec).indexOf("\n");
+		final String lineToSearchIn = text.substring(startExec, endExec);
+		Matcher matcher = SP_EXEC_IN_SP_REGEX.matcher(lineToSearchIn);
+		if (matcher.find()) {
+			if (ServiceManager.getService(project, DataSourceAccessorComponent.class).getSpNames().containsKey(matcher.group())) {
+			}
+			int startOfOffset = startExec + lineToSearchIn.indexOf(matcher.group());
+			int endOfOffset = startOfOffset + matcher.group().length();
+			startIndices.add(startOfOffset);
+			final VisualPosition visualPosition = editor.offsetToVisualPosition(startOfOffset);
+			indexHelper.add(visualPosition);
+			final String spLinkText = text.substring(startOfOffset, endOfOffset);
+			indexHelper.getSpLinkable().put(spLinkText, spLinkText);
+			endIndices.add(endOfOffset);
+			searchForStartAndEndIndices(endExec);
+		}
 	}
 
 	@Override
@@ -284,6 +283,7 @@ public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
 			EditorFactory.getInstance().releaseEditor(editor);
 		}
 	}
+
 
 	private void createUIComponents() {
 		addTextFieldAutoCompletion();
@@ -313,6 +313,39 @@ public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
 				}
 			});
 		}
+	}
+
+
+	public static void main(String[] args) {
+
+		final ArrayList<String> list = Lists.newArrayList();
+		list.add("exec @res = SP_NUMERATOR_10");
+		list.add("SP_NUMERATOR_10");
+		list.add(" exec SP_GET_INDEX_FOUND  @cur_date_char");
+		list.add(" exec sp_procxmode AP020010 , \"anymode\"");
+		list.add("execute @status=SP_CHECK_FREEZE  @j_freeze_coll    = @freeze_coll     ,");
+		list.add(" exec AP_IS_CLUB");
+		list.add("exec @status = SP_NUMERATOR @type = 4, @nrt = @event_nr out");
+		list.add("execute @ret_sts=SP_AP040030_INSERT_OTHER @full_line_text   = @full_line_text");
+		list.add("exec SP_GET_DATETIME @d_date = @date, @d_time = @time, @d_datetime = @date_event out");
+		list.add("exec SP_GET_DATETIME @d_date = @follow_upd, @d_time = @follow_up_time , @d_datetime = @follow_up_event_date outexecute  @status = SP_INSERT_EXPT_VIP");
+		list.add("execute SP_CLOSE_EVENTS");
+		list.add("execute  @status     = SP_JOB_AFTER_EVENTS");
+		list.add("exec @status = MP_SEND_SMS_ON_FAX_RECEIVE");
+		list.add("RISK_ACCIDENT_SENIORITY_MODIFY");
+		list.add("  update T_NUMERATOR set DOC_NRT = DOC_NRT +1");
+		Pattern SP_EXEC_IN_SP_REGEX = Pattern.compile("[A-Z]+_[A-Z_\\d]+|[A-Z]+[A-Z_\\d]+", Pattern.UNICODE_CASE);
+
+
+		for (final String s : list) {
+			final Matcher matcher = SP_EXEC_IN_SP_REGEX.matcher(s);
+			if (!matcher.find()) {
+				System.out.println(String.format("[%s] doesn't match", s));
+			}
+
+			System.out.println(matcher.group());
+		}
+
 	}
 
 	/**
@@ -392,101 +425,6 @@ public class SPViewPanelForm implements Disposable, SPViewSubmitListener {
 	public JComponent $$$getRootComponent$$$() {
 		return mainPanel;
 	}
-
-	/*//	class SpTextLinkListener extends AbstractAction implements MouseListener {
-	class SpTextLinkListener implements EditorMouseListener {
-		private String textLink;
-
-		SpTextLinkListener(String textLink) {
-			this.textLink = textLink;
-		}
-
-		SpTextLinkListener() {
-		}
-
-		protected void execute() {
-			logger.info("execute");
-			*//*if ("accept".equals(url)) {
-				//execute code
-			} else if ("decline".equals(url)) {
-				//execute code
-			}*//*
-		}
-
-
-		@Override
-		public void mousePressed(EditorMouseEvent editorMouseEvent) {
-		}
-
-		@Override
-		public void mouseClicked(EditorMouseEvent editorMouseEvent) {
-			if (editorMouseEvent.getMouseEvent().isControlDown()) {
-				try {
-					editor.xyToLogicalPosition(editorMouseEvent.getMouseEvent().getPoint());
-//					if (editor.getDocument().getText(editor.xyToLogicalPosition(editorMouseEvent.getMouseEvent().getPoint()) - 40, 60).contains("exec")) {
-					if (false) {
-						final String text = textPaneBody.getText(textPaneBody.viewToModel(editorMouseEvent.getMouseEvent().getPoint()) - 40, 100);
-						final String[] spNameExtract = text.split("exec");
-						if (spNameExtract.length > 0) {
-							final String[] spNameSndExtract = spNameExtract[1].split("\n");
-							final String spClickedName = spNameSndExtract[0].trim();
-							if (indexHelper.getSpLinkable().containsKey(spClickedName)) {
-								fetchSpAndOpenNewTab(spClickedName);
-							}
-						}
-					}
-				} catch (Exception e1) {
-					logger.error(e1);
-				}
-			}
-		}
-
-		@Override
-		public void mouseReleased(EditorMouseEvent editorMouseEvent) {
-
-		}
-
-		@Override
-		public void mouseEntered(EditorMouseEvent editorMouseEvent) {
-		}
-
-		@Override
-		public void mouseExited(EditorMouseEvent editorMouseEvent) {
-
-		}
-	}
-
-	private void fetchSpAndOpenNewTab(final String spName) {
-		logger.info("spClickName=" + spName);
-		UIUtil.invokeAndWaitIfNeeded(new Runnable() {
-			@Override
-			public void run() {
-				final DataSourceAccessorComponent dbAccessor = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class);
-				final AnnoRefSettings sqlRefState = AnnoRefConfigSettings.getInstance(project).getAnnoRefState();
-				dbAccessor.initDataSource(project, sqlRefState.SP_DATA_SOURCE_NAME);
-				String spText = null;
-				try {
-					spText = dbAccessor.fetchSpForViewing(spName, project);
-				} catch (SQLException e1) {
-					logger.error(e1);
-				}
-				ServiceManager.getService(project, SPViewContentStateManager.class).addContent(getSPViewContent(spName, spText), spName);
-			}
-		});
-	}
-
-
-	private Content getSPViewContent(String spName, String spText) {
-
-		final SPViewPanelForm spPanel = new SPViewPanelForm(spName, project);
-		final Content newContent = ContentFactory.SERVICE.getInstance().createContent(spPanel.getMainPanel(), "", false);
-		newContent.setIcon(IconLoader.findIcon("icons/syBaseLogo_36.png"));
-		spPanel.setContent(newContent);
-		spPanel.setTextForViewing(spText);
-		newContent.setDisposer(spPanel);
-		return newContent;
-	}
-*/
 }
 
 

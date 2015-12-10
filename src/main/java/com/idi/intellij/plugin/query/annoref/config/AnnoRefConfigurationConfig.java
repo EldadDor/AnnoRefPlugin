@@ -7,8 +7,8 @@ import com.idi.intellij.plugin.query.annoref.connection.DataSourceAccessorCompon
 import com.idi.intellij.plugin.query.annoref.notification.AnnoRefNotifications;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefSettings;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.AnnoRefBundle;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -33,6 +33,7 @@ import com.intellij.util.ui.ColorIcon;
 import com.intellij.util.ui.UIUtil;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.lang.math.NumberUtils;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -95,6 +96,11 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 	private JComboBox uiPropertiesComboBox;
 	private JLabel selectedUIPropertyColor;
 	private JButton resetToDefaultsButton;
+	private JTextField implementedByTextField;
+	private JLabel implementedByLabel;
+	private JTextField idiServiceTextField;
+	private JLabel idiServiceLabel;
+	private JTextField autosyncMaxIntervalTextBox;
 	private AnnoRefSettings settings;
 	private AnnoRefSettings settingsClone;
 	private String selectDataSource;
@@ -163,9 +169,12 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 		colorSelectedTextBox.setText(settings.ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR);
 		colorSelectedHighlightCheckBox.setSelected(settings.ANNO_ALL_SYNTAX_HIGHLIGHT_ENABLE);
 		includeAllLibrariesCheckbox.setSelected(settings.DEEP_SCAN_ENABLED);
+		implementedByTextField.setText(settings.IMPLEMENTED_BY_FRAMEWORK_FQN);
+		idiServiceTextField.setText(settings.IDI_SERVICE_FRAMEWORK_FQN);
 		spDataSourceComboBox.setModel(getDataSourcesModel());
 		connectionPoolComboBox.setModel(getConnectionMethodModel());
-		uiPropertiesComboBox.setModel(getUIPropertiesModel());
+		autosyncMaxIntervalTextBox.setText(settings.REINDEX_INTERVAL.toString());
+//		uiPropertiesComboBox.setModel(getUIPropertiesModel());
 		addDataSourceComboBoxListener();
 		addSelectedUIPropertyColorListener();
 		addTestConnectionListener();
@@ -201,7 +210,7 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 	}
 
 	private ComboBoxModel getDataSourcesModel() {
-		final Collection<String> availableConnections = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class).getAvailableConnections(project);
+		final Collection<String> availableConnections = AnnRefApplication.getInstance(project, DataSourceAccessorComponent.class).getAvailableConnections(project);
 		final ArrayList<String> dataSourceList = new ArrayList<String>();
 		dataSourceList.add("");
 		for (final String availableConnection : availableConnections) {
@@ -350,7 +359,7 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 			}
 
 			private void invokeAndWait() {
-				final DataSourceAccessorComponent dbAccessor = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class);
+				final DataSourceAccessorComponent dbAccessor = AnnRefApplication.getInstance(project, DataSourceAccessorComponent.class);
 				if (selectDataSource == null) {
 					selectDataSource = settings.SP_DATA_SOURCE_NAME;
 				}
@@ -383,36 +392,36 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 	@Override
 	public boolean isModified() {
 		try {
-			if (settings.ENABLE_AUTO_SYNC) {
-				logger.info("isModified(): ENABLE_AUTO_SYNC=" + settings.ENABLE_AUTO_SYNC);
+			if (settingsClone.ENABLE_AUTO_SYNC) {
+				logger.info("isModified(): ENABLE_AUTO_SYNC=" + settingsClone.ENABLE_AUTO_SYNC);
 			}
 			if (enableAnnotationFQNOverrideCheckBox.isSelected()) {
 				annoRefFQNTextBoxesEnableDisable(true);
-				if (!settings.ANNOREF_ANNOTATION_FQN.equals(annoRefFQN.getText().trim()) ||
-						!settings.ANNO_ANNOTATION_FQN.equals(annoFQN.getText().trim()) ||
-						!settings.ANNOREF_ANNOTATION_ATTRIBUTE_ID.equals(annoRefAttributeId.getText().trim())) {
-					settings.ANNOREF_ANNOTATION_FQN = annoRefFQN.getText().trim();
-					settings.ANNO_ANNOTATION_FQN = annoFQN.getText().trim();
-					settings.ANNOREF_ANNOTATION_ATTRIBUTE_ID = annoRefAttributeId.getText().trim();
+				if (!settingsClone.ANNOREF_ANNOTATION_FQN.equals(annoRefFQN.getText().trim()) ||
+						!settingsClone.ANNO_ANNOTATION_FQN.equals(annoFQN.getText().trim()) ||
+						!settingsClone.ANNOREF_ANNOTATION_ATTRIBUTE_ID.equals(annoRefAttributeId.getText().trim())) {
+					settingsClone.ANNOREF_ANNOTATION_FQN = annoRefFQN.getText().trim();
+					settingsClone.ANNO_ANNOTATION_FQN = annoFQN.getText().trim();
+					settingsClone.ANNOREF_ANNOTATION_ATTRIBUTE_ID = annoRefAttributeId.getText().trim();
 					isModified = true;
 				}
 			} else {
 				annoRefFQNTextBoxesEnableDisable(false);
 			}
-			if (settings.ENABLE_SQLREF_FQN_OVERRIDE != enableAnnotationFQNOverrideCheckBox.isSelected()) {
+			if (settingsClone.ENABLE_SQLREF_FQN_OVERRIDE != enableAnnotationFQNOverrideCheckBox.isSelected()) {
 				isModified = true;
 			}
-			settings.ENABLE_SQLREF_FQN_OVERRIDE = enableAnnotationFQNOverrideCheckBox.isSelected();
+			settingsClone.ENABLE_SQLREF_FQN_OVERRIDE = enableAnnotationFQNOverrideCheckBox.isSelected();
 			/*****************************************************************************************************************/
 			annoRefSuperFQNEnableDisable(annoRefEnableSuper.isSelected());
-			if (settings.ENABLE_ANNO_SUPER != annoRefEnableSuper.isSelected()) {
+			if (settingsClone.ENABLE_ANNO_SUPER != annoRefEnableSuper.isSelected()) {
 				isModified = true;
 			}
-			settings.ENABLE_ANNO_SUPER = annoRefEnableSuper.isSelected();
+			settingsClone.ENABLE_ANNO_SUPER = annoRefEnableSuper.isSelected();
 			/*****************************************************************************************************************/
-		/*if (settings.SP_DATA_SOURCE_NAME != spDataSourceList.getModel().getElementAt(0)) {
-//			settings.SP_DATA_SOURCE_NAME = spViewDataSourceText.getText().trim();
-			final boolean dataSource = ServiceManager.getService(project, DataSourceAccessorComponent.class).initDataSource(project, settings.SP_DATA_SOURCE_NAME);
+		/*if (settingsClone.SP_DATA_SOURCE_NAME != spDataSourceList.getModel().getElementAt(0)) {
+//			settingsClone.SP_DATA_SOURCE_NAME = spViewDataSourceText.getText().trim();
+			final boolean dataSource = ServiceManager.getService(project, DataSourceAccessorComponent.class).initDataSource(project, settingsClone.SP_DATA_SOURCE_NAME);
 			if (dataSource) {
 				constructAMessagePopUp("DataSource " + dataSource + " configured successfully", null);
 			} else {
@@ -420,48 +429,62 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 			}
 			isModified = true;
 		}*/
-			if (!spViewText.getText().trim().equals(settings.SP_VIEW_ANNOTATION_FQN)) {
-				settings.SP_VIEW_ANNOTATION_FQN = spViewText.getText().trim();
+			if (!spViewText.getText().trim().equals(settingsClone.SP_VIEW_ANNOTATION_FQN)) {
+				settingsClone.SP_VIEW_ANNOTATION_FQN = spViewText.getText().trim();
 				isModified = true;
 			}
 			/*****************************************************************************************************************/
-			if (!settings.SP_DATA_SOURCE_NAME.equals(String.valueOf(spDataSourceComboBox.getModel().getSelectedItem()))) {
-				settings.SP_DATA_SOURCE_NAME = String.valueOf(spDataSourceComboBox.getModel().getSelectedItem());
+			if (!settingsClone.SP_DATA_SOURCE_NAME.equals(String.valueOf(spDataSourceComboBox.getModel().getSelectedItem()))) {
+				settingsClone.SP_DATA_SOURCE_NAME = String.valueOf(spDataSourceComboBox.getModel().getSelectedItem());
 				isModified = true;
 			}
-			if (!settings.CONNECTION_METHOD_WAY.equals(String.valueOf(connectionPoolComboBox.getModel().getSelectedItem()))) {
-				settings.CONNECTION_METHOD_WAY = String.valueOf(connectionPoolComboBox.getModel().getSelectedItem());
+			if (!settingsClone.CONNECTION_METHOD_WAY.equals(String.valueOf(connectionPoolComboBox.getModel().getSelectedItem()))) {
+				settingsClone.CONNECTION_METHOD_WAY = String.valueOf(connectionPoolComboBox.getModel().getSelectedItem());
 				isConnectionMethodChanged = true;
 				isModified = true;
 			}
 
-			if (!annoRefSuperFQN.getText().trim().equals(settings.ANNO_REF_SUPER_INTERFACE)) {
-				settings.ANNO_REF_SUPER_INTERFACE = annoRefSuperFQN.getText().trim();
+			if (!annoRefSuperFQN.getText().trim().equals(settingsClone.ANNO_REF_SUPER_INTERFACE)) {
+				settingsClone.ANNO_REF_SUPER_INTERFACE = annoRefSuperFQN.getText().trim();
 				isModified = true;
 			}
-			if (autosyncProjectRootCheckBox.isSelected() != settings.ENABLE_AUTO_SYNC) {
-				settings.ENABLE_AUTO_SYNC = autosyncProjectRootCheckBox.isSelected();
+			if (!implementedByTextField.getText().trim().equals(settingsClone.IMPLEMENTED_BY_FRAMEWORK_FQN)) {
+				settingsClone.IMPLEMENTED_BY_FRAMEWORK_FQN = implementedByTextField.getText().trim();
 				isModified = true;
 			}
-			if (enableUtilsClassScanCheckBox.isSelected() != settings.ENABLE_UTIL_CLASS_SCAN) {
-				settings.ENABLE_UTIL_CLASS_SCAN = enableUtilsClassScanCheckBox.isSelected();
+			if (!idiServiceTextField.getText().trim().equals(settingsClone.IDI_SERVICE_FRAMEWORK_FQN)) {
+				settingsClone.IDI_SERVICE_FRAMEWORK_FQN = idiServiceTextField.getText().trim();
 				isModified = true;
 			}
-			if (includeAllLibrariesCheckbox.isSelected() != settings.DEEP_SCAN_ENABLED) {
-				settings.DEEP_SCAN_ENABLED = includeAllLibrariesCheckbox.isSelected();
+			if (autosyncProjectRootCheckBox.isSelected() != settingsClone.ENABLE_AUTO_SYNC) {
+				settingsClone.ENABLE_AUTO_SYNC = autosyncProjectRootCheckBox.isSelected();
 				isModified = true;
 			}
-			if (enableSqlValidation.isSelected() != settings.ENABLE_SQL_TO_MODEL_VALIDATION) {
-				settings.ENABLE_SQL_TO_MODEL_VALIDATION = enableSqlValidation.isSelected();
+			if (enableUtilsClassScanCheckBox.isSelected() != settingsClone.ENABLE_UTIL_CLASS_SCAN) {
+				settingsClone.ENABLE_UTIL_CLASS_SCAN = enableUtilsClassScanCheckBox.isSelected();
 				isModified = true;
 			}
-			if (!colorSelectedTextBox.getText().isEmpty() && !colorSelectedTextBox.getText().equals(settings.ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR)) {
-				settings.ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR = colorSelectedTextBox.getText();
+			if (includeAllLibrariesCheckbox.isSelected() != settingsClone.DEEP_SCAN_ENABLED) {
+				settingsClone.DEEP_SCAN_ENABLED = includeAllLibrariesCheckbox.isSelected();
 				isModified = true;
 			}
-			if (colorSelectedHighlightCheckBox.isSelected() != settings.ANNO_ALL_SYNTAX_HIGHLIGHT_ENABLE) {
-				settings.ANNO_ALL_SYNTAX_HIGHLIGHT_ENABLE = colorSelectedHighlightCheckBox.isSelected();
+			if (enableSqlValidation.isSelected() != settingsClone.ENABLE_SQL_TO_MODEL_VALIDATION) {
+				settingsClone.ENABLE_SQL_TO_MODEL_VALIDATION = enableSqlValidation.isSelected();
 				isModified = true;
+			}
+			if (!colorSelectedTextBox.getText().isEmpty() && !colorSelectedTextBox.getText().equals(settingsClone.ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR)) {
+				settingsClone.ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR = colorSelectedTextBox.getText();
+				isModified = true;
+			}
+			if (colorSelectedHighlightCheckBox.isSelected() != settingsClone.ANNO_ALL_SYNTAX_HIGHLIGHT_ENABLE) {
+				settingsClone.ANNO_ALL_SYNTAX_HIGHLIGHT_ENABLE = colorSelectedHighlightCheckBox.isSelected();
+				isModified = true;
+			}
+			if (NumberUtils.isNumber(autosyncMaxIntervalTextBox.getText())) {
+				if (Integer.parseInt(autosyncMaxIntervalTextBox.getText()) != settingsClone.REINDEX_INTERVAL) {
+					settingsClone.REINDEX_INTERVAL = Integer.parseInt(autosyncMaxIntervalTextBox.getText());
+					isModified = true;
+				}
 			}
 		} catch (Exception e) {
 			ServiceManager.getService(project, AnnoRefNotifications.class).notifyAnnoRefError(project, AnnoRefBundle.message("annoRef.configuration.loading.error"));
@@ -501,7 +524,7 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 	public void apply() throws ConfigurationException {
 		if (isModified) {
 			if (selectDataSource != null) {
-				final DataSourceAccessorComponent dbAccessor = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class);
+				final DataSourceAccessorComponent dbAccessor = AnnRefApplication.getInstance(project, DataSourceAccessorComponent.class);
 				final boolean configured = dbAccessor.initDataSource(project, selectDataSource, true);
 				spDataSourceComboBox.getModel().setSelectedItem(selectDataSource);
 				if (configured) {
@@ -514,10 +537,11 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 				}
 			}
 			AnnoRefConfigSettings instance = AnnoRefConfigSettings.getInstance(project);
+			settings.copyClone(settingsClone);
 			instance.loadState(settings);
 		}
 		if (isConnectionMethodChanged) {
-			final DataSourceAccessorComponent dbAccessor = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class);
+			final DataSourceAccessorComponent dbAccessor = AnnRefApplication.getInstance(project, DataSourceAccessorComponent.class);
 			dbAccessor.getConnectionPool().closeConnectionsSilently();
 			WindowManager.getInstance().getStatusBar(project).fireNotificationPopup(constructAMessagePopUp("Connection method changed to " + selectedConnectionMethod, JavaeeIcons.DATASOURCE_REMOTE_INSTANCE),
 					JBColor.GREEN);
@@ -528,22 +552,25 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 
 	@Override
 	public void reset() {
-		enableAnnotationFQNOverrideCheckBox.setSelected(settingsClone.ENABLE_SQLREF_FQN_OVERRIDE);
-		annoRefFQN.setText(settingsClone.ANNOREF_ANNOTATION_FQN);
-		annoRefAttributeId.setText(settingsClone.ANNOREF_ANNOTATION_ATTRIBUTE_ID);
-		annoRefXmlAttributeId.setText(settingsClone.XML_ELEMENT_ATTRIBUTE_ID);
-		annoFQN.setText(settingsClone.ANNO_ANNOTATION_FQN);
-		autosyncProjectRootCheckBox.setSelected(settingsClone.ENABLE_AUTO_SYNC);
-		annoRefSuperFQN.setText(settingsClone.ANNO_REF_SUPER_INTERFACE);
-		annoRefEnableSuper.setSelected(settingsClone.ENABLE_ANNO_SUPER);
+		enableAnnotationFQNOverrideCheckBox.setSelected(settings.ENABLE_SQLREF_FQN_OVERRIDE);
+		annoRefFQN.setText(settings.ANNOREF_ANNOTATION_FQN);
+		annoRefAttributeId.setText(settings.ANNOREF_ANNOTATION_ATTRIBUTE_ID);
+		annoRefXmlAttributeId.setText(settings.XML_ELEMENT_ATTRIBUTE_ID);
+		annoFQN.setText(settings.ANNO_ANNOTATION_FQN);
+		autosyncProjectRootCheckBox.setSelected(settings.ENABLE_AUTO_SYNC);
+		annoRefSuperFQN.setText(settings.ANNO_REF_SUPER_INTERFACE);
+		annoRefEnableSuper.setSelected(settings.ENABLE_ANNO_SUPER);
 //		spDataSourceComboBox.setModel(getDataSourcesModel());
-		spViewText.setText(settingsClone.SP_VIEW_ANNOTATION_FQN);
-		colorSelectedTextBox.setText(settingsClone.ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR);
-		enableSqlValidation.setSelected(settingsClone.ENABLE_SQL_TO_MODEL_VALIDATION);
-		enableUtilsClassScanCheckBox.setSelected(settingsClone.ENABLE_UTIL_CLASS_SCAN);
-		connectionPoolComboBox.getModel().setSelectedItem(settingsClone.CONNECTION_METHOD_WAY);
-		colorSelectedHighlightCheckBox.setSelected(settingsClone.ANNO_ALL_SYNTAX_HIGHLIGHT_ENABLE);
-		includeAllLibrariesCheckbox.setSelected(settingsClone.DEEP_SCAN_ENABLED);
+		spViewText.setText(settings.SP_VIEW_ANNOTATION_FQN);
+		colorSelectedTextBox.setText(settings.ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR);
+		enableSqlValidation.setSelected(settings.ENABLE_SQL_TO_MODEL_VALIDATION);
+		enableUtilsClassScanCheckBox.setSelected(settings.ENABLE_UTIL_CLASS_SCAN);
+		connectionPoolComboBox.getModel().setSelectedItem(settings.CONNECTION_METHOD_WAY);
+		colorSelectedHighlightCheckBox.setSelected(settings.ANNO_ALL_SYNTAX_HIGHLIGHT_ENABLE);
+		includeAllLibrariesCheckbox.setSelected(settings.DEEP_SCAN_ENABLED);
+		idiServiceTextField.setText(settings.IDI_SERVICE_FRAMEWORK_FQN);
+		implementedByTextField.setText(settings.IMPLEMENTED_BY_FRAMEWORK_FQN);
+		autosyncMaxIntervalTextBox.setText(String.valueOf(settings.REINDEX_INTERVAL));
 		isModified = false;
 
 //		spDataSourceComboBox.getModel().setSelectedItem(settingsClone.SP_DATA_SOURCE_NAME);
@@ -606,7 +633,7 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 		tabbedPane1 = new JTabbedPane();
 		SQLRefPanel.add(tabbedPane1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
 		final JPanel panel1 = new JPanel();
-		panel1.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
+		panel1.setLayout(new FormLayout("fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:max(d;4px):noGrow,left:4dlu:noGrow,fill:d:grow", "center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow,top:4dlu:noGrow,center:max(d;4px):noGrow"));
 		tabbedPane1.addTab("General Settings", panel1);
 		final JPanel panel2 = new JPanel();
 		panel2.setLayout(new FormLayout("fill:d:grow,left:4dlu:noGrow,fill:d:grow,left:4dlu:noGrow,fill:max(d;4px):noGrow", "center:d:grow,top:4dlu:noGrow,center:d:grow"));
@@ -628,7 +655,7 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 		final JPanel panel3 = new JPanel();
 		panel3.setLayout(new FormLayout("fill:d:grow,left:4dlu:noGrow,fill:d:grow", "center:d:grow,top:4dlu:noGrow,center:d:grow"));
 		panel3.setMinimumSize(new Dimension(100, 27));
-		panel1.add(panel3, cc.xy(3, 1));
+		panel1.add(panel3, cc.xyw(3, 1, 3));
 		includeAllLibrariesCheckbox = new JCheckBox();
 		includeAllLibrariesCheckbox.setText("Deep Scan (include all dependencies)");
 		panel3.add(includeAllLibrariesCheckbox, cc.xy(1, 1, CellConstraints.LEFT, CellConstraints.DEFAULT));
@@ -666,8 +693,16 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 		resetToDefaultsButton = new JButton();
 		resetToDefaultsButton.setText("Reset To Defaults");
 		panel5.add(resetToDefaultsButton, cc.xy(1, 3, CellConstraints.CENTER, CellConstraints.DEFAULT));
+		final JLabel label3 = new JLabel();
+		label3.setText("Autosync Mininmum Interval");
+		label3.setToolTipText("Set the minimum interval for the plugin to reindex when noticing a change in the projects structure");
+		panel1.add(label3, cc.xy(3, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
+		autosyncMaxIntervalTextBox = new JTextField();
+		autosyncMaxIntervalTextBox.setMinimumSize(new Dimension(100, 20));
+		autosyncMaxIntervalTextBox.setPreferredSize(new Dimension(100, 20));
+		panel1.add(autosyncMaxIntervalTextBox, cc.xy(5, 3, CellConstraints.LEFT, CellConstraints.DEFAULT));
 		mainSettingsPanel = new JPanel();
-		mainSettingsPanel.setLayout(new GridLayoutManager(17, 5, new Insets(2, 2, 2, 2), -1, -1));
+		mainSettingsPanel.setLayout(new GridLayoutManager(21, 5, new Insets(2, 2, 2, 2), -1, -1));
 		tabbedPane1.addTab("Advance Settings", mainSettingsPanel);
 		annoRefFQN = new JTextField();
 		annoRefFQN.setBackground(new Color(-1));
@@ -676,73 +711,85 @@ public class AnnoRefConfigurationConfig extends SearchableConfigurable.Parent.Ab
 		annoRefFQN.setMargin(new Insets(2, 2, 2, 2));
 		annoRefFQN.setToolTipText("The FQN for the annotation to use");
 		mainSettingsPanel.add(annoRefFQN, new GridConstraints(1, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-		final JLabel label3 = new JLabel();
-		label3.setText("AnnoRef annotation's fully qualifed name: ");
-		mainSettingsPanel.add(label3, new GridConstraints(0, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		final JLabel label4 = new JLabel();
+		label4.setText("AnnoRef annotation's fully qualifed name: ");
+		mainSettingsPanel.add(label4, new GridConstraints(0, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		annoRefAttributeId = new JTextField();
 		annoRefAttributeId.setToolTipText("The annotation attribute name to use for reference in the corresponding xml file id");
 		mainSettingsPanel.add(annoRefAttributeId, new GridConstraints(5, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-		final JLabel label4 = new JLabel();
-		label4.setText("Annotation Attribute Id name:");
-		label4.setToolTipText("");
-		mainSettingsPanel.add(label4, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		final JLabel label5 = new JLabel();
+		label5.setText("Annotation Attribute Id name:");
+		label5.setToolTipText("");
+		mainSettingsPanel.add(label5, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		annoFQN = new JTextField();
 		annoFQN.setBackground(new Color(-1));
 		annoFQN.setEditable(false);
 		annoFQN.setEnabled(false);
 		mainSettingsPanel.add(annoFQN, new GridConstraints(3, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-		final JLabel label5 = new JLabel();
-		label5.setText("Initial annotation's fully qualifed name:");
-		mainSettingsPanel.add(label5, new GridConstraints(2, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		final JLabel label6 = new JLabel();
-		label6.setText("Xml structure baselines: ");
-		label6.setToolTipText(ResourceBundle.getBundle("annoconfig").getString("xml.structure.example"));
-		mainSettingsPanel.add(label6, new GridConstraints(15, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		label6.setText("Initial annotation's fully qualifed name:");
+		mainSettingsPanel.add(label6, new GridConstraints(2, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		final JLabel label7 = new JLabel();
+		label7.setText("Xml structure baselines: ");
+		label7.setToolTipText(ResourceBundle.getBundle("annoconfig").getString("xml.structure.example"));
+		label7.setVisible(false);
+		mainSettingsPanel.add(label7, new GridConstraints(19, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		xmlSchemaTextArea = new JTextArea();
 		xmlSchemaTextArea.setBackground(new Color(-6500));
-		mainSettingsPanel.add(xmlSchemaTextArea, new GridConstraints(16, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+		xmlSchemaTextArea.setVisible(false);
+		mainSettingsPanel.add(xmlSchemaTextArea, new GridConstraints(20, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
 		annoRefEnableSuper = new JCheckBox();
 		annoRefEnableSuper.setSelected(true);
 		annoRefEnableSuper.setText("Enable Super interface/class ");
-		mainSettingsPanel.add(annoRefEnableSuper, new GridConstraints(8, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 2, false));
+		mainSettingsPanel.add(annoRefEnableSuper, new GridConstraints(12, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 2, false));
 		annoRefSuperFQN = new JTextField();
-		mainSettingsPanel.add(annoRefSuperFQN, new GridConstraints(9, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		mainSettingsPanel.add(annoRefSuperFQN, new GridConstraints(13, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		spViewText = new JTextField();
-		mainSettingsPanel.add(spViewText, new GridConstraints(11, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		mainSettingsPanel.add(spViewText, new GridConstraints(15, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		spViewFQNLabel = new JLabel();
 		spViewFQNLabel.setText("SP Viewer fully qualified name:");
-		mainSettingsPanel.add(spViewFQNLabel, new GridConstraints(10, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(spViewFQNLabel, new GridConstraints(14, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		spViewDefaultLabel = new JLabel();
 		spViewDefaultLabel.setText("SP DataSource value:");
-		mainSettingsPanel.add(spViewDefaultLabel, new GridConstraints(12, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(spViewDefaultLabel, new GridConstraints(16, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		spDataSourceComboBox = new JComboBox();
 		final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
 		spDataSourceComboBox.setModel(defaultComboBoxModel1);
-		mainSettingsPanel.add(spDataSourceComboBox, new GridConstraints(12, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(spDataSourceComboBox, new GridConstraints(16, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		testConnectionBtn = new JButton();
 		testConnectionBtn.setText("Test Connection");
-		mainSettingsPanel.add(testConnectionBtn, new GridConstraints(12, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(testConnectionBtn, new GridConstraints(16, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		colorChooserLabel = new JLabel();
 		colorChooserLabel.setText("Define color for annotation highlight:");
-		mainSettingsPanel.add(colorChooserLabel, new GridConstraints(13, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(colorChooserLabel, new GridConstraints(17, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		colorSelectedTextBox = new JTextField();
 		colorSelectedTextBox.setEditable(true);
 		colorSelectedTextBox.setText("");
-		mainSettingsPanel.add(colorSelectedTextBox, new GridConstraints(13, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		mainSettingsPanel.add(colorSelectedTextBox, new GridConstraints(17, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		annoRefXmlAttributeId = new JTextField();
-		mainSettingsPanel.add(annoRefXmlAttributeId, new GridConstraints(7, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-		final JLabel label7 = new JLabel();
-		label7.setText("Xml Attribute Id name:");
-		mainSettingsPanel.add(label7, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(annoRefXmlAttributeId, new GridConstraints(11, 0, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		final JLabel label8 = new JLabel();
+		label8.setText("Xml Attribute Id name:");
+		mainSettingsPanel.add(label8, new GridConstraints(10, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		connectionPoolComboBox = new JComboBox();
-		mainSettingsPanel.add(connectionPoolComboBox, new GridConstraints(14, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(connectionPoolComboBox, new GridConstraints(18, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		connectionPoolLabel = new JLabel();
 		connectionPoolLabel.setText("Choose Plugin connection method:");
-		mainSettingsPanel.add(connectionPoolLabel, new GridConstraints(14, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(connectionPoolLabel, new GridConstraints(18, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		colorSelectedHighlightCheckBox = new JCheckBox();
 		colorSelectedHighlightCheckBox.setEnabled(true);
 		colorSelectedHighlightCheckBox.setText("Enable Highlighting");
-		mainSettingsPanel.add(colorSelectedHighlightCheckBox, new GridConstraints(13, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		mainSettingsPanel.add(colorSelectedHighlightCheckBox, new GridConstraints(17, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		implementedByTextField = new JTextField();
+		mainSettingsPanel.add(implementedByTextField, new GridConstraints(9, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		implementedByLabel = new JLabel();
+		implementedByLabel.setText("ImplementedBy fully qualified name:");
+		mainSettingsPanel.add(implementedByLabel, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		idiServiceTextField = new JTextField();
+		mainSettingsPanel.add(idiServiceTextField, new GridConstraints(7, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		idiServiceLabel = new JLabel();
+		idiServiceLabel.setText("IDIService fully qualified name:");
+		mainSettingsPanel.add(idiServiceLabel, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 	}
 
 	/**

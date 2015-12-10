@@ -104,7 +104,10 @@ public class ConnectionUtil {
 		return true;
 	}
 
-	public static DataSource getDataSource() {
+	public static DataSource getDataSource(Project project) {
+		if (dataSource == null) {
+			initializeDefaultDataSource(project);
+		}
 		return dataSource;
 	}
 

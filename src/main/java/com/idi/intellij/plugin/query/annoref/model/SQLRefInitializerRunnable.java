@@ -3,7 +3,7 @@ package com.idi.intellij.plugin.query.annoref.model;
 import com.idi.intellij.plugin.query.annoref.component.SQLRefFileEditorListener;
 import com.idi.intellij.plugin.query.annoref.component.SQLRefFileSystemListener;
 import com.idi.intellij.plugin.query.annoref.component.SQLRefMessageBusAccessor;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefDataAccessor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -31,14 +31,14 @@ public class SQLRefInitializerRunnable implements Runnable {
 
 	@Override
 	public void run() {
-		SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).setProject(project);
-		SQLRefApplication.getInstance().initializeManagersForProject(project);
+		AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).setProject(project);
+		AnnRefApplication.getInstance().initializeManagersForProject(project);
 		final VirtualFile[] xmlVfToScan = PackageIndex.getInstance(project).getDirectoriesByPackageName("queries", true);
-		SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, xmlVfToScan);
+		AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, xmlVfToScan);
 		final VirtualFile[] classVfToScan = PackageIndex.getInstance(project).getDirectoriesByPackageName("com.idi", true);
-		SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, classVfToScan);
+		AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, classVfToScan);
 		LOGGER.info("Starting SQLRef correlation");
-		SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).findNonCorrelatingSQLRefsInXmlFiles();
+		AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).findNonCorrelatingSQLRefsInXmlFiles();
 		initBusListeners();
 	}
 
@@ -51,7 +51,7 @@ public class SQLRefInitializerRunnable implements Runnable {
 			    event.getSource();
 		    }
 	    });*/
-		busAccessor.registerListener(SQLRefApplication.getInstance(project, SQLRefFileSystemListener.class));
-		busAccessor.registerListener(SQLRefApplication.getInstance(project, SQLRefFileEditorListener.class));
+		busAccessor.registerListener(AnnRefApplication.getInstance(project, SQLRefFileSystemListener.class));
+		busAccessor.registerListener(AnnRefApplication.getInstance(project, SQLRefFileEditorListener.class));
 	}
 }

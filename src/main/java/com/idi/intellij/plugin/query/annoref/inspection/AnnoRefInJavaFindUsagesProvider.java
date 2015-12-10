@@ -26,7 +26,7 @@ public class AnnoRefInJavaFindUsagesProvider extends JavaFindUsagesProvider {
 
 	@Override
 	public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-		if (psiElement instanceof PsiJavaToken && ((PsiJavaToken) psiElement).getTokenType().toString().equals("STRING_LITERAL")) {
+		if (psiElement instanceof PsiJavaToken && ((PsiJavaToken) psiElement).getTokenType() == JavaTokenType.STRING_LITERAL) {
 			return true;
 		}
 		return false;
@@ -44,7 +44,7 @@ public class AnnoRefInJavaFindUsagesProvider extends JavaFindUsagesProvider {
 		if (element instanceof PsiAnnotation) {
 			return "AnnoRef";
 		}
-		if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType().toString().equals("STRING_LITERAL")) {
+		if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType() == JavaTokenType.STRING_LITERAL) {
 			return "QueryUtils";
 		}
 		if (element instanceof PsiMethodCallExpression) {
@@ -64,7 +64,7 @@ public class AnnoRefInJavaFindUsagesProvider extends JavaFindUsagesProvider {
 		if (element instanceof PsiAnnotation) {
 			return element.getText();
 		}
-		if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType().toString().equals("STRING_LITERAL")) {
+		if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType() == JavaTokenType.STRING_LITERAL) {
 			return element.getText();
 		}
 		if (element instanceof PsiMethodCallExpression) {
@@ -84,7 +84,7 @@ public class AnnoRefInJavaFindUsagesProvider extends JavaFindUsagesProvider {
 			}
 			return element.getText();
 		}
-		if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType().toString().equals("STRING_LITERAL")) {
+		if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType() == JavaTokenType.STRING_LITERAL) {
 			return "Usages of =" + element.getText();
 		}
 		if (element instanceof PsiMethodCallExpression) {

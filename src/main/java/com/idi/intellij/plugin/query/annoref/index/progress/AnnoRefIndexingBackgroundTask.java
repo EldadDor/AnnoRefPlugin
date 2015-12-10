@@ -9,7 +9,6 @@
  */
 package com.idi.intellij.plugin.query.annoref.index.progress;
 
-import com.idi.intellij.plugin.query.annoref.index.SQLRefClassFileIndex;
 import com.idi.intellij.plugin.query.annoref.index.SQLRefRepository;
 import com.idi.intellij.plugin.query.annoref.index.SQLRefXmlFileIndex;
 import com.idi.intellij.plugin.query.annoref.index.listeners.IndexProgressChangedListener;
@@ -27,11 +26,13 @@ import java.util.concurrent.ExecutorService;
  * @author eldad
  * @date 14/12/2014
  */
+@Deprecated
 public class AnnoRefIndexingBackgroundTask extends BackgroundTask {
 
 	private final ExecutorService executor;
 	private final IndexProgressChangedListener indexProgressChangedListener;
 
+	@Deprecated
 	protected AnnoRefIndexingBackgroundTask(@Nullable Project project, @NotNull String title, boolean canBeCancelled, @Nullable PerformInBackgroundOption backgroundOption, ProgressIndicator progressIndicator, ExecutorService executor, IndexProgressChangedListener indexProgressChangedListener) {
 		super(project, title, canBeCancelled, backgroundOption, progressIndicator);
 		this.executor = executor;
@@ -39,6 +40,7 @@ public class AnnoRefIndexingBackgroundTask extends BackgroundTask {
 		initProgressIndicator(progressIndicator, true, title);
 	}
 
+	@Deprecated
 	public AnnoRefIndexingBackgroundTask(@Nullable Project project, @NotNull String title, boolean canBeCancelled, ProgressIndicator progressIndicator, ExecutorService executor, IndexProgressChangedListener indexProgressChangedListener) {
 		super(project, title, canBeCancelled, progressIndicator);
 		this.executor = executor;
@@ -49,11 +51,11 @@ public class AnnoRefIndexingBackgroundTask extends BackgroundTask {
 	@Override
 	protected void execute(@NotNull ProgressIndicator progressIndicator) throws InterruptedException {
 		//		progressIndicator.start();
-		ServiceManager.getService(getProject(), SQLRefRepository.class).resetAllProjectOnModulesChange();
-		SQLRefXmlFileIndex refXmlFileIndex = new SQLRefXmlFileIndex(getProject(), indexProgressChangedListener);
-		SQLRefClassFileIndex sqlRefClassFileIndex = new SQLRefClassFileIndex(getProject(), indexProgressChangedListener);
-		refXmlFileIndex.indexSQLRef();
-		sqlRefClassFileIndex.indexSQLRef();
+//		ServiceManager.getService(getProject(), SQLRefRepository.class).resetAllProjectOnModulesChange();
+//		SQLRefXmlFileIndex refXmlFileIndex = new SQLRefXmlFileIndex(getProject(), indexProgressChangedListener);
+//		SQLRefClassFileIndex sqlRefClassFileIndex = new SQLRefClassFileIndex(getProject(), indexProgressChangedListener);
+//		refXmlFileIndex.indexSQLRef();
+//		sqlRefClassFileIndex.indexSQLRef();
 	/*	if (progressIndicator.isRunning()) {
 			progressIndicator.stop();
 		}*/

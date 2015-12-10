@@ -1,11 +1,14 @@
 package com.idi.intellij.plugin.query.annoref.util;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.idi.intellij.plugin.query.annoref.index.SQLRefRepository;
 import com.idi.intellij.plugin.query.annoref.index.listeners.ClassVisitorListener;
 import com.idi.intellij.plugin.query.annoref.notification.AnnoRefNotifications;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefSettings;
+import com.idi.intellij.plugin.query.annoref.repo.model.SQLRefReference;
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.jam.model.util.JamCommonUtil;
 import com.intellij.openapi.components.ServiceManager;
@@ -14,6 +17,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PropertyUtil;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -22,6 +26,7 @@ import com.intellij.util.FilteringProcessor;
 import com.intellij.util.Processor;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -39,8 +44,10 @@ import static com.idi.intellij.plugin.query.annoref.common.SQLRefConstants.*;
  */
 public class SQLRefNamingUtil {
 	private static final Logger logger = Logger.getInstance(SQLRefNamingUtil.class.getName());
+	public static final PsiAnnotation[] PSI_EMPTY_ANNOTATIONS = new PsiAnnotation[0];
+	public static final String[] EMPTY_STRING = new String[0];
 
-	public static Boolean isMatchFileName(String fileName, String regexPattern) {
+	public static Boolean isMatchFileName(CharSequence fileName, String regexPattern) {
 		Pattern pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(fileName);
 		return matcher.find();
@@ -57,7 +64,7 @@ public class SQLRefNamingUtil {
 	}
 
 	//	private static String cleanSQLRefQuotes(PsiElement annoRefValue) {
-	private static String cleanSQLRefQuotes(PsiAnnotation annoRefValue) {
+	private static String cleanSQLRefQuotes(PsiElement annoRefValue) {
 		String firstStrip;
 		if (annoRefValue != null && annoRefValue.getText().length() > 1 && annoRefValue.getText().contains("=")) {
 			firstStrip = StringUtils.stripEnd(annoRefValue.getText().split("=")[1], ")");
@@ -78,7 +85,7 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
-	public static PsiAnnotation getPropitiousAnnotationForFile(PsiFile psiFile) {
+	public static PsiAnnotation getPropitiousAnnotationForFile(PsiElement psiFile) {
 		try {
 			if (psiFile instanceof PsiJavaFile) {
 				for (PsiElement classChild : psiFile.getChildren()) {
@@ -89,7 +96,7 @@ public class SQLRefNamingUtil {
 						if (psiAnno != null) {
 							qualifiedName = psiAnno.getQualifiedName();
 						}
-						String[] sQLRefArray = new String[0];
+						String[] sQLRefArray = EMPTY_STRING;
 						if (qualifiedName != null) {
 							sQLRefArray = qualifiedName.split("\\.");
 						}
@@ -105,7 +112,7 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
-	public static String isPropitiousClassFile(PsiFile psiFile, ClassVisitorListener visitorListener, final String classFQN) {
+	public static String isPropitiousClassFile(PsiElement psiFile, ClassVisitorListener visitorListener, final String classFQN) {
 		try {
 //			final PsiClass childOfType = PsiTreeUtil.findChildOfType(psiFile, PsiClass.class);
 			if (psiFile instanceof PsiJavaFile) {
@@ -114,7 +121,7 @@ public class SQLRefNamingUtil {
 						final PsiModifierListOwner psiModifierListOwner = (PsiModifierListOwner) classChild;
 
 						process((Class<PsiModifierListOwner>) psiModifierListOwner.getClass(), psiFile);
-						final PsiAnnotation psiAnno = getPropitiousClassElementAnnotation((PsiClass) classChild, classFQN);
+						final PsiAnnotation psiAnno = getPropitiousClassElementAnnotation((PsiModifierListOwner) classChild, classFQN);
 //						((PsiClass) classChild).getMethods()[0].getModifierList().findAnnotation("com.idi.framework.vo.common.vo.annotations.Property");
 
 
@@ -145,7 +152,7 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
-	private static void process(Class<PsiModifierListOwner> classToInspect, PsiFile psiFile) {
+	private static void process(Class<PsiModifierListOwner> classToInspect, PsiElement psiFile) {
 		JamCommonUtil.findAnnotatedElements(classToInspect, "", PsiManager.getInstance(psiFile.getProject()), GlobalSearchScope.allScope(psiFile.getProject()),
 				new FilteringProcessor<PsiModifierListOwner>(new Condition<PsiModifierListOwner>() {
 					@Override
@@ -161,7 +168,7 @@ public class SQLRefNamingUtil {
 	}
 
 	private static void lookForValidPropertiesInAnnotatedClasses(ClassVisitorListener visitorListener, PsiClass classChild, PsiAnnotation psiAnno,
-	                                                             Map<String, Map<String, PsiMethod>> methodsPropertiesMap) {
+			Map<String, Map<String, PsiMethod>> methodsPropertiesMap) {
 		visitorListener.foundValidAnnotation(psiAnno);
 		final AnnoRefSettings annoRefState = AnnoRefConfigSettings.getInstance(classChild.getProject()).getAnnoRefState();
 		if (annoRefState.ENABLE_SQL_TO_MODEL_VALIDATION) {
@@ -192,10 +199,10 @@ public class SQLRefNamingUtil {
 	}
 
 	private static void lookForValidPropertiesInAnnotatedChildClasses(ClassVisitorListener visitorListener, PsiAnnotation psiAnno,
-	                                                                  PsiMethod method, Map<String, Map<String, PsiMethod>> methodsPropertiesMap) {
+			PsiMethod method, Map<String, Map<String, PsiMethod>> methodsPropertiesMap) {
 		final PsiType returnType = method.getReturnType();
 		logger.info("isPropitiousClassFile(): returnType=" + returnType);
-		if (method.getReturnType() instanceof PsiClassType && ((PsiClassType) method.getReturnType()).resolve().getName().equals("VOList")) {
+		if (method.getReturnType() instanceof PsiClassType && "VOList".equals(((PsiClassType) method.getReturnType()).resolve().getName())) {
 			if (((PsiClassType) method.getReturnType()).getParameterCount() == 1 && ((PsiClassType) method.getReturnType()).getParameters()[0] instanceof PsiClassType) {
 				final PsiClass classGrandChild = ((PsiClassType) ((PsiClassType) method.getReturnType()).getParameters()[0]).resolveGenerics().getElement();
 				lookForValidPropertiesInAnnotatedClasses(visitorListener, classGrandChild, psiAnno, methodsPropertiesMap);
@@ -239,23 +246,9 @@ public class SQLRefNamingUtil {
 		try {
 			if (psiFile instanceof PsiJavaFile) {
 				for (PsiElement classChild : psiFile.getChildren()) {
-					if (classChild instanceof PsiClass && ((PsiModifierListOwner) classChild).hasModifierProperty(PsiModifier.PUBLIC)) {
-						final PsiAnnotation psiAnno = getPropitiousClassElementAnnotation((PsiClass) classChild, classFQN);
-						if (psiAnno != null) {
-							String qualifiedName = psiAnno.getQualifiedName();
-							if (qualifiedName != null) {
-								final String[] sQLRefArray = qualifiedName.split("\\.");
-								if (isValidSQLRefId(psiAnno, sQLRefArray)) {
-									final String cleanedAnno = cleanAnnoRefForName(psiFile, psiAnno);
-									if (cleanedAnno != null) {
-										if (visitorListener != null) {
-											visitorListener.foundValidAnnotation(psiAnno);
-										}
-										return psiAnno;
-									}
-								}
-							}
-						}
+					final PsiAnnotation psiAnno = getPsiAnnotationForPsiClass(psiFile, visitorListener, classFQN, classChild);
+					if (psiAnno != null) {
+						return psiAnno;
 					}
 				}
 			}
@@ -265,15 +258,34 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
-	public static boolean isMethodAnnotated(PsiMethod method, String annotationFQN) {
-		if (method.getModifierList() != null) {
-			final PsiAnnotation annotation = method.getModifierList().findAnnotation(annotationFQN);
-			return (annotation != null);
+	@Nullable public static PsiAnnotation getPsiAnnotationForPsiClass(PsiElement psiFile, ClassVisitorListener visitorListener, String classFQN, PsiElement classChild) {
+		if (classChild instanceof PsiClass && ((PsiModifierListOwner) classChild).hasModifierProperty(PsiModifier.PUBLIC)) {
+			final PsiAnnotation psiAnno = getPropitiousClassElementAnnotation((PsiClass) classChild, classFQN);
+			if (psiAnno != null) {
+				String qualifiedName = psiAnno.getQualifiedName();
+				if (qualifiedName != null) {
+					final String[] sQLRefArray = qualifiedName.split("\\.");
+					if (isValidSQLRefId(psiAnno, sQLRefArray)) {
+						String cleanedAnno = psiFile == null ? cleanAnnoRefForName(classChild, psiAnno) : cleanAnnoRefForName(psiFile, psiAnno);
+						if (cleanedAnno != null) {
+							if (visitorListener != null) {
+								visitorListener.foundValidAnnotation(psiAnno);
+							}
+							return psiAnno;
+						}
+					}
+				}
+			}
 		}
-		return false;
+		return null;
 	}
 
-	public static PsiAnnotationMemberValue getMethodAnnotationValue(PsiMethod method, String annotationFQN, String attributeName) {
+	public static boolean isMethodAnnotated(PsiModifierListOwner method, String annotationFQN) {
+		final PsiAnnotation annotation = method.getModifierList().findAnnotation(annotationFQN);
+		return (annotation != null);
+	}
+
+	public static PsiAnnotationMemberValue getMethodAnnotationValue(PsiModifierListOwner method, String annotationFQN, String attributeName) {
 		if (method.getModifierList() != null) {
 			final PsiAnnotation annotation = method.getModifierList().findAnnotation(annotationFQN);
 			if (annotation != null) {
@@ -283,7 +295,7 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
-	public static PsiAnnotation getAnnotationForConfiguredClassFile(PsiFile psiFile, String classFQN) {
+	public static PsiAnnotation getAnnotationForConfiguredClassFile(PsiElement psiFile, String classFQN) {
 		try {
 			if (psiFile instanceof PsiJavaFile) {
 				for (PsiElement classChild : psiFile.getChildren()) {
@@ -301,7 +313,7 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
-	public static String cleanAnnoRefForName(PsiFile psiFile, PsiAnnotation psiAnno) {
+	public static String cleanAnnoRefForName(PsiElement psiFile, PsiElement psiAnno) {
 		if (!psiAnno.getText().isEmpty()) {
 			final PsiElement annoElement = psiFile.findElementAt(psiAnno.getTextOffset() + psiAnno.getText().split("=")[1].length());
 			return cleanSQLRefAnnotationForValue(annoElement);
@@ -314,7 +326,7 @@ public class SQLRefNamingUtil {
 				psiAnno.findAttributeValue(AnnoRefConfigSettings.getInstance(psiAnno.getProject()).getAnnoRefState().ANNOREF_ANNOTATION_ATTRIBUTE_ID) != null;
 	}
 
-	public static String isPropitiousClassFile(PsiFile psiFile) {
+	public static String isPropitiousClassFile(PsiElement psiFile) {
 		try {
 			if (psiFile instanceof PsiJavaFile) {
 				for (PsiElement classChild : psiFile.getChildren()) {
@@ -351,8 +363,8 @@ public class SQLRefNamingUtil {
 			for (PsiElement psiElement : psiClass.getChildren()) {
 				if (psiElement instanceof PsiModifierList) {
 					for (PsiAnnotation annotation : ((PsiAnnotationOwner) psiElement).getAnnotations()) {
-						if (getSqlRefState(psiClass).
-								ANNOREF_ANNOTATION_FQN.equals(annotation.getQualifiedName())) {
+						final AnnoRefSettings sqlRefState = getSqlRefState(psiClass);
+						if (sqlRefState != null && sqlRefState.ANNOREF_ANNOTATION_FQN.equals(annotation.getQualifiedName())) {
 							return true;
 						}
 					}
@@ -362,7 +374,7 @@ public class SQLRefNamingUtil {
 		return false;
 	}
 
-	private static AnnoRefSettings getSqlRefState(PsiClass psiClass) {
+	private static AnnoRefSettings getSqlRefState(PsiElement psiClass) {
 		final AnnoRefConfigSettings settings = AnnoRefConfigSettings.getInstance(psiClass.getProject());
 		if (settings != null && settings.getState() != null) {
 			return settings.getAnnoRefState();
@@ -372,7 +384,7 @@ public class SQLRefNamingUtil {
 		return null;
 	}
 
-	public static PsiAnnotation getPropitiousClassElementAnnotation(PsiClass psiClass, final String classFQN) {
+	public static PsiAnnotation getPropitiousClassElementAnnotation(PsiModifierListOwner psiClass, final String classFQN) {
 		if (psiClass.hasModifierProperty(PsiModifier.PUBLIC)) {
 			for (PsiElement psiElement : psiClass.getChildren()) {
 				if (psiElement instanceof PsiModifierList) {
@@ -409,7 +421,7 @@ public class SQLRefNamingUtil {
 			}
 
 		}
-		return new PsiAnnotation[0];
+		return PSI_EMPTY_ANNOTATIONS;
 	}
 
 	public static PsiAnnotation isAnnoRefAnnotationValid(PsiElement psiElement) {
@@ -433,5 +445,53 @@ public class SQLRefNamingUtil {
 //		annoRefToScanList.add(AnnoRefConfigSettings.getInstance(project).getAnnoRefState().ANNO_ANNOTATION_FQN);
 		annoRefToScanList.add(AnnoRefConfigSettings.getInstance(project).getAnnoRefState().ANNOREF_ANNOTATION_FQN);
 		return annoRefToScanList;
+	}
+
+	public static String getValidAnnoRefId(@NotNull PsiElement element, @NotNull PsiType psiType, @NotNull Project project) {
+		if (AnnoRefConfigSettings.getInstance(project).getAnnoRefState().ANNOREF_UTIL_CLASS_FQN.equals(((PsiClassReferenceType) psiType).getReference().getQualifiedName())) {
+			if (((PsiCall) element).getArgumentList().getExpressions().length == 1) {
+				final PsiExpression psiExpression = ((PsiCall) element).getArgumentList().getExpressions()[0];
+				if (psiExpression instanceof PsiLiteral) {
+					return String.valueOf(((PsiLiteral) psiExpression).getValue());
+				}
+				if (psiExpression instanceof PsiReferenceExpression) {
+					final PsiElement resolvedElement = ((PsiReference) psiExpression).resolve();
+					if (resolvedElement instanceof PsiLocalVariable) {
+						final String[] declarationAndAssignment = resolvedElement.getText().split("=");
+						return declarationAndAssignment[1].trim().replaceAll("\"", "").replaceAll(";", "");
+					}
+					return psiExpression.getText();
+				}
+			}
+		}
+		return null;
+	}
+
+	public static SQLRefReference isValidMethodCall(PsiElement psiElement) {
+		if (isAcceptedMethodCall(psiElement)) {
+			final PsiType type = ((PsiMethodCallExpression) psiElement).getMethodExpression().getQualifierExpression().getType();
+			if (isAcceptedClassTypeReference(type)) {
+				final Project project = psiElement.getProject();
+				final String refId = getValidAnnoRefId(psiElement, type, project);
+				if (logger.isDebugEnabled()) {
+					logger.debug("constructLineMarkerProvider(): RefId=" + refId);
+				}
+				if (!Strings.isNullOrEmpty(refId)) {
+					return ServiceManager.getService(project, SQLRefRepository.class).getSQLRefReferenceForID(refId);
+				}
+			}
+		}
+		return null;
+	}
+
+
+	public static boolean isAcceptedClassTypeReference(PsiType type) {
+		return type != null && type instanceof PsiClassReferenceType && ((PsiClassReferenceType) type).getReference() != null;
+	}
+
+	public static boolean isAcceptedMethodCall(PsiElement psiElement) {
+		return psiElement instanceof PsiMethodCallExpression && ((PsiMethodCallExpression) psiElement).getMethodExpression() != null &&
+				((PsiMethodCallExpression) psiElement).getMethodExpression().getQualifierExpression() != null &&
+				((PsiMethodCallExpression) psiElement).getMethodExpression().getQualifierExpression().getType() != null;
 	}
 }

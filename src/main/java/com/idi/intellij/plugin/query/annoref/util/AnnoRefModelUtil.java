@@ -65,7 +65,7 @@ public class AnnoRefModelUtil {
 			if (psiElement instanceof PsiAnnotation) {
 				return getValidAnnoReference((PsiAnnotation) psiElement, project);
 			}
-			if (psiElement instanceof PsiJavaToken && ((PsiJavaToken) psiElement).getTokenType().toString().equals("STRING_LITERAL")) {
+			if (psiElement instanceof PsiJavaToken && ((PsiJavaToken) psiElement).getTokenType() == JavaTokenType.STRING_LITERAL) {
 				return getValidAnnoReference(StringUtils.cleanQuote(psiElement.getText()), project);
 			}
 		}
@@ -166,7 +166,7 @@ public class AnnoRefModelUtil {
 						return cleanedAnnoRef;
 					}
 				}
-				if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType().toString().equals("STRING_LITERAL")) {
+				if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType() == JavaTokenType.STRING_LITERAL) {
 					final String refKey = StringUtils.cleanQuote(element.getText());
 					if (refKey != null) {
 						return refKey;
@@ -216,7 +216,7 @@ public class AnnoRefModelUtil {
 		PsiFile[] files = CacheManager.SERVICE.getInstance(module.getProject()).getFilesWithWord(refId, Short.valueOf("255"), searchScope, true);
 
 		for (PsiFile file : files) {
-			if (((file instanceof XmlFile)) && (SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).isPropitiousXmlFile(file))) {
+			if (((file instanceof XmlFile)) && (AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).isPropitiousXmlFile(file))) {
 				return true;
 			}
 		}

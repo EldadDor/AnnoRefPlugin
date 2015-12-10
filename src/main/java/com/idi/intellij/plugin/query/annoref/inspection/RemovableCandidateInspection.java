@@ -106,10 +106,10 @@ public class RemovableCandidateInspection extends BaseJavaBatchLocalInspectionTo
 		private final boolean myIgnoreMethodsOfDeprecated;
 
 		private DeprecationElementVisitor(final ProblemsHolder holder,
-		                                  boolean ignoreInsideDeprecated,
-		                                  boolean ignoreAbstractDeprecatedOverrides,
-		                                  boolean ignoreImportStatements,
-		                                  boolean ignoreMethodsOfDeprecated) {
+				boolean ignoreInsideDeprecated,
+				boolean ignoreAbstractDeprecatedOverrides,
+				boolean ignoreImportStatements,
+				boolean ignoreMethodsOfDeprecated) {
 			myHolder = holder;
 			myIgnoreInsideDeprecated = ignoreInsideDeprecated;
 			myIgnoreAbstractDeprecatedOverrides = ignoreAbstractDeprecatedOverrides;
@@ -245,7 +245,7 @@ public class RemovableCandidateInspection extends BaseJavaBatchLocalInspectionTo
 	}
 
 	static void checkMethodOverridesDeprecated(MethodSignatureBackedByPsiMethod methodSignature, List<MethodSignatureBackedByPsiMethod> superMethodSignatures,
-	                                           boolean ignoreAbstractDeprecatedOverrides, ProblemsHolder holder) {
+			boolean ignoreAbstractDeprecatedOverrides, ProblemsHolder holder) {
 		PsiMethod method = methodSignature.getMethod();
 		PsiElement methodName = method.getNameIdentifier();
 		for (MethodSignatureBackedByPsiMethod superMethodSignature : superMethodSignatures) {

@@ -8,7 +8,7 @@ import com.idi.intellij.plugin.query.annoref.index.listeners.IndexProgressChange
 import com.idi.intellij.plugin.query.annoref.notification.AnnoRefNotifications;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings;
 import com.idi.intellij.plugin.query.annoref.repo.model.SQLRefReference;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefNamingUtil;
 import com.idi.intellij.plugin.query.annoref.util.StringUtils;
 import com.intellij.codeInsight.daemon.impl.CollectHighlightsUtil;
@@ -44,6 +44,7 @@ import java.util.Map;
  * Time: 7:40 PM
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class SQLRefClassFileIndex {
 	private static final Logger logger = Logger.getInstance(SQLRefClassFileIndex.class.getName());
 	private Project project;
@@ -88,7 +89,7 @@ public class SQLRefClassFileIndex {
 		String classFileName = classFile.getName();
 		final PsiElement[] annoElement = new PsiElement[1];
 		final Map<String, Map<String, PsiMethod>>[] methodPropertiesMap = new Map[]{new HashMap<String, Map<String, PsiMethod>>()};
-		final PsiFile psiFile = SQLRefApplication.getPsiFileFromVirtualFile(classFile, project);
+		final PsiFile psiFile = AnnRefApplication.getPsiFileFromVirtualFile(classFile, project);
 		String sqlRefIdInClass = SQLRefNamingUtil.isPropitiousClassFile(psiFile, new ClassVisitorListener() {
 			@Override
 			public void foundValidAnnotation(PsiElement classRef) {
@@ -125,11 +126,11 @@ public class SQLRefClassFileIndex {
 					if (logger.isDebugEnabled()) {
 						logger.debug("scanClassFile(): psiImportStatement.getQualifiedName()=" + psiImportStatement.getQualifiedName());
 					}
-					final FilterElementProcessor processor = new FilterElementProcessor(new StringLiteralElementFilter());
+					final FilterElementProcessor processor = new FilterElementProcessor(new StringLiteralElementFilter(project, null));
 					final boolean processed = PsiTreeUtil.processElements(psiFile, processor);
 					final List<PsiElement> results = processor.getResults();
 					if (!results.isEmpty()) {
-						for (final PsiElement psiElement : results) {
+					/*	for (final PsiElement psiElement : results) {
 							final String refId = StringUtils.cleanQuote(((PsiCall) psiElement).getArgumentList().getExpressions()[0].getText());
 							final SQLRefReference refReference = ServiceManager.getService(project, SQLRefRepository.class).getSQLRefReferenceForID(refId);
 							if (refReference != null && refReference.getSqlRefId() != null) {
@@ -141,14 +142,14 @@ public class SQLRefClassFileIndex {
 									logger.debug("scanForRequiredMethodCalls(): MethodCallRef=" + methodCallReferenceId);
 								}
 							}
-						}
+						}*/
 					}
 				}
 			}
 		}
 	}
 
-	@Deprecated
+/*	@Deprecated
 	private void lookForInnerUsageInClass(VirtualFile classFile, PsiFile psiFile) {
 		final Editor editor = findFirstAvailableEditor(FileEditorManager.getInstance(project).getAllEditors(classFile));
 		if (editor != null) {
@@ -183,7 +184,7 @@ public class SQLRefClassFileIndex {
 				}
 			}
 		}
-	}
+	}*/
 
 
 	@Nullable

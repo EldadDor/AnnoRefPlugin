@@ -19,5 +19,7 @@ public interface IndicateProgressListener {
 	 */
 	void cancel();
 
+	void checkCanceled() throws IDIProcessCancelledException;
+
 	void indicateChange();
 }

@@ -1,6 +1,6 @@
 package com.idi.intellij.plugin.query.annoref.model;
 
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -22,7 +22,7 @@ public class ClassReferenceCache {
 	private ConcurrentSkipListMap<String, List<Pair<VirtualFile, PsiElement>>> classesRefCache = new ConcurrentSkipListMap<String, List<Pair<VirtualFile, PsiElement>>>();
 
 	public static ClassReferenceCache getInstance(Project project) {
-		return SQLRefApplication.getCurrentProjectClassesReferenceCache(project);
+		return AnnRefApplication.getCurrentProjectClassesReferenceCache(project);
 	}
 
 	public boolean addClassReferenceToCache(VirtualFile virtualFile, String annoName, PsiElement psiElement) {

@@ -10,6 +10,8 @@
 package com.idi.intellij.plugin.query.annoref.component;
 
 import com.idi.intellij.plugin.query.annoref.action.SPViewingInformation;
+import com.idi.intellij.plugin.query.annoref.codeInsight.AnnoRefGotoTargetModel;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 
@@ -21,6 +23,8 @@ public class AnnoRefDataKey {
 	//	public static final DataKey<PsiElement> ANNO_REF_METHOD_UTIL_ELEMENT = DataKey.create("ANNO_REF_METHOD_UTIL_ELEMENT");
 	public static final Key<PsiElement> ANNO_REF_METHOD_UTIL_ELEMENT = new Key("ANNO_REF_METHOD_UTIL_ELEMENT");
 	public static final Key<SPViewingInformation> DATA_SOURCE_NAME_DATA_KEY = new Key("DATA_SOURCE_NAME_DATA_KEY");
+	public static final Key<AnnoRefGotoTargetModel> GOTO_DECLARATION_ANN_REF = new Key("GOTO_DECLARATION_ANN_REF");
+	public static final Key<Disposable> SP_VIEW_COMPONENT = new Key("SP_VIEW_COMPONENT");
 //	public static final DataKey<DataSourceName> DATA_SOURCE_NAME_DATA_KEY=DataKey.create("DATA_SOURCE_NAME_DATA_KEY");
 //	public static final DataKey<PsiElement> ANNO_REF_METHOD_UTIL_ELEMENT = DataKey.create("ANNO_REF_METHOD_UTIL_ELEMENT");
 }

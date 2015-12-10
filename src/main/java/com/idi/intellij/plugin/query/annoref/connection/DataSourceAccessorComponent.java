@@ -9,7 +9,6 @@
  */
 package com.idi.intellij.plugin.query.annoref.connection;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.idi.intellij.plugin.query.annoref.common.SQLRefConstants;
 import com.idi.intellij.plugin.query.annoref.index.listeners.IndexProgressChangedListener;
@@ -55,7 +54,7 @@ public class DataSourceAccessorComponent implements ProjectComponent {
 	private final Project project;
 	public final AtomicBoolean processFinished = new AtomicBoolean(false);
 	public final AtomicBoolean connectionStateful = new AtomicBoolean(false);
-	private List<String> spNamesList;
+	private Map<String, String> spNamesMap;
 	private DataSource dataSource;
 	private final ConnectionPool connectionPool;
 
@@ -65,6 +64,9 @@ public class DataSourceAccessorComponent implements ProjectComponent {
 	}
 
 	public DataSource getDataSource() {
+		if (dataSource == null) {
+			initializeDataSource();
+		}
 		return dataSource;
 	}
 
@@ -157,7 +159,7 @@ public class DataSourceAccessorComponent implements ProjectComponent {
 	}
 
 	public void runInBackgroundWithIndicator(final ExecutorService executorService, final IndexProgressChangedListener progressListener, final Project project, String spName,
-	                                         StringBuilder spTextBuilder, DatabaseConnectorProgress[] sqlRefProgressIndicator) {
+			StringBuilder spTextBuilder, DatabaseConnectorProgress[] sqlRefProgressIndicator) {
 		final Runnable runnable;
 		if (spTextBuilder == null) {
 			runnable = new DBConnectionRunnable(project, this, executorService, progressListener);
@@ -318,20 +320,37 @@ public class DataSourceAccessorComponent implements ProjectComponent {
 	}
 
 
-	public List<String> getStoreProceduresNames() {
+	public Collection<String> getStoreProceduresNames() {
+		initializeDataSource();
+		if (spNamesMap == null || spNamesMap.size() != getDataSource().getProcedures().size()) {
+			initializeStoreProceduresMap();
+		}
+		return spNamesMap.values();
+	}
+
+	private void initializeDataSource() {
 		if (dataSource == null) {
-			dataSource = ConnectionUtil.getDataSource();
+			dataSource = ConnectionUtil.getDataSource(project);
 		}
 		if (dataSource == null) {
 			LOGGER.error("DataSource wasn't initialized");
 		}
-		if (spNamesList == null || spNamesList.size() != dataSource.getProcedures().size()) {
-			spNamesList = Lists.newArrayListWithExpectedSize(dataSource.getProcedures().size());
-			for (final DatabaseProcedureInfo databaseProcedure : dataSource.getProcedures()) {
-				spNamesList.add(databaseProcedure.getName());
+	}
+
+	private void initializeStoreProceduresMap() {
+		if (getDataSource() != null && getDataSource().getProcedures() != null) {
+			spNamesMap = Maps.newHashMapWithExpectedSize(getDataSource().getProcedures().size());
+			for (final DatabaseProcedureInfo databaseProcedure : getDataSource().getProcedures()) {
+				spNamesMap.put(databaseProcedure.getName(), databaseProcedure.getName());
 			}
 		}
-		return spNamesList;
+	}
+
+	public Map<String, String> getSpNames() {
+		if (spNamesMap == null || spNamesMap.isEmpty()) {
+			initializeStoreProceduresMap();
+		}
+		return spNamesMap;
 	}
 
 	@NotNull

@@ -13,6 +13,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.Computable;
+import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaToken;
 import com.intellij.psi.SmartPsiElementPointer;
@@ -38,7 +39,7 @@ public class AnnoRefFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
 			final boolean b = AnnoRefModelUtil.isValidAnnoRef(element) != null;
 			return b;
 		}
-		if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType().toString().equals("STRING_LITERAL")) {
+		if (element instanceof PsiJavaToken && ((PsiJavaToken) element).getTokenType() == JavaTokenType.STRING_LITERAL) {
 			final boolean b = AnnoRefModelUtil.isValidAnnoRef(element) != null;
 			return b;
 		}

@@ -14,7 +14,7 @@ import com.idi.intellij.plugin.query.annoref.connection.ConnectionUtil;
 import com.idi.intellij.plugin.query.annoref.connection.DataSourceAccessorComponent;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefSettings;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -64,15 +64,16 @@ public class SPViewContentStateManager implements PersistentStateComponent<SPVie
 		StartupManager.getInstance(myProject).runWhenProjectIsInitialized(new Runnable() {
 			@Override
 			public void run() {
+				SQLRefSPView spView = SQLRefSPView.getInstance(project);
 				ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(SP_VIEW_TOOL_WINDOW_ID);
 				if (toolWindow == null) {
 					toolWindow = ToolWindowManager.getInstance(project).registerToolWindow(SP_VIEW_TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM);
 				}
 				toolWindow.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/syBaseLogo_3_sm.png")));
 				contentManager = toolWindow.getContentManager();
-//				final ToolWindowContentUi windowContentUi = new ToolWindowContentUi((ToolWindowImpl) toolWindow);
+				final ToolWindowContentUi windowContentUi = new ToolWindowContentUi((ToolWindowImpl) toolWindow);
 //				windowContentUi.
-				toolWindow.setTitle("");
+				toolWindow.setTitle("");//todo  eldad >> check db name here?
 				toolWindow.installWatcher(contentManager);
 //				new ContentManagerWatcher(toolWindow, contentManager);
 			}
@@ -105,7 +106,7 @@ public class SPViewContentStateManager implements PersistentStateComponent<SPVie
 	public void closeContent(Content content) {
 		contentManager.removeContent(content, true);
 		if (contentManager.getContents().length == 0) {
-			SQLRefApplication.getInstance(myProject, DataSourceAccessorComponent.class).getConnectionPool().closeConnectionsSilently();
+			AnnRefApplication.getInstance(myProject, DataSourceAccessorComponent.class).getConnectionPool().closeConnectionsSilently();
 		}
 	}
 
@@ -140,7 +141,7 @@ public class SPViewContentStateManager implements PersistentStateComponent<SPVie
 		try {
 			ConnectionUtil.initializeTempDataSourceSimpleBackgroundTask(project, new AtomicBoolean(false));
 			if (ConnectionUtil.initTempDataSource(project, dbEnv)) {
-				final DataSourceAccessorComponent dbAccessor = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class);
+				final DataSourceAccessorComponent dbAccessor = AnnRefApplication.getInstance(project, DataSourceAccessorComponent.class);
 				connectTemporary = ConnectionUtil.connectTemporary(project, dbEnv);
 				return dbAccessor.fetchSpForViewing(spName, project, true, connectTemporary);
 			}
@@ -157,7 +158,7 @@ public class SPViewContentStateManager implements PersistentStateComponent<SPVie
 		final AnnoRefSettings sqlRefState = AnnoRefConfigSettings.getInstance(project).getAnnoRefState();
 		final Content alreadyOpenContent = getAlreadyOpenContent(contentName);
 		if (alreadyOpenContent == null) {
-			final DataSourceAccessorComponent dbAccessor = SQLRefApplication.getInstance(project, DataSourceAccessorComponent.class);
+			final DataSourceAccessorComponent dbAccessor = AnnRefApplication.getInstance(project, DataSourceAccessorComponent.class);
 //			dbAccessor.initDataSource(project, sqlRefState.SP_DATA_SOURCE_NAME, false);
 			try {
 				logger.info("displayStorageProcedureText(): SP_Name=" + spName);

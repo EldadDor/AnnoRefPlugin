@@ -9,7 +9,7 @@
 package com.idi.intellij.plugin.query.annoref.component;
 
 import com.idi.intellij.plugin.query.annoref.model.ReferenceCollectionManager;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefDataAccessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -24,7 +24,7 @@ public class SQLRefFileEditorListener extends FileEditorManagerAdapter {
 
 	@Override
 	public void fileOpened(FileEditorManager source, VirtualFile file) {
-		SQLRefApplication.getInstance(source.getProject(), SQLRefDataAccessor.class).findNonCorrelatingSQLRefInXmlFile(file.getName(), true);
+		AnnRefApplication.getInstance(source.getProject(), SQLRefDataAccessor.class).findNonCorrelatingSQLRefInXmlFile(file.getName(), true);
 		super.fileOpened(source, file);
 	}
 

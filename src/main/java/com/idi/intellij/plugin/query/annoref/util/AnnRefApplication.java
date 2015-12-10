@@ -13,7 +13,11 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootAdapter;
@@ -27,6 +31,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.Processor;
 import com.intellij.util.messages.impl.MessageListenerList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.event.HyperlinkEvent;
@@ -46,13 +51,13 @@ import static com.idi.intellij.plugin.query.annoref.common.SQLRefConstants.ANNO_
  * Time: 23:32:31
  * To change this template use File | Settings | File Templates.
  */
-public class SQLRefApplication {
-	private static final Logger logger = Logger.getInstance(SQLRefApplication.class.getName());
+public class AnnRefApplication {
+	private static final Logger logger = Logger.getInstance(AnnRefApplication.class.getName());
 	private static final Map<String, ReferenceCollectionManager> sqlRefProjectReferencesManager = new ConcurrentHashMap<String, ReferenceCollectionManager>();
 	private static final Map<String, ClassReferenceCache> classesRefCacheProjectManager = new ConcurrentHashMap<String, ClassReferenceCache>();
 	private static final AtomicInteger scannerCounter = new AtomicInteger(0);
 	private static final AtomicBoolean isResetRunning = new AtomicBoolean(false);
-	private static SQLRefApplication instance;
+	private static AnnRefApplication instance;
 	private MessageListenerList<Notifications> notificationsMessageListenerList;
 	private static AtomicLong lastIndexTime = new AtomicLong(0l);
 
@@ -63,9 +68,9 @@ public class SQLRefApplication {
 		return ServiceManager.getService(type);
 	}
 
-	public static SQLRefApplication getInstance() {
+	public static AnnRefApplication getInstance() {
 		if (instance == null) {
-			instance = new SQLRefApplication();
+			instance = new AnnRefApplication();
 		}
 		return instance;
 	}
@@ -81,6 +86,21 @@ public class SQLRefApplication {
 	public static VirtualFile getVirtualFileFromPsiFile(PsiFile psiFile, Project project) {
 		return FileDocumentManager.getInstance().getFile(PsiDocumentManager.getInstance(project).getDocument(psiFile));
 	}
+
+	public static Editor getEditorFromVirtualFile(VirtualFile virtualFile, Project project) {
+		return findFirstAvailableEditor(FileEditorManager.getInstance(project).getAllEditors(virtualFile));
+	}
+
+	@Nullable
+	private static Editor findFirstAvailableEditor(@NotNull FileEditor[] fileEditors) {
+		for (FileEditor fileEditor : fileEditors) {
+			if (fileEditor instanceof TextEditor) {
+				return ((TextEditor) fileEditor).getEditor();
+			}
+		}
+		return null;
+	}
+
 
 	public static <T> T getInstanceComponent(Class<T> type) {
 		return ApplicationManager.getApplication().getComponent(type);
@@ -102,9 +122,9 @@ public class SQLRefApplication {
 		project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter() {
 			@Override
 			public void rootsChanged(ModuleRootEvent event) {
-//				if (isLastIndexTimeIfLapsed(project, 1)) {
+				if (isLastIndexTimeIfLapsed(project, 1)) {
 					final Project projectSource = (Project) event.getSource();
-					if (AnnoRefConfigSettings.getInstance(project).getAnnoRefState().ENABLE_AUTO_SYNC && !ApplicationManager.getApplication().isUnitTestMode()) {
+					if (AnnoRefConfigSettings.getInstance(project).getAnnoRefState().ENABLE_AUTO_SYNC) {
 						logger.info("rootsChanged(): ENABLE_AUTO_SYNC is on");
 						new AnnoRefBackgroundWorker().runInBackground(project);
 					} else {
@@ -112,7 +132,7 @@ public class SQLRefApplication {
 						doUpdateNotifications(projectSource);
 					}
 				}
-//			}
+			}
 		});
 	}
 
@@ -210,6 +230,9 @@ public class SQLRefApplication {
 		if (phase == 0) {
 			logger.info("setLastIndexTimeIfLapsed(): Project Bootstrap");
 			lastIndexTime.set(System.currentTimeMillis());
+			return true;
+		}
+		if (AnnoRefConfigSettings.getInstance(project).getAnnoRefState().REINDEX_INTERVAL < 0) {
 			return true;
 		}
 		if (TimeUtil.isOlderThan(lastIndexTime.get(), AnnoRefConfigSettings.getInstance(project).getAnnoRefState().REINDEX_INTERVAL)) {

@@ -1,5 +1,6 @@
 package com.idi.intellij.plugin.query.annoref.repo.model;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.diagnostic.Logger;
@@ -33,7 +34,7 @@ public class SQLRefReference implements Comparable<String> {
 	private List<PsiElement> classAnnoElements = new LinkedList<PsiElement>();
 	private List<SmartPsiElementPointer<PsiElement>> xmlSmartPointersElements = new LinkedList<SmartPsiElementPointer<PsiElement>>();
 	private List<SmartPsiElementPointer<PsiElement>> classSmartPointersElements = new LinkedList<SmartPsiElementPointer<PsiElement>>();
-	private Map<String, SmartPsiElementPointer<PsiElement>> utilClassSmartPointersElements = Maps.newConcurrentMap();
+	private HashBasedTable<String, String, SmartPsiElementPointer<PsiElement>> utilClassSmartPointersElements = HashBasedTable.create();
 
 	private Map<String, Map<String, PsiMethod>> classPropertiedMethods = Maps.newConcurrentMap();
 	private Map<String, String> sqlSelectedColumns = Maps.newConcurrentMap();
@@ -43,18 +44,27 @@ public class SQLRefReference implements Comparable<String> {
 		this.sqlRefId = sqlRefId;
 	}
 
-	public SQLRefReference addClassInformation(VirtualFile classVF, PsiElement annoElement) {
+	public SQLRefReference addClassInformation(VirtualFile classVF, PsiElement psiElement) {
 		if (addClassFile(classVF.getName(), classVF)) {
-			classAnnoElements.add(annoElement);
-			classSmartPointersElements.add(createAnnoRefSmartPointer(annoElement));
+			classAnnoElements.add(psiElement);
+			classSmartPointersElements.add(createAnnoRefSmartPointer(psiElement));
 		}
 		return this;
 	}
 
-	public SQLRefReference addXmlInformation(VirtualFile xmlVF, PsiElement annoElement) {
+	public SQLRefReference addUtilClassCallInformation(VirtualFile classVF, PsiElement psiElement) {
+		if (addClassFile(classVF.getName(), classVF)) {
+			final SmartPsiElementPointer<PsiElement> annoRefSmartPointer = createAnnoRefSmartPointer(psiElement);
+			final HashBasedTable<Object, Object, Object> table = HashBasedTable.create();
+			utilClassSmartPointersElements.add(annoRefSmartPointer);
+		}
+		return this;
+	}
+
+	public SQLRefReference addXmlInformation(VirtualFile xmlVF, PsiElement psiElement) {
 		if (addXmlFile(xmlVF.getName(), xmlVF)) {
-			xmlQueryElements.add(annoElement);
-			xmlSmartPointersElements.add(createAnnoRefSmartPointer(annoElement));
+			xmlQueryElements.add(psiElement);
+			xmlSmartPointersElements.add(createAnnoRefSmartPointer(psiElement));
 		}
 		return this;
 	}
@@ -114,9 +124,8 @@ public class SQLRefReference implements Comparable<String> {
 		if (log.isDebugEnabled()) {
 			log.info("addUtilClassCallInformation(): refId=" + refId);
 		}
-//	public SQLRefReference addUtilClassCallInformation(PsiJavaFileStub refId, PsiElement psiMethodElement) {
 		final SmartPsiElementPointer<PsiElement> annoRefSmartPointer = createAnnoRefSmartPointer(psiMethodElement);
-		utilClassSmartPointersElements.put(refId, annoRefSmartPointer);
+//		utilClassSmartPointersElements.put(refId, annoRefSmartPointer);
 		return this;
 	}
 
@@ -145,7 +154,7 @@ public class SQLRefReference implements Comparable<String> {
 		return xmlSmartPointersElements.size() + classSmartPointersElements.size() + utilClassSmartPointersElements.size();
 	}
 
-	public Map<String, SmartPsiElementPointer<PsiElement>> getUtilClassSmartPointersElements() {
+	public HashBasedTable<String, String, SmartPsiElementPointer<PsiElement>> getUtilClassSmartPointersElements() {
 		return utilClassSmartPointersElements;
 	}
 

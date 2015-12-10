@@ -16,7 +16,6 @@ import com.intellij.jam.model.util.JamCommonUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.progress.util.ProgressWindow;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 
@@ -47,10 +46,6 @@ public class ModuleScanningTask extends IDIAbstractTask {
 		}
 	}
 
-	@Override
-	public void run(ProgressWindow progressWindow) {
-
-	}
 
 	@Override
 	public boolean runComputableTask(IDIProgressIndicator progressIndicator) throws IDIProcessCancelledException {

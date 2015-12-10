@@ -9,8 +9,8 @@
  */
 package com.idi.intellij.plugin.query.annoref.task;
 
-import com.google.common.collect.Maps;
 import com.idi.intellij.plugin.query.annoref.util.AnnoRefBundle;
+import com.intellij.find.SearchInBackgroundOption;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.impl.LaterInvocator;
@@ -24,7 +24,6 @@ import com.intellij.openapi.startup.StartupManager;
 import com.intellij.util.DisposeAwareRunnable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -39,19 +38,12 @@ import java.util.concurrent.Future;
 public class IDITaskManager {
 	private static final Logger log = Logger.getInstance(IDITaskManager.class.getName());
 	private static final BackgroundTaskQueue myUpdatingQueue = new BackgroundTaskQueue(null, AnnoRefBundle.message("annoRef.progress.reindex"));
-	private static final Map<String, IndicateProgressListener> runningTasksMap = Maps.newConcurrentMap();
+
 
 	public interface IDITaskHandler {
 		void waitFor();
 	}
 
-	public static boolean isTaskActive(String task) {
-		return (runningTasksMap.containsKey(task));
-	}
-
-	public static void clearRunningTask(String task) {
-		runningTasksMap.remove(task);
-	}
 
 	/*public static void run(final Project project, String title, final IDITask task) throws IDIProcessCancelledException {
 		final Exception[] canceledEx = new Exception[1];
@@ -104,6 +96,8 @@ public class IDITaskManager {
 
 
 	public static Boolean runCompute(final Project project, final String title, final IDITask task) throws IDIProcessCancelledException {
+//		final ExternalSystemManager<?, ?, ?, ?, ?> manager = ExternalSystemApiUtil.getManager(ProjectSystemId.IDE);
+
 		log.info("runCompute(): task=" + task.getTaskName());
 //		final Task.Modal task1 = new Task.Modal(project, title, true) {
 //			@Override
@@ -130,11 +124,11 @@ public class IDITaskManager {
 		};*/
 
 //		ProgressManager.getInstance().runProcessWithProgressAsynchronously(backgroundTask, indicator);
-		final Task.Backgroundable task1 = new Task.Backgroundable(project, title, true, PerformInBackgroundOption.DEAF) {
+		final Task.Backgroundable task1 = new Task.Backgroundable(project, title, true, new SearchInBackgroundOption()) {
 			@Override
-			public void run(@NotNull ProgressIndicator progressIndicator) {
+			public void run(@NotNull final ProgressIndicator progressIndicator) {
 				final IDIProgressIndicator idiProgressIndicator = new IDIProgressIndicator(progressIndicator, task.numOfFiles());
-				runningTasksMap.put(task.getTaskName(), idiProgressIndicator);
+
 				DumbService.getInstance(project).runReadActionInSmartMode(new Runnable() {
 					@Override
 					public void run() {
@@ -143,14 +137,13 @@ public class IDITaskManager {
 							task.run(idiProgressIndicator);
 						} catch (IDIProcessCancelledException e) {
 							log.error(e);
+							progressIndicator.cancel();
 						}
 					}
 				});
 			}
 		};
-		if (!myUpdatingQueue.isTestMode()) {
-			myUpdatingQueue.run(task1);
-		}
+		myUpdatingQueue.run(task1);
 //		final BackgroundableProcessIndicator backgroundableProcessIndicator = new BackgroundableProcessIndicator(task1);
 
 	/*	final Task.Modal task1 = new Task.Modal(project, title, true) {
@@ -238,7 +231,7 @@ public class IDITaskManager {
 					dumbService.smartInvokeLater(new Runnable() {
 						@Override
 						public void run() {
-							task.run(indicator);
+//							task.run(indicator);
 						}
 					});
 				} else {

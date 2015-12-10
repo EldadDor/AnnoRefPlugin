@@ -5,8 +5,8 @@ import com.idi.intellij.plugin.query.annoref.task.ClassScanningTask;
 import com.idi.intellij.plugin.query.annoref.task.IDITaskManager;
 import com.idi.intellij.plugin.query.annoref.task.ModuleScanningTask;
 import com.idi.intellij.plugin.query.annoref.task.XmlScanningTask;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.AnnoRefBundle;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -89,8 +89,8 @@ public class SQLRefBootStrapComponent implements StartupActivity {
 		final boolean xmlScan = wrapXmlTaskWithRunnable(project);
 		boolean result = classScan ^ xmlScan;
 		logger.info("runActivity(): running result=" + result);
-		SQLRefApplication.getInstance().initializeManagersForProject(project);
-		SQLRefApplication.isLastIndexTimeIfLapsed(project, 0);
+		AnnRefApplication.getInstance().initializeManagersForProject(project);
+		AnnRefApplication.isLastIndexTimeIfLapsed(project, 0);
 		ServiceManager.getService(project, SPViewContentStateManager.class);
 	}
 

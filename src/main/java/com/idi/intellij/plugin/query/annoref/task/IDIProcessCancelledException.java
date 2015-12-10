@@ -13,6 +13,20 @@ package com.idi.intellij.plugin.query.annoref.task;
  * @author eldad
  * @date 03/01/2015
  */
-public class IDIProcessCancelledException extends Exception {
+public class IDIProcessCancelledException extends RuntimeException {
 
+	public IDIProcessCancelledException(Throwable cause) {
+		super(cause);
+	}
+
+	public IDIProcessCancelledException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public IDIProcessCancelledException(String message) {
+		super(message);
+	}
+
+	public IDIProcessCancelledException() {
+	}
 }

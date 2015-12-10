@@ -1,6 +1,6 @@
 package com.idi.intellij.plugin.query.annoref.inspection.fix;
 
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefDataAccessor;
 import com.intellij.codeInspection.LocalQuickFixBase;
 import com.intellij.codeInspection.ProblemDescriptor;
@@ -83,7 +83,7 @@ public class CreateNewAnnoRefInFileFix extends LocalQuickFixBase {
 
 	private boolean isValidResourceFile(VirtualFile virtualFile, Project project) {
 		final String name = virtualFile.getName();
-		final Boolean matchFileName = SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).isMatchFileName(name);
+		final Boolean matchFileName = AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).isMatchFileName(name);
 		log.info("isValidResourceFile(): name=" + name + " isValid=" + matchFileName);
 		return matchFileName;
 	}

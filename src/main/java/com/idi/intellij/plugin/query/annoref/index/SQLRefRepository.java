@@ -127,6 +127,18 @@ public class SQLRefRepository implements ProjectComponent {
 //			classRepository.put(classFileID, sqlRefReference);
 		}
 	}
+	public void addUtilClassMethodCallInformationToRepository(String refID, VirtualFile classVF, PsiElement methodCallElement) {
+//		logger.info("addUtilClassMethodCallInformationToRepository(): refID=" + refID);
+		if (sqlRefReferenceMap.containsKey(refID)) {
+			SQLRefReference sqlRefReference = sqlRefReferenceMap.get(refID);
+			sqlRefReference.addUtilClassCallInformation(classVF, methodCallElement);
+		} else {
+			SQLRefReference sqlRefReference = new SQLRefReference(refID);
+			sqlRefReference.addUtilClassCallInformation(classVF, methodCallElement);
+//			logger.info("addUtilClassMethodCallInformationToRepository(): sqlRefReference new=" + sqlRefReference);
+			sqlRefReferenceMap.put(refID, sqlRefReference);
+		}
+	}
 
 /*
 	public void addMethodPropertyInformationToClassReference(String refID, PsiMethod psiMethod, String propertyName) {

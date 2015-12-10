@@ -1,6 +1,6 @@
 package com.idi.intellij.plugin.query.annoref.index;
 
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.intellij.openapi.project.Project;
 
 /**
@@ -23,10 +23,10 @@ public class SQLRefIndexProjectRunnable implements Runnable {
 	public void run() {
 		try {
 			SQLRefXmlFileIndex refXmlFileIndex = new SQLRefXmlFileIndex(project);
-			SQLRefApplication.addScanner();
+			AnnRefApplication.addScanner();
 			refXmlFileIndex.indexSQLRef();
 		} finally {
-			SQLRefApplication.removeScanner();
+			AnnRefApplication.removeScanner();
 		}
 	}
 }

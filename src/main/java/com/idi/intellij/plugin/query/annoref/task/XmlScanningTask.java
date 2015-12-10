@@ -16,8 +16,8 @@ import com.idi.intellij.plugin.query.annoref.index.visitors.AnnoRefXmlVisitor;
 import com.idi.intellij.plugin.query.annoref.notification.AnnoRefNotifications;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefConfigSettings;
 import com.idi.intellij.plugin.query.annoref.persist.AnnoRefSettings;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.AnnoRefBundle;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefNamingUtil;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefXmlVisitor;
 import com.intellij.ide.highlighter.XmlFileType;
@@ -25,7 +25,6 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.progress.util.ProgressWindow;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -51,6 +50,7 @@ public class XmlScanningTask extends IDIAbstractTask {
 		runTask();
 	}
 
+	@Override
 	public void runTask() {
 		logger.info("run(): Xml files to scan=" + filesCollection.size());
 		xmlRefCount = 0;
@@ -58,20 +58,18 @@ public class XmlScanningTask extends IDIAbstractTask {
 			for (final VirtualFile xmlFile : filesCollection) {
 				final FileType fileTypeByFile = FileTypeManager.getInstance().getFileTypeByFile(xmlFile);
 				if (fileTypeByFile instanceof XmlFileType) {
+					progressListener.checkCanceled();
 					scanXmlFile(xmlFile);
 					progressListener.indicateChange();
 				}
 			}
 			ServiceManager.getService(project, AnnoRefNotifications.class).notifyAnnoRefIndex(project, SQLRefConstants.ANNO_REF_XML, xmlRefCount);
+		} catch (IDIProcessCancelledException e) {
+			logger.error("runTask() processCancelled");
 		} catch (Exception e) {
 			logger.error(e);
-			progressListener.cancel();
+			throw new IDIProcessCancelledException(e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public void run(ProgressWindow progressWindow) {
-
 	}
 
 	@Override
@@ -83,7 +81,6 @@ public class XmlScanningTask extends IDIAbstractTask {
 				scanXmlFile(xmlFile);
 				progressIndicator.indicateChange();
 			}
-			IDITaskManager.clearRunningTask(SQLRefConstants.ANNO_REF_XML);
 			ServiceManager.getService(project, AnnoRefNotifications.class).notifyAnnoRefIndex(project, SQLRefConstants.ANNO_REF_XML, xmlRefCount);
 			return true;
 		} catch (Exception e) {
@@ -99,7 +96,7 @@ public class XmlScanningTask extends IDIAbstractTask {
 
 	@Override
 	public String getTaskName() {
-		return SQLRefConstants.ANNO_REF_XML;
+		return getClass().getSimpleName();
 	}
 
 
@@ -114,7 +111,7 @@ public class XmlScanningTask extends IDIAbstractTask {
 				}
 			};
 			SQLRefXmlVisitor.getInstance(project).setXmlVisitorListener(xmlVisitorListener).setInspector(false);
-			SQLRefXmlVisitor.getInstance(project).visitFile(SQLRefApplication.getPsiFileFromVirtualFile(xmlFile, project));
+			SQLRefXmlVisitor.getInstance(project).visitFile(AnnRefApplication.getPsiFileFromVirtualFile(xmlFile, project));
 			parseXmlForSql(xmlFile);
 
 			/*if (remove) {
@@ -128,7 +125,7 @@ public class XmlScanningTask extends IDIAbstractTask {
 		final AnnoRefSettings annoRefState = AnnoRefConfigSettings.getInstance(project).getAnnoRefState();
 		if (annoRefState.ENABLE_SQL_TO_MODEL_VALIDATION) {
 			logger.info(AnnoRefBundle.message("annoRef.xml.parse.sql.validation.enabled"));
-			final XmlBuilderDriver xmlBuilderDriver = new XmlBuilderDriver(SQLRefApplication.getPsiFileFromVirtualFile(xmlFile, project).getText());
+			final XmlBuilderDriver xmlBuilderDriver = new XmlBuilderDriver(AnnRefApplication.getPsiFileFromVirtualFile(xmlFile, project).getText());
 			xmlBuilderDriver.build(new AnnoRefXmlVisitor(project, xmlFile));
 		}
 		logger.info(AnnoRefBundle.message("annoRef.xml.parse..sql.validation.disabled"));

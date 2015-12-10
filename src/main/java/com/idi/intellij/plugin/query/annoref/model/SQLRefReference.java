@@ -1,6 +1,6 @@
 package com.idi.intellij.plugin.query.annoref.model;
 
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefDataAccessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -128,11 +128,11 @@ public class SQLRefReference implements Comparator<String> {
 
 	@NotNull
 	public Navigatable xmlLocation(Project project) {
-		return new OpenFileDescriptor(SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).getProject(), containingVirtualFile(), xmlPsiElement.getTextOffset());
+		return new OpenFileDescriptor(AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).getProject(), containingVirtualFile(), xmlPsiElement.getTextOffset());
 	}
 
 	public Navigatable classLocation(Project project, VirtualFile classVF) {
-		return new OpenFileDescriptor(SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).getProject(), classVF, ((PsiElement) classPsiElements.values().toArray()[0]).getTextOffset());
+		return new OpenFileDescriptor(AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).getProject(), classVF, ((PsiElement) classPsiElements.values().toArray()[0]).getTextOffset());
 	}
 
 	private void paintQueryId(@NotNull Editor editor) {

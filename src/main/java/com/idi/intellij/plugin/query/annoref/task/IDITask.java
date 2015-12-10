@@ -9,16 +9,12 @@
  */
 package com.idi.intellij.plugin.query.annoref.task;
 
-import com.intellij.openapi.progress.util.ProgressWindow;
-
 /**
  * @author eldad
  * @date 03/01/2015
  */
 public interface IDITask {
 	void run(IDIProgressIndicator progressIndicator) throws IDIProcessCancelledException;
-
-	void run(ProgressWindow progressWindow);
 
 	boolean runComputableTask(IDIProgressIndicator progressIndicator) throws IDIProcessCancelledException;
 

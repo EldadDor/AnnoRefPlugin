@@ -31,7 +31,7 @@ public class ReferenceNavigator {
 	public boolean navigateToClassReference(Project project, @NotNull SQLRefReference reference) {
 		VirtualFile virtualFile = reference.containingClassVirtualFile(null);
 		if (virtualFile != null) {
-			FileEditor[] fileEditors = FileEditorManager.getInstance(SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).getProject()).openFile(virtualFile, true);
+			FileEditor[] fileEditors = FileEditorManager.getInstance(AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).getProject()).openFile(virtualFile, true);
 			for (FileEditor fileEditor : fileEditors) {
 				if (fileEditor instanceof TextEditor) {
 					((NavigatableFileEditor) fileEditor).navigateTo(reference.classLocation(project, virtualFile));

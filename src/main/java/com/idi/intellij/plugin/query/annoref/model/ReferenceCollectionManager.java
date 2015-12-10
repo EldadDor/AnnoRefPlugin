@@ -1,6 +1,6 @@
 package com.idi.intellij.plugin.query.annoref.model;
 
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefDataAccessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -43,7 +43,7 @@ public class ReferenceCollectionManager extends AbstractCollection<FileReference
 	}
 
 	public static ReferenceCollectionManager getInstance(Project project) {
-		return SQLRefApplication.getCurrentProjectReferenceCollectionManager(project);
+		return AnnRefApplication.getCurrentProjectReferenceCollectionManager(project);
 	}
 
 	public FileReferenceCollection resetXMLSQLReferencesInCollection(String fileName) throws Exception {
@@ -71,7 +71,7 @@ public class ReferenceCollectionManager extends AbstractCollection<FileReference
 			for (int i = 0; i < navigableSetAfter.descendingSet().toArray().length; i++) {
 //				progressIndicator.setFraction(0.0 + ((1 + i) / 150));
 				String after = (String) navigableSetAfter.descendingSet().toArray()[i];
-				ClassReferenceCache currentProjectClassesReferenceCache = SQLRefApplication.getCurrentProjectClassesReferenceCache(project);
+				ClassReferenceCache currentProjectClassesReferenceCache = AnnRefApplication.getCurrentProjectClassesReferenceCache(project);
 				List<Pair<VirtualFile, PsiElement>> classesRefs = currentProjectClassesReferenceCache.hitCacheForClassReference(after);
 				if (classesRefs != null && !classesRefs.isEmpty()) {
 					LOGGER.info("Retrieving cached class : " + currentProjectClassesReferenceCache.displayCachedClassInfo(after));
@@ -79,7 +79,7 @@ public class ReferenceCollectionManager extends AbstractCollection<FileReference
 					for (Pair<VirtualFile, PsiElement> classRef : classesRefs) {
 						newReferenceCollection.getQueryId(after).getClassPsiElements().put(classRef.getFirst().getName(), classRef.getSecond());
 						if (newReferenceCollection.getQueryId(after).getRangeHighlighter() != null) {
-							if (SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).removeErrorTextRangeForElement(newReferenceCollection.getQueryId(after).getXmlPsiElement(),
+							if (AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).removeErrorTextRangeForElement(newReferenceCollection.getQueryId(after).getXmlPsiElement(),
 									newReferenceCollection.getQueryId(after).getRangeHighlighter())) {
 								LOGGER.info("RangeHighLighter was removed successfully");
 							} else {
@@ -89,7 +89,7 @@ public class ReferenceCollectionManager extends AbstractCollection<FileReference
 					}
 				} else {
 					SQLRefReference newSQLRef = newReferenceCollection.getQueryId(after);
-					newSQLRef.setRangeHighlighter(SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).addErrorTextRangeForElement(newSQLRef.getXmlPsiElement()));
+					newSQLRef.setRangeHighlighter(AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).addErrorTextRangeForElement(newSQLRef.getXmlPsiElement()));
 				}
 			}
 //			progressIndicator.setFraction(0.0 + (1 / 30));

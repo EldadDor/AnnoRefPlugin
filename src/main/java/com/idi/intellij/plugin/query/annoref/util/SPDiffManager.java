@@ -38,16 +38,14 @@ public class SPDiffManager implements ProjectComponent {
 	public void diff(String text1, String text2) {
 		PsiFile file1 = PsiFileFactory.getInstance(project).createFileFromText(text1, SybaseDialect.INSTANCE, text1, true, true);
 		PsiFile file2 = PsiFileFactory.getInstance(project).createFileFromText(text2, SybaseDialect.INSTANCE, text2, true, true);
-//		final SyntaxHighlighterLanguageFactory languageFactory = SyntaxHighlighterFactory.LANGUAGE_FACTORY;
-//		Document document = PsiDocumentManager.getInstance(project).getDocument(file1);
-		final VirtualFile virtualFile1 = SQLRefApplication.getVirtualFileFromPsiFile(file1, project);
-		final VirtualFile virtualFile2 = SQLRefApplication.getVirtualFileFromPsiFile(file2, project);
+		final SyntaxHighlighterLanguageFactory languageFactory = SyntaxHighlighterFactory.LANGUAGE_FACTORY;
+		Document document = PsiDocumentManager.getInstance(project).getDocument(file1);
+		final VirtualFile virtualFile1 = AnnRefApplication.getVirtualFileFromPsiFile(file1, project);
+		final VirtualFile virtualFile2 = AnnRefApplication.getVirtualFileFromPsiFile(file2, project);
 		DirDiffManager diffManager = DirDiffManager.getInstance(ProjectManager.getInstance().getDefaultProject());
 		final DiffElement diffElement1 = diffManager.createDiffElement(virtualFile1);
 		final DiffElement diffElement2 = diffManager.createDiffElement(virtualFile2);
-		if (diffElement2 != null && diffElement1 != null) {
-			diffManager.showDiff(diffElement1, diffElement2);
-		}
+		diffManager.showDiff(diffElement1, diffElement2);
 	}
 
 	@Override

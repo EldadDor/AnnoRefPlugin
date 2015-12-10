@@ -108,7 +108,7 @@ public class IDIProgressIndicator implements IndicateProgressListener {
 		return false;
 	}
 
-	public void checkCanceled() throws IDIProcessCancelledException {
+	@Override public void checkCanceled() throws IDIProcessCancelledException {
 		if (isCanceled()) {
 			throw new IDIProcessCancelledException();
 		}

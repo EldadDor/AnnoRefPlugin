@@ -1,7 +1,7 @@
 package com.idi.intellij.plugin.query.annoref.config;
 
 import com.google.common.collect.Lists;
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -176,7 +176,7 @@ public class SPViewPanelPopOut implements Disposable {
 	public void setTextForViewing(String spName, String text) {
 		PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(text, SybaseDialect.INSTANCE, text, true, true);
 		final SyntaxHighlighterLanguageFactory languageFactory = SyntaxHighlighterFactory.LANGUAGE_FACTORY;
-		final SyntaxHighlighter syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(SybaseDialect.INSTANCE, project, SQLRefApplication.getVirtualFileFromPsiFile(file, project));
+		final SyntaxHighlighter syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(SybaseDialect.INSTANCE, project, AnnRefApplication.getVirtualFileFromPsiFile(file, project));
 		Document document = PsiDocumentManager.getInstance(project).getDocument(file);
 		Editor editor = EditorFactory.getInstance().createEditor(document, project, SqlFileType.INSTANCE, true);
 

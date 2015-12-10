@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>IDI-IdeaPlugin</name>
     <id>IDIPlugin</id>
-    <version>4.8.0</version>
+    <version>4.8.3</version>
     <category>IDI</category>
     <description><![CDATA[
 	      A Proprietary version for the AnnoRef plugin.
@@ -19,13 +19,23 @@
     <depends>com.intellij.javaee</depends>
     <depends>org.jetbrains.idea.maven</depends>
     <change-notes><![CDATA[
-      <b>Version 4.8.0</b>
-       <ul>
-        <li>Changing the background tasks method of invocation to handle those mysterious crashes</li>
-       </ul>
-      <b>Version 4.7.8</b>
-      <ul>Bug fix:
-           <i>Editor of class com.intellij.openapi.editor.impl.EditorImpl hasn't been released</li>
+      <b>Version 4.8.3</b>
+      <ul>
+        <li>Ctrl-Click now works from Annotations & Xml & QueryUtils</li>
+        <li>Javadoc for @SQLRef & XML query elements</li>
+        </ul>
+      <b>Version 4.8.2</b>
+      <ul>
+      <li>Global inspection for Pom to root classpath analyses</li>
+      </ul>
+      <b>Version 4.8.1</b>
+        <ul>
+          <li>Fix in settings form panel</li>
+          <li>Trying to fix indexing in the background issues</li>
+        </ul>
+       <b>Version 4.7.8</b>
+      <ul>
+          <li>Bug fix:  <i>Editor of class com.intellij.openapi.editor.impl.EditorImpl hasn't been released</li>
      </ul>
       <b>Version 4.7.7</b>
       <ul>
@@ -82,32 +92,41 @@
         <localInspection language="JAVA"
                          implementationClass="com.idi.intellij.plugin.query.annoref.inspection.SQLRefClassInspection"
                          shortName="AnnoRefConverter" displayName="convert @SQL to @SQLRef" level="INFO"
+                         groupPath="local"
                          enabledByDefault="true" groupName="IDI" order="last"/>
         <localInspection language="JAVA"
                          implementationClass="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefMethodUtilCallInspection"
                          shortName="AnnoRefMethodUtilCall" displayName="convert @SQL to @SQLRef" level="INFO"
+                         groupPath="local"
                          enabledByDefault="true" groupName="IDI" order="last"/>
         <localInspection language="XML"
                          implementationClass="com.idi.intellij.plugin.query.annoref.inspection.SQLRefXmlInspection"
                          shortName="AnnoRefClassCreator" displayName="Create AnnoRef class to unused Xml Tag"
-                         level="WARNING"
-                         enabledByDefault="true" groupName="IDI" order="last"/>
-        <localInspection language="JAVA"
-                         implementationClass="com.idi.intellij.plugin.query.annoref.inspection.RemovableCandidateInspection"
-                         shortName="RemovableCandidateInspector"
-                         displayName="Mark RemovableCandidate elements with line"
-                         level="WARNING"
-                         enabledByDefault="true" groupName="IDI" order="last"/>
+                         groupPath="local"
+                         level="WARNING" enabledByDefault="true" groupName="IDI" order="last"/>
+        <!--	<localInspection language="JAVA"
+                             implementationClass="com.idi.intellij.plugin.query.annoref.inspection.RemovableCandidateInspection"
+                             shortName="RemovableCandidateInspector"
+                             displayName="Mark RemovableCandidate elements with line"
+                             level="WARNING"
+                             enabledByDefault="true" groupName="IDI" order="last"/>-->
 
+        <globalInspection language="JAVA" groupPath="global" groupName="IDI"
+                          implementationClass="com.idi.intellij.plugin.query.annoref.inspection.ClientToServerBuildPathInspection"
+                          shortName="ClientToServerBuildPath"
+                          displayName="Analyze Client and Server in project running classpath" level="INFO"
+                          enabledByDefault="true" groupKey="annoRef.inspection.global.client.to.server"
+                          groupBundle="annoRefMessages"/>
         <localInspection language="SQL" groupName="IDI" enabledByDefault="true" shortName="AnnoRefSqlInspection"
-                         displayName="AnnoRefSqlInspection"
+                         displayName="AnnoRefSqlInspection" groupPath="local"
                          implementationClass="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefSqlInspection"/>
         <!--<intentionAction>
             <className>com.idi.intellij.plugin.query.sqlref.intention.SQLRefConversionIntentionAction</className>
             <category>Other</category>
         </intentionAction>-->
         <gotoDeclarationHandler
-                implementation="com.idi.intellij.plugin.query.annoref.codeInsight.StoreProcExecViewHandler"/>
+                implementation="com.idi.intellij.plugin.query.annoref.codeInsight.AnnoRegGotoDeclarationHandler"
+                order="last"/>
         <usageTargetProvider
                 implementation="com.idi.intellij.plugin.query.annoref.inspection.AnnoRefUsagesTargetProvider"/>
         <findUsagesHandlerFactory
@@ -126,7 +145,7 @@
                                     implementationClass="com.idi.intellij.plugin.query.annoref.codeInsight.MyJavaDocumentationProvider"/>
         <documentationProvider
                 implementation="com.idi.intellij.plugin.query.annoref.codeInsight.MyJavaDocumentationProvider"
-                order="last"/>
+                order="first"/>
 
     </extensions>
 

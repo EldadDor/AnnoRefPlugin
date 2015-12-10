@@ -14,11 +14,8 @@ import com.idi.intellij.plugin.query.annoref.persist.AnnoRefSettings;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.LanguageFileType;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.GlobalSearchScopesCore;
@@ -36,7 +33,7 @@ public abstract class IDIAbstractTask implements IDITask {
 	protected Project project;
 	protected int filesCount;
 	protected IndicateProgressListener progressListener;
-	protected ProgressIndicator ideaProgressIndicator;
+	//	protected ProgressIndicator ideaProgressIndicator;
 	protected Collection<VirtualFile> filesCollection;
 
 	protected IDIAbstractTask(Project project, @Nullable IndicateProgressListener progressListener) {

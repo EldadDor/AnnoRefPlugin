@@ -1,7 +1,7 @@
 package com.idi.intellij.plugin.query.annoref.action;
 
 
-import com.idi.intellij.plugin.query.annoref.util.SQLRefApplication;
+import com.idi.intellij.plugin.query.annoref.util.AnnRefApplication;
 import com.idi.intellij.plugin.query.annoref.util.SQLRefDataAccessor;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -44,19 +44,19 @@ public class SQLRefNavigationResetAction extends AnAction {
 						if (project != null) {
 
 
-							SQLRefApplication.resetProjectClassesAndReferences(project);
+							AnnRefApplication.resetProjectClassesAndReferences(project);
 							progress.setFraction(0.2);
-							SQLRefApplication.getInstance().initializeManagersForProject(project);
+							AnnRefApplication.getInstance().initializeManagersForProject(project);
 							progress.setFraction(0.3);
 							final VirtualFile[] xmlVfToScan = PackageIndex.getInstance(project).getDirectoriesByPackageName("queries", true);
 							progress.setFraction(0.4);
-							SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, xmlVfToScan);
+							AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, xmlVfToScan);
 							progress.setFraction(0.5);
 							final VirtualFile[] classVfToScan = PackageIndex.getInstance(project).getDirectoriesByPackageName("com.idi", true);
 							progress.setFraction(0.6);
-							SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, classVfToScan);
+							AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).lookForConventionalReferencedFile(project, classVfToScan);
 							progress.setFraction(0.7);
-							SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).findNonCorrelatingSQLRefsInXmlFiles();
+							AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).findNonCorrelatingSQLRefsInXmlFiles();
 							progress.setFraction(0.8);
 						}
 					} catch (Exception e) {
@@ -106,11 +106,11 @@ public class SQLRefNavigationResetAction extends AnAction {
 					@Override
 					public void run() {
 						if (isBackGroundTaskFinished) {
-							SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).findNonCorrelatingSQLRefsInXmlFiles();
+							AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).findNonCorrelatingSQLRefsInXmlFiles();
 						}
 						while (true) {
 							if (isBackGroundTaskFinished) {
-								SQLRefApplication.getInstance(project, SQLRefDataAccessor.class).findNonCorrelatingSQLRefsInXmlFiles();
+								AnnRefApplication.getInstance(project, SQLRefDataAccessor.class).findNonCorrelatingSQLRefsInXmlFiles();
 								return;
 							}
 						}

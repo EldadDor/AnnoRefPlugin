@@ -14,20 +14,15 @@ import com.idi.intellij.plugin.query.annoref.util.StringUtils;
 import com.intellij.codeInsight.documentation.MyQuickDocOnMouseOverManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.ex.MarkupModelEx;
-import com.intellij.openapi.editor.markup.HighlighterLayer;
-import com.intellij.openapi.editor.markup.HighlighterTargetArea;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.JBColor;
+import com.intellij.util.ui.UIUtil;
 import org.picocontainer.Disposable;
 
 import javax.swing.*;
@@ -204,10 +199,10 @@ public class SPAnnoRefHighlighter implements SelectionListener, CaretListener, D
 			}
 		}
 		final String finalWordToHighlight = wordToHighlight;
-		SwingUtilities.invokeLater(new Runnable() {
+		UIUtil.invokeLaterIfNeeded(new Runnable() {
 			@Override
 			public void run() {
-//				buildHighlighters(StringUtil.isEmpty(finalWordToHighlight) ? null : finalWordToHighlight);
+				//				buildHighlighters(StringUtil.isEmpty(finalWordToHighlight) ? null : finalWordToHighlight);
 				buildHighlighters(StringUtil.isEmpty(finalWordToHighlight) ? null : finalWordToHighlight);
 			}
 		});
@@ -311,9 +306,9 @@ public class SPAnnoRefHighlighter implements SelectionListener, CaretListener, D
 	}
 
 	private void buildHighlighters(final String highlightText) {
-		ApplicationManager.getApplication().assertIsDispatchThread();
+		//		ApplicationManager.getApplication().assertIsDispatchThread();
 		synchronized (items) {
-			logger.info("buildHighlighters(): items_1=" + items.size());
+			logger.info("buildHighlighters(): (1) size=" + items.size() + " thread=" + Thread.currentThread().getName());
 			final MarkupModelEx markupModel = (MarkupModelEx) editor.getMarkupModel();
 			for (RangeHighlighter rangeHighlighter : items) {
 				if (markupModel.containsHighlighter(rangeHighlighter)) {
@@ -323,22 +318,23 @@ public class SPAnnoRefHighlighter implements SelectionListener, CaretListener, D
 			items.clear();
 			if (highlightText != null) {
 				String text = editor.getDocument().getText();
-				TextAttributesKey ATTRIBUTE_VALUE_KEY = TextAttributesKey.createTextAttributesKey("annoRef.attributeValue", DefaultLanguageHighlighterColors.STRING);
+//				TextAttributesKey ATTRIBUTE_VALUE_KEY = TextAttributesKey.createTextAttributesKey("annoRef.attributeValue", DefaultLanguageHighlighterColors.STRING);
+				JBColor annoSyntaxColor = null;
 				if (!AnnoRefConfigSettings.getInstance(editor.getProject()).getAnnoRefState().ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR.isEmpty()) {
 					final Color decode = Color.decode(AnnoRefConfigSettings.getInstance(editor.getProject()).getAnnoRefState().ANNO_ALL_SYNTAX_HIGHLIGHT_COLOR);
-					JBColor annoSyntaxColor = new JBColor(decode, decode);
-					ATTRIBUTE_VALUE_KEY.getDefaultAttributes().setForegroundColor(annoSyntaxColor);
-					ATTRIBUTE_VALUE_KEY.getDefaultAttributes().setBackgroundColor(EditorColors.SEARCH_RESULT_ATTRIBUTES.getDefaultAttributes().getBackgroundColor());
+					annoSyntaxColor = new JBColor(decode, decode);
+//					ATTRIBUTE_VALUE_KEY.getDefaultAttributes().setForegroundColor(annoSyntaxColor);
+//					ATTRIBUTE_VALUE_KEY.getDefaultAttributes().setBackgroundColor(EditorColors.SEARCH_RESULT_ATTRIBUTES.getDefaultAttributes().getBackgroundColor());
 				}
-
 //				final TextAttributes textAttributes = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
-				final TextAttributes defaultAttributes = ATTRIBUTE_VALUE_KEY.getDefaultAttributes();
+//				 TextAttributes defaultAttributes = ATTRIBUTE_VALUE_KEY.getDefaultAttributes();
+				final TextAttributes syntaxHighlightTextAttributes = new TextAttributes(annoSyntaxColor, null, null, EffectType.LINE_UNDERSCORE, Font.PLAIN);
 				int index = -1;
 				do {
-					logger.info("buildHighlighters(): items_2=" + items.size());
+					logger.info("buildHighlighters(): (2) size=" + items.size() + " thread=" + Thread.currentThread().getName());
 					index = text.indexOf(highlightText, index + 1);
 					if (index >= 0 && StringUtils.isStartEnd(text, index, index + highlightText.length(), true)) {
-						RangeHighlighter rangeHighlighter = markupModel.addRangeHighlighter(index, index + highlightText.length(), HIGHLIGHT_LAYER, defaultAttributes, HighlighterTargetArea.EXACT_RANGE);
+						RangeHighlighter rangeHighlighter = markupModel.addRangeHighlighter(index, index + highlightText.length(), HIGHLIGHT_LAYER, syntaxHighlightTextAttributes, HighlighterTargetArea.EXACT_RANGE);
 						/*final SyntaxHighlighter syntaxHighlighter = SyntaxHighlighterFactory.getSyntaxHighlighter(SybaseDialect.INSTANCE, editor.getProject(),
 								SQLRefApplication.getVirtualFileFromPsiFile(, project));*/
 						rangeHighlighter.setErrorStripeTooltip(highlightText);
@@ -347,7 +343,7 @@ public class SPAnnoRefHighlighter implements SelectionListener, CaretListener, D
 //						final EditorHighlighter highlighter = HighlighterFactory.createHighlighter(syntaxHighlighter, editor.getColorsScheme());
 					}
 				} while (index >= 0);
-				logger.info("buildHighlighters(): items_3=" + items.size());
+				logger.info("buildHighlighters(): (3) size=" + items.size() + " thread=" + Thread.currentThread().getName());
 			}
 		}
 	}

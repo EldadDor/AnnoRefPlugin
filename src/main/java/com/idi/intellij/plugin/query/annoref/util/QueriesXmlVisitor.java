@@ -105,7 +105,7 @@ public class QueriesXmlVisitor extends XmlRecursiveElementVisitor {
 			visitedFile = file;
 			currentFileRefCollection = new FileReferenceCollection(file);
 			/*	if (soDisplayProgress)
-	         {
+		     {
                    progressIndicator.setFraction(0.0 + (1 / 20));
                }*/
 			super.visitFile(file);
